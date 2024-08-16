@@ -17,7 +17,7 @@ function RectangleAndLines() {
     // Define the bounds for the rectangle
     const bounds = [
       [4.00760, 92.73595], // Southwest coordinates
-      [21.98961, 112.80782] // Northeast coordinates testsetset
+      [21.98961, 112.80782] // Northeast coordinates test2
     ];
 
     // Fit the map to the bounds
