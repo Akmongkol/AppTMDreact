@@ -1,12 +1,15 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Map from './components/Map'
+import NotFound from './NotFound';
 
 function App() {
   return (
-    <>
-      <div>
-        <Map />
-      </div>
-    </>
+    <BrowserRouter>
+    <Routes>
+      <Route path="/" element={<Map />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  </BrowserRouter>
   )
 }
 
