@@ -16,8 +16,8 @@ function RectangleAndLines() {
   useEffect(() => {
     // Define the bounds for the rectangle
     const bounds = [
-      [4.00760, 96.03485], // Southwest coordinates
-      [21.98961, 105.92804] // Northeast coordinates
+      [4.00760, 92.73595], // Southwest coordinates
+      [21.98961, 112.80782] // Northeast coordinates test2
     ];
 
     // Fit the map to the bounds
