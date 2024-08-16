@@ -1,0 +1,28 @@
+.map-container {
+  position: relative;
+}
+
+.input-container {
+  position: absolute;
+  z-index: 1000;
+  width: 100%;
+  max-width: 500px;
+  top: 10px;
+  left: 10px;
+}
+
+
+@media (max-width: 600px) {
+  .input-container {
+    width: 30%; 
+    max-width: none; 
+  }
+}
+
+.playlayer {
+  position: absolute;
+  z-index: 1000;
+  left: 50%;
+  bottom: 0; /* Position at the bottom */
+  transform: translateX(-50%);
+}
