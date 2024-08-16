@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 
-function P3hLayer({ sliderValue }) {
+function TileLayout({ sliderValue, action }) {
     const map = useMap();
     const weatherChartRef = useRef(null); // Use useRef to persist the layer
 
@@ -24,15 +24,15 @@ function P3hLayer({ sliderValue }) {
 
         // Create new tile layer and add it to the map
         weatherChartRef.current = L.tileLayer(
-            `http://127.0.0.1:8080/fcst/tiled/${formattedDate}/p3h/{z}/{x}/{y}/`,
+            `http://127.0.0.1:8080/fcst/tiled/${formattedDate}/${action}/{z}/{x}/{y}/`,
             {
                 opacity: 0.9,
                 crossOrigin: true,
             }
         ).addTo(map);
-    }, [map, sliderValue]); // Add sliderValue to the dependency array
+    }, [map, sliderValue, action]); // Add sliderValue to the dependency array
 
     return null;
 }
 
-export default P3hLayer;
+export default TileLayout;

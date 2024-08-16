@@ -1,32 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import Button from '@mui/material/Button';
-import 'leaflet/dist/leaflet.css';
 import './App.css';
 import Searchinput from './SearchInput';
 import ModelMetrogram from './ModelMeteogram';
 import WindLayer from './WindLayer';
-import P3hLayer from './P3hLayer';
+import TileLayout from './TileLayout';
 import PlayGround from './PlayGround';
+import SelectTile from './SelectTile';
 import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+
 
 function RectangleAndLines() {
   const map = useMap();
 
   useEffect(() => {
-    // Define the bounds for the rectangle
     const bounds = [
       [4.00760, 92.73595], // Southwest coordinates
-      [21.98961, 112.80782] // Northeast coordinates test2
+      [21.98961, 112.80782] // Northeast coordinates
     ];
 
-    // Fit the map to the bounds
     map.fitBounds(bounds);
 
-    // Create the rectangle and add it to the map
     const rectangle = L.rectangle(bounds, { color: "#FFFFFF00", weight: 1 }).addTo(map);
 
-    // Get the corners of the rectangle
     const corners = rectangle.getBounds();
     const sw = corners.getSouthWest();
     const ne = corners.getNorthEast();
@@ -39,7 +38,6 @@ function RectangleAndLines() {
       [se, sw],
     ];
 
-    // Add the lines to the map
     lines.forEach(line => {
       L.polyline(line, { color: "#666666", weight: 2 }).addTo(map);
     });
@@ -54,6 +52,7 @@ function Map() {
   const [open, setOpen] = useState(false);
   const [dialogPosition, setDialogPosition] = useState(null);
   const [sliderValue, setSliderValue] = useState(0);
+  const [selectedLayer, setSelectedLayer] = useState('p3h'); // Default value
 
   const handleLocationChange = (selectedItem) => {
     if (selectedItem) {
@@ -73,13 +72,17 @@ function Map() {
     setDialogPosition(null);
   };
 
+  const handleSelect = (value) => {
+    setSelectedLayer(value);
+  };
 
   return (
     <div className='map-container'>
       <div className='input-container'>
         <Searchinput onLocationChange={handleLocationChange} />
       </div>
-      <MapContainer center={position || [13.7563, 100.5018]} Zoom={6} zoomControl={false} style={{ height: '100vh', width: '100vw' }}>
+      <SelectTile onSelect={handleSelect} />
+      <MapContainer center={position || [13.7563, 100.5018]} zoom={6} zoomControl={false} style={{ height: '100vh', width: '100vw' }}>
         <TileLayer
           url="https://api.maptiler.com/maps/backdrop/256/{z}/{x}/{y}.png?key=ShNzB5Vk7GowmweaWj5p"
           attribution='<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>'
@@ -87,7 +90,7 @@ function Map() {
         />
         <RectangleAndLines />
         <WindLayer sliderValue={sliderValue} />
-        <P3hLayer sliderValue={sliderValue} />
+        <TileLayout sliderValue={sliderValue} action={selectedLayer} />
         {position && (
           <Marker position={position}>
             <Popup>
