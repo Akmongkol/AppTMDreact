@@ -1,10 +1,10 @@
 import React from 'react'
 import { SpeedDial, SpeedDialAction } from '@mui/material';
 import SpeedDialIcon from '@mui/material/SpeedDialIcon';
-import FileCopyIcon from '@mui/icons-material/FileCopyOutlined';
-import SaveIcon from '@mui/icons-material/Save';
-import PrintIcon from '@mui/icons-material/Print';
-import ShareIcon from '@mui/icons-material/Share';
+import WaterDropIcon from '@mui/icons-material/WaterDrop';
+import AirIcon from '@mui/icons-material/Air';
+import ThermostatIcon from '@mui/icons-material/Thermostat';
+import AcUnitIcon from '@mui/icons-material/AcUnit';
 
 function SelectTile({ onSelect }) {
     const handleActionClick = (value) => {
@@ -19,22 +19,22 @@ function SelectTile({ onSelect }) {
                 direction="down"
             >
                 <SpeedDialAction
-                    icon={<FileCopyIcon />}
+                    icon={<WaterDropIcon />}
                     tooltipTitle="ปริมาณฝนสะสม 3 ชั่วโมง"
                     onClick={() => handleActionClick('p3h')}
                 />
                 <SpeedDialAction
-                    icon={<SaveIcon />}
+                    icon={<AirIcon />}
                     tooltipTitle="ความกดอากาศ"
                     onClick={() => handleActionClick('mslp')}
                 />
                 <SpeedDialAction
-                    icon={<PrintIcon />}
+                    icon={<ThermostatIcon />}
                     tooltipTitle="อุณหภูมิ"
                     onClick={() => handleActionClick('t2m')}
                 />
                 <SpeedDialAction
-                    icon={<ShareIcon />}
+                    icon={<AcUnitIcon />}
                     tooltipTitle="ความชื้น"
                     onClick={() => handleActionClick('rhum')}
                 />

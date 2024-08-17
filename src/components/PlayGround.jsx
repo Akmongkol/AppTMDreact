@@ -110,8 +110,9 @@ function PlayGround({ onSliderChange }) {
         setSliderValue(prevValue => {
           const nextValue = prevValue + threeHours;
           if (nextValue > maxValue) {
-            clearInterval(sliderIntervalRef.current);
-            return maxValue;
+            // Reset to minValue to loop
+            onSliderChange(minValue); // Ensure minValue is set
+            return minValue;
           }
           onSliderChange(nextValue);
           return nextValue;
