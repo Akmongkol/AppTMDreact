@@ -2,6 +2,7 @@ import React from 'react';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import Data from '../config/data.json';
+
 // Create a map of titles to items for quick lookup
 const options = Data.map(item => ({
     id: item.id,
@@ -19,8 +20,10 @@ function Searchinput({ onLocationChange }) {
             disableClearable
             options={options.map(option => option.title)}
             onInputChange={(event, newValue) => {
-                if (newValue) {
-                    event.preventDefault()
+                if (newValue === '') {
+                    // Input is cleared
+                    onLocationChange(null);
+                } else {
                     const selectedItem = titleToItemMap.get(newValue);
                     if (selectedItem) {
                         onLocationChange(selectedItem);
@@ -28,7 +31,8 @@ function Searchinput({ onLocationChange }) {
                 }
             }}
             renderInput={(params) => (
-                <TextField fullWidth
+                <TextField 
+                    fullWidth
                     sx={{
                         width: '100%', // Make TextField fill the container width
                         backgroundColor: 'white',

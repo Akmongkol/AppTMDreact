@@ -8,6 +8,7 @@ import WindLayer from './WindLayer';
 import TileLayout from './TileLayout';
 import PlayGround from './PlayGround';
 import SelectTile from './SelectTile';
+import GeoDistricts from './GeoDistricts';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -51,10 +52,12 @@ function Map() {
   const [dialogPosition, setDialogPosition] = useState(null);
   const [sliderValue, setSliderValue] = useState(0);
   const [selectedLayer, setSelectedLayer] = useState('p3h'); // Default value
+  const [clearGeoDistrictMarker, setClearGeoDistrictMarker] = useState(false);
 
   const handleLocationChange = (selectedItem) => {
     if (selectedItem) {
       setPosition([selectedItem.lat, selectedItem.lng]);
+      setClearGeoDistrictMarker(true); // Clear GeoDistricts marker
     } else {
       setPosition(null);
     }
@@ -74,6 +77,10 @@ function Map() {
     setSelectedLayer(value);
   };
 
+  const handleClearPosition = () => {
+    setPosition(null);
+  };
+
   return (
     <div className='map-container'>
       <div className='input-container'>
@@ -89,6 +96,11 @@ function Map() {
         <RectangleAndLines />
         <WindLayer sliderValue={sliderValue} />
         <TileLayout sliderValue={sliderValue} action={selectedLayer} />
+        <GeoDistricts 
+          clearMarker={clearGeoDistrictMarker} 
+          setClearMarker={setClearGeoDistrictMarker} 
+          onFeatureClick={handleClearPosition} 
+        />
         {position && (
           <Marker position={position}>
             <Popup>
