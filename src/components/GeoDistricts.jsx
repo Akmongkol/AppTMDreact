@@ -71,9 +71,10 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick }) {
   }, [clearMarker, setClearMarker]);
 
   const geojsonStyle = {
-    color: "red",
-    weight: 1,
-    opacity: 0.1
+    color: "white", // Change to a more visible color
+    weight: 0, // Adjust thickness
+    opacity: 0, // Increase opacity
+    fillOpacity: 0 // Fill opacity
   };
 
   const handleButtonClick = () => {
