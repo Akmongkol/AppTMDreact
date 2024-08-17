@@ -11,8 +11,6 @@ import SelectTile from './SelectTile';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-
-
 function RectangleAndLines() {
   const map = useMap();
 

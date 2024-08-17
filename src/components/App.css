@@ -27,7 +27,7 @@
 .playlayer {
   position: absolute;
   z-index: 1000;
-  left: 50%;
   bottom: 0; /* Position at the bottom */
-  transform: translateX(-50%);
+  left: 50%; /* Move to the center horizontally */
+  transform: translateX(-50%); /* Offset by half of its width to center it */
 }
