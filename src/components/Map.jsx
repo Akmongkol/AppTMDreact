@@ -93,12 +93,12 @@ function Map() {
           maxZoom={20}
         />
         <RectangleAndLines />
-        <TileLayout sliderValue={sliderValue} action={selectedLayer} />
         <GeoDistricts 
           clearMarker={clearGeoDistrictMarker} 
           setClearMarker={setClearGeoDistrictMarker} 
           onFeatureClick={handleClearPosition} 
         />
+        <TileLayout sliderValue={sliderValue} action={selectedLayer} />
         {position && (
           <Marker position={position}>
             <Popup>
