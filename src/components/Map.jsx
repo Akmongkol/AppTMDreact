@@ -4,7 +4,6 @@ import Button from '@mui/material/Button';
 import './App.css';
 import Searchinput from './SearchInput';
 import ModelMetrogram from './ModelMeteogram';
-import WindLayer from './WindLayer';
 import TileLayout from './TileLayout';
 import PlayGround from './PlayGround';
 import SelectTile from './SelectTile';
@@ -94,7 +93,6 @@ function Map() {
           maxZoom={20}
         />
         <RectangleAndLines />
-        <WindLayer sliderValue={sliderValue} />
         <TileLayout sliderValue={sliderValue} action={selectedLayer} />
         <GeoDistricts 
           clearMarker={clearGeoDistrictMarker} 
