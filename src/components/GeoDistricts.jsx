@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { GeoJSON, Marker, Popup } from 'react-leaflet';
+import { GeoJSON, Marker, Popup, useMap } from 'react-leaflet';
 import Button from '@mui/material/Button';
 import L from 'leaflet';
-import subdistricts from '../config/subdistricts.json';
+import Subdistricts from '../config/subdistricts.json';
+import Districts from '../config/districts.json'
+import Provinces from '../config/provinces.json';
 import ModelMetrogram from './ModelMeteogram';
 
 // Helper function to calculate the center of a polygon or multipolygon
@@ -27,6 +29,28 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick }) {
   const [selectedLat, setSelectedLat] = useState(null);
   const [selectedLng, setSelectedLng] = useState(null);
   const [popupContent, setPopupContent] = useState('');
+  const [geoData, setGeoData] = useState(Subdistricts); // Default data
+  const map = useMap(); // Access map instance
+
+  const updateGeoData = () => {
+    const zoomLevel = map.getZoom();
+    if (zoomLevel <= 6) {
+      setGeoData(Provinces);
+    } else if (zoomLevel <=9) {
+      setGeoData(Districts);
+    }else{
+      setGeoData(Subdistricts);
+    }
+  };
+
+  useEffect(() => {
+    updateGeoData(); // Update data initially
+    map.on('zoomend', updateGeoData); // Update data on zoom level change
+
+    return () => {
+      map.off('zoomend', updateGeoData); // Clean up event listener
+    };
+  }, [map]);
 
   const onEachFeature = (feature, layer) => {
     layer.on({
@@ -54,7 +78,19 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick }) {
         if (latLng) {
           setSelectedLat(latLng.lat);
           setSelectedLng(latLng.lng);
-          setPopupContent(feature.properties ? feature.properties.tam_th : 'No data');
+          
+          // Determine popup content based on zoom level
+          const zoomLevel = map.getZoom();
+          
+          if (zoomLevel <= 6) {
+            setPopupContent(feature.properties ? feature.properties.pro_th : 'No data');
+          } 
+          else if(zoomLevel <= 9) {
+            setPopupContent(feature.properties ? feature.properties.amp_th : 'No data');
+          }else{
+            setPopupContent(feature.properties ? feature.properties.tam_th : 'No data');
+          }
+
           onFeatureClick(); // Notify Map to clear its position
         }
       }
@@ -83,7 +119,7 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick }) {
 
   return (
     <>
-      <GeoJSON data={subdistricts} style={geojsonStyle} onEachFeature={onEachFeature} />
+      <GeoJSON data={geoData} style={geojsonStyle} onEachFeature={onEachFeature} />
       {selectedLat && selectedLng && (
         <Marker position={{ lat: selectedLat, lng: selectedLng }}>
           <Popup>
