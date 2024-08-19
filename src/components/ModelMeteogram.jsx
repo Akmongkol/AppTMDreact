@@ -388,7 +388,7 @@ function ModelMetrogram({ open, handleClose, lat, lng }) {
                                             </Box>
                                             <Box display="flex" alignItems="center">
                                                 <AirIcon sx={{ mr: 1, color: 'gray' }} />
-                                                <Typography sx={{ mr: 1 }}>
+                                                <Typography sx={{ mr: 4 }}>
                                                     {groupedWindSpeed[day][0].toFixed(1)} m/s
                                                 </Typography>
                                                 <NavigationIcon 
@@ -422,7 +422,7 @@ function ModelMetrogram({ open, handleClose, lat, lng }) {
 
     return (
         <ThemeProvider theme={theme}>
-            <Dialog open={open} onClose={handleClose} fullWidth maxWidth="lg">
+            <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xl">
                 <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white' }}>
                     Weather Forecast
                     <IconButton
