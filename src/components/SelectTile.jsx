@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react';
 import { SpeedDial, SpeedDialAction } from '@mui/material';
 import SpeedDialIcon from '@mui/material/SpeedDialIcon';
 import WaterDropIcon from '@mui/icons-material/WaterDrop';
@@ -7,6 +7,8 @@ import ThermostatIcon from '@mui/icons-material/Thermostat';
 import AcUnitIcon from '@mui/icons-material/AcUnit';
 
 function SelectTile({ onSelect }) {
+    const [open, setOpen] = useState(true);
+
     const handleActionClick = (value) => {
         onSelect(value);
     };
@@ -17,6 +19,9 @@ function SelectTile({ onSelect }) {
                 ariaLabel="SpeedDial example"
                 icon={<SpeedDialIcon />}
                 direction="down"
+                open={open} // Keep actions open by default
+                onOpen={() => setOpen(true)}
+                onClose={() => setOpen(false)} // Keep it open on close attempt
             >
                 <SpeedDialAction
                     icon={<WaterDropIcon />}
@@ -43,4 +48,4 @@ function SelectTile({ onSelect }) {
     )
 }
 
-export default SelectTile
+export default SelectTile;

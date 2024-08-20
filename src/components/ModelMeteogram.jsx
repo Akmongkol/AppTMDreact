@@ -15,11 +15,14 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Stack from '@mui/material/Stack';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import WbSunnyIcon from '@mui/icons-material/WbSunny';
 import OpacityIcon from '@mui/icons-material/Opacity';
 import AirIcon from '@mui/icons-material/Air';
 import CompressIcon from '@mui/icons-material/Compress';
 import NavigationIcon from '@mui/icons-material/Navigation';
+import PartlyClound from '../widget-icon/partly-cloudy-day-drizzle.svg';
+import ClearDay from '../widget-icon/clear-day.svg';
+import PartlyCloudyNight from '../widget-icon/partly-cloudy-night.svg';
+import ClearNight from '../widget-icon/clear-night.svg';
 
 // Initialize the windbarb module
 Windbarb(Highcharts);
@@ -293,14 +296,14 @@ function ModelMetrogram({ open, handleClose, lat, lng }) {
       const getWeatherIcon = (isDay, precipitation) => {
         if (isDay) {
           if (precipitation > 1 && precipitation <= 10) {
-            return "./src/assets/widget-icon/partly-cloudy-day-drizzle.svg";
+            return `${PartlyClound}`;
           }
-          return "./src/assets/widget-icon/clear-day.svg";
+          return `${ClearDay}`;
         } else {
           if (precipitation > 1 && precipitation <= 10) {
-            return "./src/assets/widget-icon/partly-cloudy-night-drizzle.svg";
+            return `${PartlyCloudyNight}`;
           }
-          return "./src/assets/widget-icon/clear-night.svg";
+          return `${ClearNight}`;
         }
       };
 
