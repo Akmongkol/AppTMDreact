@@ -440,13 +440,13 @@ function ModelMetrogram({ open, handleClose, lat, lng }) {
                         aria-label="widget tabs"
                         sx={{ bgcolor: 'white', borderBottom: 1, borderColor: 'divider' }}
                     >
-                        <Tab label="Chart" />
                         <Tab label="Daily Data" />
+                        <Tab label="Chart" />
                     </Tabs>
                     <Box sx={{ p: 2 }}>
-                        {tabIndex === 0 && chartOptions ? (
+                        {tabIndex === 1 && chartOptions ? (
                             <HighchartsReact highcharts={Highcharts} options={chartOptions} />
-                        ) : tabIndex === 1 ? (
+                        ) : tabIndex === 0 ? (
                             error ? (
                                 <Typography color="error">{error}</Typography>
                             ) : (
