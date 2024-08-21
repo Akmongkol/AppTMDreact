@@ -7,7 +7,7 @@ import ModelMetrogram from './ModelMeteogram';
 import TileLayout from './TileLayout';
 import PlayGround from './PlayGround';
 import SelectTile from './SelectTile';
-import GeoDistricts from './GeoDistricts';
+import GeoDistricts from './GeoData';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
