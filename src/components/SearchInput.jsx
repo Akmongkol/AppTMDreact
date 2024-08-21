@@ -9,54 +9,6 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import Data from '../config/data.json';
 
-// Styled components
-const StyledTextField = styled(TextField)(({ theme }) => ({
-    '& .MuiOutlinedInput-root': {
-      borderRadius: '25px', // เพิ่มความโค้งของขอบ
-      transition: 'all 0.3s ease-in-out',
-      backgroundColor: 'white',
-      '& fieldset': {
-        borderColor: theme.palette.grey[300],
-        borderWidth: '2px',
-      },
-      '&:hover': {
-        backgroundColor: theme.palette.primary.main,
-        '& fieldset': {
-          borderColor: theme.palette.primary.main,
-        },
-        '& input': {
-          color: 'white',
-        },
-        '& .MuiInputAdornment-root .MuiSvgIcon-root': {
-          color: 'white',
-        },
-      },
-      '&.Mui-focused': {
-        backgroundColor: theme.palette.primary.main,
-        '& fieldset': {
-          borderColor: theme.palette.primary.main,
-        },
-        '& input': {
-          color: 'white',
-        },
-        '& .MuiInputAdornment-root .MuiSvgIcon-root': {
-          color: 'white',
-        },
-      },
-    },
-    '& .MuiInputLabel-root': {
-      color: theme.palette.text.secondary,
-      '&.Mui-focused': {
-        color: 'white',
-      },
-    },
-    '& .MuiInputBase-input': {
-      padding: '10px 14px',
-    },
-    '&:hover .MuiInputLabel-root': {
-      color: 'white',
-    },
-  }));
 
 const LocationButton = styled(IconButton)(({ theme }) => ({
   width: '48px',
