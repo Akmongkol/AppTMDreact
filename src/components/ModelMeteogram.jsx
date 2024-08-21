@@ -46,9 +46,8 @@ function ModelMetrogram({ open, handleClose, lat, lng }) {
 
     const fetchData = useCallback(() => {
         if (open && lat !== undefined && lng !== undefined) {
-            const apiUrl = `http://127.0.0.1:8080/datapts/${lng}/${lat}`;
-
-            axios.get(apiUrl)
+            
+            axios.get(`${import.meta.env.VITE_API_URL}/datapts/${lng}/${lat}`)
                 .then((response) => {
                     const apiData = response.data;
                     try {

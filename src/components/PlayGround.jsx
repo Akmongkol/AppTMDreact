@@ -32,9 +32,8 @@ function PlayGround({ onSliderChange }) {
   const threeHours = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
 
   useEffect(() => {
-    const getNameUrl = "http://127.0.0.1:8080/recent-folder";
-
-    axios.get(getNameUrl)
+    
+    axios.get(`${import.meta.env.VITE_API_URL}/recent-folder`)
       .then(response => {
         const getdata = response.data.most_recent_folder;
         let startDateStr = getdata.toString();

@@ -28,7 +28,7 @@ function TileLayout({ sliderValue, action }) {
             .concat("00"); // Append "00" for minutes
 
         // Fetch and set wind layer
-        axios.get(`http://127.0.0.1:8080/streamlines/${formattedDate}`)
+        axios.get(`${import.meta.env.VITE_API_URL}/streamlines/${formattedDate}`)
             .then(response => {
                 const data = response.data;
 
@@ -66,7 +66,7 @@ function TileLayout({ sliderValue, action }) {
         }
 
         weatherChartRef.current = L.tileLayer(
-            `http://127.0.0.1:8080/fcst/tiled/${formattedDate}/${action}/{z}/{x}/{y}/`,
+            `${import.meta.env.VITE_API_URL}/fcst/tiled/${formattedDate}/${action}/{z}/{x}/{y}/`,
             {
                 opacity: 0.9,
                 crossOrigin: true,
