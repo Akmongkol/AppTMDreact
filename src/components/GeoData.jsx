@@ -27,8 +27,6 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick }) {
       newGeoData = Subdistricts;
     }
 
-    console.log('Zoom Level:', zoomLevel); // Debugging
-
     setGeoData(newGeoData);
   };
 
@@ -51,11 +49,11 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick }) {
     const getTooltipContent = () => {
       const zoomLevel = map.getZoom();
       if (zoomLevel <= 6) {
-        return `<div>pro: ${feature.properties.pro_th || 'No data'}</div>`;
+        return `<div>จังหวัด: ${feature.properties.pro_th || 'No data'}</div>`;
       } else if (zoomLevel <= 9) {
-        return `<div>amp: ${feature.properties.amp_th || 'No data'}</div>`;
+        return `<div>อำเภอ: ${feature.properties.amp_th || 'No data'}</div><div>จังหวัด: ${feature.properties.pro_th || 'No data'}</div>`;
       } else {
-        return `<div>tam: ${feature.properties.tam_th || 'No data'}</div>`;
+        return `<div>ตำบล: ${feature.properties.tam_th || 'No data'}</div><div>อำเภอ: ${feature.properties.amp_th || 'No data'}</div><div>จังหวัด: ${feature.properties.pro_th || 'No data'}</div>`;
       }
     };
 
@@ -67,6 +65,7 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick }) {
 
     layer.on({
       click: (e) => {
+
         const centroid = turf.centroid(feature);
         const [longitude, latitude] = centroid.geometry.coordinates;
 
