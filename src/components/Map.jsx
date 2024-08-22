@@ -60,7 +60,10 @@ function Map() {
   const [sliderValue, setSliderValue] = useState(0);
   const [selectedLayer, setSelectedLayer] = useState('p3h');
   const [clearGeoDistrictMarker, setClearGeoDistrictMarker] = useState(false);
-  const [locationName, setLocationName] = useState('');
+
+
+  const [locationName, setLocationName] = useState(''); // เพิ่ม state สำหรับชื่อตำแหน่ง
+
   const [defaultPopupOpen, setDefaultPopupOpen] = useState(false);
   const markerRef = useRef(null);
   // เพิ่ม state สำหรับเก็บข้อมูลสภาพอากาศ
