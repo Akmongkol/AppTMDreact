@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
 import './App.css';
 import Searchinput from './SearchInput';
 import ModelMetrogram from './ModelMeteogram';
@@ -52,13 +54,16 @@ function Map() {
   const [sliderValue, setSliderValue] = useState(0);
   const [selectedLayer, setSelectedLayer] = useState('p3h'); // Default value
   const [clearGeoDistrictMarker, setClearGeoDistrictMarker] = useState(false);
+  const [locationName, setLocationName] = useState(''); // เพิ่ม state สำหรับชื่อตำแหน่ง
 
   const handleLocationChange = (selectedItem) => {
     if (selectedItem) {
       setPosition([selectedItem.lat, selectedItem.lng]);
+      setLocationName(selectedItem.title); // เก็บชื่อตำแหน่ง
       setClearGeoDistrictMarker(true); // Clear GeoDistricts marker
     } else {
       setPosition(null);
+      setLocationName(''); // ล้างชื่อตำแหน่งเมื่อไม่มีการเลือก
     }
   };
 
@@ -78,6 +83,7 @@ function Map() {
 
   const handleClearPosition = () => {
     setPosition(null);
+    setLocationName(''); // ล้างชื่อตำแหน่งเมื่อล้างตำแหน่ง
   };
 
   return (
@@ -102,7 +108,14 @@ function Map() {
         {position && (
           <Marker position={position}>
             <Popup>
-              <Button onClick={() => handleOpen(position[0], position[1])}>Open modal</Button>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                <Typography variant="body1">
+                  {locationName || 'ไม่ระบุชื่อตำแหน่ง'}
+                </Typography>
+                <Button onClick={() => handleOpen(position[0], position[1])}>
+                  เพิ่มเติม
+                </Button>
+              </Box>
             </Popup>
           </Marker>
         )}

@@ -21,7 +21,7 @@ import CompressIcon from '@mui/icons-material/Compress';
 import NavigationIcon from '@mui/icons-material/Navigation';
 import PartlyClound from '../widget-icon/partly-cloudy-day-drizzle.svg';
 import ClearDay from '../widget-icon/clear-day.svg';
-import PartlyCloudyNight from '../widget-icon/partly-cloudy-night.svg';
+import PartlyCloudyNight from '../widget-icon/partly-cloudy-night-drizzle.svg';
 import ClearNight from '../widget-icon/clear-night.svg';
 
 // Initialize the windbarb module
@@ -294,12 +294,12 @@ function ModelMetrogram({ open, handleClose, lat, lng }) {
 
       const getWeatherIcon = (isDay, precipitation) => {
         if (isDay) {
-          if (precipitation > 1 && precipitation <= 10) {
+          if (precipitation > 1 ) {
             return `${PartlyClound}`;
           }
           return `${ClearDay}`;
         } else {
-          if (precipitation > 1 && precipitation <= 10) {
+          if (precipitation > 1 ) {
             return `${PartlyCloudyNight}`;
           }
           return `${ClearNight}`;
