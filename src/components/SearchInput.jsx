@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import IconButton from '@mui/material/IconButton';
@@ -40,14 +40,9 @@ function Searchinput({ onLocationChange, initialLocation }) {
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [value, setValue] = useState(initialLocation ? initialLocation.title : null);
     const [isLoading, setIsLoading] = useState(false);
+    const isInitialMount = useRef(true);
 
-    useEffect(() => {
-        if (initialLocation) {
-            onLocationChange(initialLocation);
-        }
-    }, [initialLocation, onLocationChange]);
-
-    const handleGetLocation = () => {
+    const getLocation = () => {
         if ("geolocation" in navigator) {
             setIsLoading(true);
             navigator.geolocation.getCurrentPosition(
@@ -58,20 +53,30 @@ function Searchinput({ onLocationChange, initialLocation }) {
                         setValue(nearest.title);
                         onLocationChange(nearest);
                     } else {
-                        alert("ไม่พบตำแหน่งที่ใกล้เคียงในฐานข้อมูล");
+                        console.log("ไม่พบตำแหน่งที่ใกล้เคียงในฐานข้อมูล");
                     }
                     setIsLoading(false);
                 },
                 (error) => {
                     console.error("Error getting location:", error);
-                    alert("ไม่สามารถรับตำแหน่งปัจจุบันได้ กรุณาลองอีกครั้งหรือป้อนตำแหน่งด้วยตนเอง");
                     setIsLoading(false);
                 }
             );
         } else {
-            alert("เบราว์เซอร์ของคุณไม่รองรับการรับตำแหน่ง");
+            console.log("เบราว์เซอร์ของคุณไม่รองรับการรับตำแหน่ง");
         }
     };
+
+    useEffect(() => {
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            if (initialLocation) {
+                onLocationChange(initialLocation);
+            } else {
+                getLocation(); // เรียกใช้ getLocation เฉพาะครั้งแรกที่โหลดคอมโพเนนต์
+            }
+        }
+    }, [initialLocation, onLocationChange]);
 
     const findNearestLocation = (lat, lng) => {
         let nearestDistance = Infinity;
@@ -143,7 +148,7 @@ function Searchinput({ onLocationChange, initialLocation }) {
                 />
             </Box>
             <LocationButton
-                onClick={handleGetLocation}
+                onClick={getLocation}
                 aria-label="ระบุตำแหน่งปัจจุบัน"
             >
                 <MyLocationIcon />
