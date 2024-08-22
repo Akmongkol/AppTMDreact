@@ -1,14 +1,14 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import IconButton from '@mui/material/IconButton';
 import Box from '@mui/material/Box';
 import MyLocationIcon from '@mui/icons-material/MyLocation';
+import CircularProgress from '@mui/material/CircularProgress';
 import { styled } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import Data from '../config/data.json';
-
 
 const LocationButton = styled(IconButton)(({ theme }) => ({
   width: '48px',
@@ -26,7 +26,6 @@ const LocationButton = styled(IconButton)(({ theme }) => ({
   transition: 'all 0.3s ease-in-out',
 }));
 
-// Create a map of titles to items for quick lookup
 const options = Data.map(item => ({
     id: item.id,
     title: `${item.province}, ${item.district}, ${item.zip}`,
@@ -36,26 +35,37 @@ const options = Data.map(item => ({
 
 const titleToItemMap = new Map(options.map(item => [item.title, item]));
 
-function Searchinput({ onLocationChange }) {
+function Searchinput({ onLocationChange, initialLocation }) {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const [value, setValue] = useState(initialLocation ? initialLocation.title : null);
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        if (initialLocation) {
+            onLocationChange(initialLocation);
+        }
+    }, [initialLocation, onLocationChange]);
 
     const handleGetLocation = () => {
         if ("geolocation" in navigator) {
+            setIsLoading(true);
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const { latitude, longitude } = position.coords;
-                    // Find the nearest location in our data
                     const nearest = findNearestLocation(latitude, longitude);
                     if (nearest) {
+                        setValue(nearest.title);
                         onLocationChange(nearest);
                     } else {
                         alert("ไม่พบตำแหน่งที่ใกล้เคียงในฐานข้อมูล");
                     }
+                    setIsLoading(false);
                 },
                 (error) => {
                     console.error("Error getting location:", error);
                     alert("ไม่สามารถรับตำแหน่งปัจจุบันได้ กรุณาลองอีกครั้งหรือป้อนตำแหน่งด้วยตนเอง");
+                    setIsLoading(false);
                 }
             );
         } else {
@@ -79,8 +89,7 @@ function Searchinput({ onLocationChange }) {
     };
 
     const calculateDistance = (lat1, lon1, lat2, lon2) => {
-        // Haversine formula to calculate distance between two points on Earth
-        const R = 6371; // Radius of the Earth in km
+        const R = 6371;
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLon = (lon2 - lon1) * Math.PI / 180;
         const a = 
@@ -88,45 +97,50 @@ function Searchinput({ onLocationChange }) {
             Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
             Math.sin(dLon/2) * Math.sin(dLon/2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        const distance = R * c; // Distance in km
+        const distance = R * c;
         return distance;
     };
 
     return (
         <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', minWidth: '330px'}}>
             <Box sx={{ flexGrow: 1, marginRight: 1 }}>
-                 <Autocomplete
-            freeSolo
-            disableClearable
-            options={options.map(option => option.title)}
-            onInputChange={(event, newValue) => {
-                if (newValue === '') {
-                    // Input is cleared
-                    onLocationChange(null);
-                } else {
-                    const selectedItem = titleToItemMap.get(newValue);
-                    if (selectedItem) {
-                        onLocationChange(selectedItem);
-                    }
-                }
-            }}
-            renderInput={(params) => (
-                <TextField 
-                    fullWidth
-                    sx={{
-                        width: '100%', // Make TextField fill the container width
-                        backgroundColor: 'white',
+                <Autocomplete
+                    freeSolo
+                    disableClearable
+                    options={options.map(option => option.title)}
+                    value={value}
+                    onChange={(event, newValue) => {
+                        setValue(newValue);
+                        const selectedItem = titleToItemMap.get(newValue);
+                        if (selectedItem) {
+                            onLocationChange(selectedItem);
+                        } else if (newValue === '') {
+                            onLocationChange(null);
+                        }
                     }}
-                    {...params}
-                    label="ค้นหาตำแหน่งแผนที่"
-                    InputProps={{
-                        ...params.InputProps,
-                        type: 'search',
-                    }}
-                    variant="outlined"
+                    renderInput={(params) => (
+                        <TextField 
+                            fullWidth
+                            sx={{
+                                width: '100%',
+                                backgroundColor: 'white',
+                            }}
+                            {...params}
+                            label="ค้นหาตำแหน่งแผนที่"
+                            InputProps={{
+                                ...params.InputProps,
+                                type: 'search',
+                                endAdornment: (
+                                    <React.Fragment>
+                                        {isLoading ? <CircularProgress color="inherit" size={20} /> : null}
+                                        {params.InputProps.endAdornment}
+                                    </React.Fragment>
+                                ),
+                            }}
+                            variant="outlined"
+                        />
+                    )}
                 />
-            )}
-        />
             </Box>
             <LocationButton
                 onClick={handleGetLocation}

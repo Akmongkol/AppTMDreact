@@ -19,9 +19,9 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick }) {
   const updateGeoData = () => {
     const zoomLevel = map.getZoom();
     let newGeoData;
-    if (zoomLevel <= 6) {
+    if (zoomLevel <= 9) {
       newGeoData = Provinces;
-    } else if (zoomLevel <= 9) {
+    } else if (zoomLevel <= 11) {
       newGeoData = Districts;
     } else {
       newGeoData = Subdistricts;
@@ -48,9 +48,9 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick }) {
     // Function to determine tooltip content based on zoom level
     const getTooltipContent = () => {
       const zoomLevel = map.getZoom();
-      if (zoomLevel <= 6) {
+      if (zoomLevel <= 9) {
         return `<div>จังหวัด: ${feature.properties.pro_th || 'No data'}</div>`;
-      } else if (zoomLevel <= 9) {
+      } else if (zoomLevel <= 11) {
         return `<div>อำเภอ: ${feature.properties.amp_th || 'No data'}</div><div>จังหวัด: ${feature.properties.pro_th || 'No data'}</div>`;
       } else {
         return `<div>ตำบล: ${feature.properties.tam_th || 'No data'}</div><div>อำเภอ: ${feature.properties.amp_th || 'No data'}</div><div>จังหวัด: ${feature.properties.pro_th || 'No data'}</div>`;
@@ -71,9 +71,9 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick }) {
 
         // Determine popup content based on zoom level
         const zoomLevel = map.getZoom();
-        if (zoomLevel <= 6) {
+        if (zoomLevel <= 9) {
           setPopupContent(feature.properties ? feature.properties.pro_th : 'No data');
-        } else if (zoomLevel <= 9) {
+        } else if (zoomLevel <= 11) {
           setPopupContent(feature.properties ? feature.properties.amp_th : 'No data');
         } else {
           setPopupContent(feature.properties ? feature.properties.tam_th : 'No data');
