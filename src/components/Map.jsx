@@ -13,7 +13,6 @@ import GeoDistricts from './GeoData';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import axios from 'axios';
-// เพิ่ม import สำหรับไอคอนสภาพอากาศ
 import PartlyClound from '../widget-icon/partly-cloudy-day-drizzle.svg';
 import ClearDay from '../widget-icon/clear-day.svg';
 import PartlyCloudyNight from '../widget-icon/partly-cloudy-night-drizzle.svg';
@@ -60,15 +59,11 @@ function Map() {
   const [sliderValue, setSliderValue] = useState(0);
   const [selectedLayer, setSelectedLayer] = useState('p3h');
   const [clearGeoDistrictMarker, setClearGeoDistrictMarker] = useState(false);
-
-
-  const [locationName, setLocationName] = useState(''); // เพิ่ม state สำหรับชื่อตำแหน่ง
-
-  const [defaultPopupOpen, setDefaultPopupOpen] = useState(false);
-  const markerRef = useRef(null);
-  // เพิ่ม state สำหรับเก็บข้อมูลสภาพอากาศ
+  const [locationName, setLocationName] = useState('');
   const [weatherData, setWeatherData] = useState(null);
+  const markerRef = useRef(null);
 
+  // Fetch weather data when position changes
   useEffect(() => {
     if (position) {
       axios.get(`${import.meta.env.VITE_API_URL}/datapts/${position[1]}/${position[0]}`)
@@ -81,19 +76,17 @@ function Map() {
     }
   }, [position]);
 
+  // Open popup automatically once weather data is fetched and marker is rendered
   useEffect(() => {
-    if (position && markerRef.current) {
-      const timer = setTimeout(() => {
-        const marker = markerRef.current;
-        if (marker) {
-          marker.openPopup();
-          setDefaultPopupOpen(true);
-        }
-      }, 100);
-
-      return () => clearTimeout(timer);
+    if (weatherData && markerRef.current) {
+      const marker = markerRef.current;
+      // Ensure marker is fully loaded before opening popup
+      marker.once('popupopen', () => {
+        console.log('Popup opened');
+      });
+      marker.openPopup(); // Opens the popup when markerRef is set
     }
-  }, [position]);
+  }, [weatherData]);
 
   const handleLocationChange = (selectedItem) => {
     if (selectedItem) {
@@ -140,6 +133,24 @@ function Map() {
     }
   };
 
+  const getTemperature = () => {
+    if (!weatherData) return null;
+    const temperatureData = weatherData.data.find(item => item.name === 't2m');
+    if (temperatureData && temperatureData.data.length > 0) {
+      return Math.round(temperatureData.data[0] - 273.15); // Convert from Kelvin to Celsius
+    }
+    return null;
+  };
+
+  const getPrecipitation = () => {
+    if (!weatherData) return null;
+    const precipitationData = weatherData.data.find(item => item.name === 'p3h');
+    if (precipitationData && precipitationData.data.length > 0) {
+      return precipitationData.data[0]; // Assuming the precipitation is a numeric value
+    }
+    return null;
+  };
+
   return (
     <div className='map-container'>
       <div className='input-container'>
@@ -159,7 +170,7 @@ function Map() {
           onFeatureClick={handleClearPosition}
         />
         <TileLayout sliderValue={sliderValue} action={selectedLayer} />
-        {position && weatherData && (
+        {position && (
           <Marker position={position} ref={markerRef}>
             <Popup>
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
@@ -167,15 +178,15 @@ function Map() {
                   {locationName || 'ไม่ระบุชื่อตำแหน่ง'}
                 </Typography>
                 <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ width: '100%' }}>
-                  <img 
-                    src={getWeatherIcon(isDaytime(), weatherData.data.find(item => item.name === 'p3h').data[0])} 
-                    alt="Weather" 
-                    style={{ width: 50, height: 50 }} 
+                  <img
+                    src={getWeatherIcon(isDaytime(), getPrecipitation())}
+                    alt="Weather"
+                    style={{ width: 50, height: 50 }}
                   />
                   <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-                    {Math.round(weatherData.data.find(item => item.name === 't2m').data[0] - 273.15)}°C
+                    {getTemperature()}°C
                   </Typography>
-                </Box>
+                </Box> 
                 <Button onClick={() => handleOpen(position[0], position[1])}>
                   เพิ่มเติม
                 </Button>
