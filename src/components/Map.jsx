@@ -55,7 +55,6 @@ function Map() {
   const [selectedLayer, setSelectedLayer] = useState('p3h'); // Default value
   const [clearGeoDistrictMarker, setClearGeoDistrictMarker] = useState(false);
   const [locationName, setLocationName] = useState(''); // เพิ่ม state สำหรับชื่อตำแหน่ง
-  const [defaultPopupOpen, setDefaultPopupOpen] = useState(false);
   const markerRef = useRef(null);
 
   useEffect(() => {
