@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -55,7 +55,23 @@ function Map() {
   const [selectedLayer, setSelectedLayer] = useState('p3h'); // Default value
   const [clearGeoDistrictMarker, setClearGeoDistrictMarker] = useState(false);
   const [locationName, setLocationName] = useState(''); // เพิ่ม state สำหรับชื่อตำแหน่ง
+  const [defaultPopupOpen, setDefaultPopupOpen] = useState(false);
+  const markerRef = useRef(null);
 
+  useEffect(() => {
+    if (position && markerRef.current) {
+      // Delay opening popup to ensure marker is rendered
+      const timer = setTimeout(() => {
+        const marker = markerRef.current;
+        if (marker) {
+          marker.openPopup();
+          setDefaultPopupOpen(true);
+        }
+      }, 100); // Adjust delay as needed
+
+      return () => clearTimeout(timer);
+    }
+  }, [position]);
   const handleLocationChange = (selectedItem) => {
     if (selectedItem) {
       setPosition([selectedItem.lat, selectedItem.lng]);
@@ -99,14 +115,14 @@ function Map() {
           maxZoom={20}
         />
         <RectangleAndLines />
-        <GeoDistricts 
-          clearMarker={clearGeoDistrictMarker} 
-          setClearMarker={setClearGeoDistrictMarker} 
-          onFeatureClick={handleClearPosition} 
+        <GeoDistricts
+          clearMarker={clearGeoDistrictMarker}
+          setClearMarker={setClearGeoDistrictMarker}
+          onFeatureClick={handleClearPosition}
         />
         <TileLayout sliderValue={sliderValue} action={selectedLayer} />
         {position && (
-          <Marker position={position}>
+          <Marker position={position} ref={markerRef}>
             <Popup>
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
                 <Typography variant="body1">
