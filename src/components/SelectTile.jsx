@@ -5,6 +5,7 @@ import WaterDropIcon from '@mui/icons-material/WaterDrop';
 import AirIcon from '@mui/icons-material/Air';
 import ThermostatIcon from '@mui/icons-material/Thermostat';
 import AcUnitIcon from '@mui/icons-material/AcUnit';
+import { useTheme } from '@mui/material/styles';
 
 function SelectTile({ onSelect }) {
     const [open, setOpen] = useState(true);
@@ -16,8 +17,9 @@ function SelectTile({ onSelect }) {
         onSelect(value);
     };
 
+    const theme = useTheme();
     const getIconStyle = (action) => ({
-        color: activeAction === action ? 'blue' : 'inherit',
+      color: activeAction === action ? theme.palette.primary.main : 'inherit',
     });
 
     return (
