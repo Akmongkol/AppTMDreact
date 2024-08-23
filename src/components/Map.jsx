@@ -3,6 +3,9 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Divider from '@mui/material/Divider';
 import './App.css';
 import Searchinput from './SearchInput';
 import ModelMetrogram from './ModelMeteogram';
@@ -81,6 +84,34 @@ function Map() {
       marker.openPopup();
     }
   }, [weatherData]);
+
+
+  useEffect(() => {
+    // เพิ่ม custom CSS สำหรับ Popup แบบกระจก
+    const style = document.createElement('style');
+    style.textContent = `
+      .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+        background: rgba(255, 255, 255, 0.25) !important;
+        backdrop-filter: blur(10px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37) !important;
+      }
+      .leaflet-popup-content-wrapper {
+        border-radius: 10px !important;
+      }
+      .leaflet-popup-content {
+        margin: 13px 19px;
+        line-height: 1.4;
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
+
 
   const handleLocationChange = (selectedItem) => {
     if (selectedItem) {
@@ -171,36 +202,59 @@ function Map() {
         <TileLayout sliderValue={sliderValue} action={selectedLayer} />
         {position && (
           <Marker position={position} ref={markerRef}>
-            <Popup>
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-                <Typography variant="body1">
-                  {locationName || 'ไม่ระบุชื่อตำแหน่ง'}
-                </Typography>
-                <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ width: '100%' }}>
-                  {(() => {
-                    const currentWeather = getWeatherData(sliderValue);
-                    if (currentWeather) {
-                      return (
-                        <>
-                          <img
-                            src={getWeatherIcon(isDaytime(sliderValue), currentWeather.precipitation)}
-                            alt="Weather"
-                            style={{ width: 50, height: 50 }}
-                          />
-                          <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-                            {currentWeather.temperature}°C
-                          </Typography>
-                        </>
-                      );
-                    } else {
-                      return <Typography>ไม่มีข้อมูล</Typography>;
-                    }
-                  })()}
-                </Box> 
-                <Button onClick={() => handleOpen(position[0], position[1])}>
-                  เพิ่มเติม
-                </Button>
-              </Box>
+             <Popup>
+             <Card 
+                elevation={0} 
+                sx={{ 
+                  minWidth: 100, 
+                  maxWidth: 200, 
+              
+                  boxShadow: 'none', 
+                  border: 'none',
+                  backgroundColor: 'transparent'
+                }}
+              >
+                <CardContent>
+                  <Typography variant="h6" component="div" gutterBottom sx={{ fontWeight: 'bold', textAlign: 'center' }}>
+                    {locationName || 'ไม่ระบุชื่อตำแหน่ง'}
+                  </Typography>
+                  <Divider sx={{ my: 1 }} />
+                  <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ width: '100%', my: 2 }}>
+                    {(() => {
+                      const currentWeather = getWeatherData(sliderValue);
+                      if (currentWeather) {
+                        return (
+                          <>
+                            <Box display="flex" flexDirection="column" alignItems="center">
+                              <img
+                                src={getWeatherIcon(isDaytime(sliderValue), currentWeather.precipitation)}
+                                alt="Weather"
+                                style={{ width: 60, height: 60 }}
+                              />
+                              <Typography variant="caption" sx={{ mt: 0.5 }}>
+                                {isDaytime(sliderValue) ? 'กลางวัน' : 'กลางคืน'}
+                              </Typography>
+                            </Box>
+                            <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                              {currentWeather.temperature}°C
+                            </Typography>
+                          </>
+                        );
+                      } else {
+                        return <Typography sx={{ textAlign: 'center', width: '100%' }}>ไม่มีข้อมูล</Typography>;
+                      }
+                    })()}
+                  </Box>
+                  <Button 
+                    variant="contained" 
+                    fullWidth 
+                    onClick={() => handleOpen(position[0], position[1])}
+                    sx={{ mt: 1 }}
+                  >
+                    ข้อมูลเพิ่มเติม
+                  </Button>
+                </CardContent>
+              </Card>
             </Popup>
           </Marker>
         )}
