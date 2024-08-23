@@ -80,10 +80,6 @@ function Map() {
   useEffect(() => {
     if (weatherData && markerRef.current) {
       const marker = markerRef.current;
-      // Ensure marker is fully loaded before opening popup
-      marker.once('popupopen', () => {
-        console.log('Popup opened');
-      });
       marker.openPopup(); // Opens the popup when markerRef is set
     }
   }, [weatherData]);
