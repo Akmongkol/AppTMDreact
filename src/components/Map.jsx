@@ -78,7 +78,7 @@ function Map() {
   useEffect(() => {
     if (weatherData && markerRef.current) {
       const marker = markerRef.current;
-
+      marker.openPopup();
     }
   }, [weatherData]);
 
@@ -169,7 +169,7 @@ function Map() {
           onFeatureClick={handleClearPosition}
         />
         <TileLayout sliderValue={sliderValue} action={selectedLayer} />
-        {position && weatherData && (
+        {position && (
           <Marker position={position} ref={markerRef}>
             <Popup>
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
