@@ -87,11 +87,21 @@ function Map() {
 
 
   useEffect(() => {
-    // เพิ่ม custom CSS สำหรับ Popup
+    // เพิ่ม custom CSS สำหรับ Popup แบบกระจก
     const style = document.createElement('style');
     style.textContent = `
       .leaflet-popup-content-wrapper, .leaflet-popup-tip {
-        background-color: #ff0000 !important;
+        background: rgba(255, 255, 255, 0.25) !important;
+        backdrop-filter: blur(10px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37) !important;
+      }
+      .leaflet-popup-content-wrapper {
+        border-radius: 10px !important;
+      }
+      .leaflet-popup-content {
+        margin: 13px 19px;
+        line-height: 1.4;
       }
     `;
     document.head.appendChild(style);
@@ -101,7 +111,8 @@ function Map() {
     };
   }, []);
 
-  
+
+
   const handleLocationChange = (selectedItem) => {
     if (selectedItem) {
       setPosition([selectedItem.lat, selectedItem.lng]);
