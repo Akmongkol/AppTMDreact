@@ -33,7 +33,7 @@ function PlayGround({ onSliderChange }) {
 
   
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_URL}/recent-folder-3`)
+    axios.get(`${import.meta.env.VITE_API_URL}/recent-folder`)
       .then(response => {
         const mostRecentFolder3 = response.data.most_recent_folder_3;
         if (mostRecentFolder3 && mostRecentFolder3.length > 0) {
