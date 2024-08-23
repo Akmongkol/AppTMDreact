@@ -63,7 +63,6 @@ function Map() {
   const [weatherData, setWeatherData] = useState(null);
   const markerRef = useRef(null);
 
-  // Fetch weather data when position changes
   useEffect(() => {
     if (position) {
       axios.get(`${import.meta.env.VITE_API_URL}/datapts/${position[1]}/${position[0]}`)
@@ -76,15 +75,13 @@ function Map() {
     }
   }, [position]);
 
-  // Open popup automatically once weather data is fetched and marker is rendered
   useEffect(() => {
     if (weatherData && markerRef.current) {
       const marker = markerRef.current;
-      // Ensure marker is fully loaded before opening popup
       marker.once('popupopen', () => {
         console.log('Popup opened');
       });
-      marker.openPopup(); // Opens the popup when markerRef is set
+      marker.openPopup();
     }
   }, [weatherData]);
 
@@ -120,9 +117,10 @@ function Map() {
     setWeatherData(null);
   };
 
-  const isDaytime = () => {
-    const currentHour = new Date().getHours();
-    return currentHour >= 6 && currentHour < 18;
+  const isDaytime = (timestamp) => {
+    const date = new Date(timestamp);
+    const hours = date.getHours();
+    return hours >= 6 && hours < 18;
   };
 
   const getWeatherIcon = (isDay, precipitation) => {
@@ -133,22 +131,26 @@ function Map() {
     }
   };
 
-  const getTemperature = () => {
-    if (!weatherData) return null;
-    const temperatureData = weatherData.data.find(item => item.name === 't2m');
-    if (temperatureData && temperatureData.data.length > 0) {
-      return Math.round(temperatureData.data[0] - 273.15); // Convert from Kelvin to Celsius
-    }
-    return null;
-  };
+  const getWeatherData = (timestamp) => {
+    if (!weatherData || !weatherData.data || !weatherData.time || !weatherData.time.datetime) return null;
 
-  const getPrecipitation = () => {
-    if (!weatherData) return null;
+    const datetimes = weatherData.time.datetime;
+    const index = datetimes.findIndex(dateStr => {
+      const apiDate = new Date(dateStr.replace('_', 'T') + 'Z');  // Convert to UTC
+      return apiDate.getTime() > timestamp;
+    }) - 1;
+
+    if (index < 0 || index >= weatherData.data[0].data.length) return null;
+
+    const temperatureData = weatherData.data.find(item => item.name === 't2m');
     const precipitationData = weatherData.data.find(item => item.name === 'p3h');
-    if (precipitationData && precipitationData.data.length > 0) {
-      return precipitationData.data[0]; // Assuming the precipitation is a numeric value
-    }
-    return null;
+
+    if (!temperatureData || !precipitationData) return null;
+
+    return {
+      temperature: Math.round(temperatureData.data[index] - 273.15),
+      precipitation: precipitationData.data[index]
+    };
   };
 
   return (
@@ -170,7 +172,7 @@ function Map() {
           onFeatureClick={handleClearPosition}
         />
         <TileLayout sliderValue={sliderValue} action={selectedLayer} />
-        {position && (
+        {position && weatherData && (
           <Marker position={position} ref={markerRef}>
             <Popup>
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
@@ -178,14 +180,25 @@ function Map() {
                   {locationName || 'ไม่ระบุชื่อตำแหน่ง'}
                 </Typography>
                 <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ width: '100%' }}>
-                  <img
-                    src={getWeatherIcon(isDaytime(), getPrecipitation())}
-                    alt="Weather"
-                    style={{ width: 50, height: 50 }}
-                  />
-                  <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-                    {getTemperature()}°C
-                  </Typography>
+                  {(() => {
+                    const currentWeather = getWeatherData(sliderValue);
+                    if (currentWeather) {
+                      return (
+                        <>
+                          <img
+                            src={getWeatherIcon(isDaytime(sliderValue), currentWeather.precipitation)}
+                            alt="Weather"
+                            style={{ width: 50, height: 50 }}
+                          />
+                          <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+                            {currentWeather.temperature}°C
+                          </Typography>
+                        </>
+                      );
+                    } else {
+                      return <Typography>ไม่มีข้อมูล</Typography>;
+                    }
+                  })()}
                 </Box> 
                 <Button onClick={() => handleOpen(position[0], position[1])}>
                   เพิ่มเติม
