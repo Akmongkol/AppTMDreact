@@ -31,3 +31,7 @@
   left: 50%; /* Move to the center horizontally */
   transform: translateX(-50%); /* Offset by half of its width to center it */
 }
+
+.leaflet-interactive {
+  outline: none;
+}
