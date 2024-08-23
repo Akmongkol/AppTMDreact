@@ -214,6 +214,7 @@ function Map() {
           handleClose={handleClose}
           lat={dialogPosition.lat}
           lng={dialogPosition.lng}
+          locationName={locationName}
         />
       )}
     </div>

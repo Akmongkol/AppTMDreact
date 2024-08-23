@@ -38,7 +38,7 @@ const theme = createTheme({
     },
 });
 
-function ModelMetrogram({ open, handleClose, lat, lng, popupContent }) {
+function ModelMetrogram({ open, handleClose, lat, lng, popupContent,locationName}) {
     const [chartOptions, setChartOptions] = useState(null);
     const [tabIndex, setTabIndex] = useState(0); // State for tab index
     const [data, setData] = useState(null); // State for storing API data
@@ -426,7 +426,7 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent }) {
         <ThemeProvider theme={theme}>
             <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xl">
                 <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white' }}>
-                        {popupContent}
+                {popupContent ? popupContent : locationName}
                     <IconButton
                         aria-label="close"
                         onClick={handleClose}
