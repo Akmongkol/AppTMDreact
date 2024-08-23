@@ -13,6 +13,9 @@ import PartlyClound from '../widget-icon/partly-cloudy-day-drizzle.svg';
 import ClearDay from '../widget-icon/clear-day.svg';
 import PartlyCloudyNight from '../widget-icon/partly-cloudy-night-drizzle.svg';
 import ClearNight from '../widget-icon/clear-night.svg';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Divider from '@mui/material/Divider';
 
 function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, onPopupContentChange }) {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -182,34 +185,54 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, onPopupCont
           }}
         >
           <Popup>
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-              <Typography variant="body1">
-                {popupContent || 'ไม่ระบุชื่อตำแหน่ง'}
-              </Typography>
-              <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ width: '100%' }}>
-                {(() => {
-                  const sliderValue = Date.now(); // Replace with your slider value if applicable
-                  const currentWeather = getWeatherData(sliderValue);
-                  if (currentWeather) {
-                    return (
-                      <>
-                        <img
-                          src={getWeatherIcon(isDaytime(sliderValue), currentWeather.precipitation)}
-                          alt="Weather"
-                          style={{ width: 50, height: 50 }}
-                        />
-                        <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-                          {currentWeather.temperature}°C
-                        </Typography>
-                      </>
-                    );
-                  } else {
-                    return <Typography>ไม่มีข้อมูล</Typography>;
-                  }
-                })()}
-              </Box>
-              <Button onClick={() => setDialogOpen(true)}>เพิ่มเติม</Button>
-            </Box>
+            <Card
+              elevation={0}
+              sx={{
+                minWidth: 100,
+                maxWidth: 200,
+                boxShadow: 'none',
+                border: 'none',
+                backgroundColor: 'transparent'
+              }}
+            >
+              <CardContent>
+                <Typography variant="body1">
+                  {popupContent || 'ไม่ระบุชื่อตำแหน่ง'}
+                </Typography>
+                <Divider sx={{ my: 1 }} />
+                <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ width: '100%', my: 2 }}>
+                    {(() => {
+                      const sliderValue = Date.now(); // Replace with your slider value if applicable
+                      const currentWeather = getWeatherData(sliderValue);
+                      if (currentWeather) {
+                        return (
+                          <>
+                          <Box display="flex" flexDirection="column" alignItems="center">
+                            <img
+                              src={getWeatherIcon(isDaytime(sliderValue), currentWeather.precipitation)}
+                              alt="Weather"
+                              style={{ width: 50, height: 50 }}
+                            />
+                            <Typography variant="caption" sx={{ mt: 0.5 }}>
+                                {isDaytime(sliderValue) ? 'กลางวัน' : 'กลางคืน'}
+                              </Typography>
+                              </Box>
+                              <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                              {currentWeather.temperature}°C
+                            </Typography>
+                          </>
+                        );
+                      } else {
+                        return <Typography sx={{ textAlign: 'center', width: '100%' }}>ไม่มีข้อมูล</Typography>;
+                      }
+                    })()}
+                  </Box>
+                  <Button variant="contained"
+                    fullWidth
+                    onClick={() => setDialogOpen(true)}
+                    sx={{ mt: 1 }}>เพิ่มเติม</Button>
+              </CardContent>
+            </Card>
           </Popup>
         </Marker>
       )}
@@ -218,7 +241,7 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, onPopupCont
         handleClose={() => setDialogOpen(false)}
         lat={selectedLat}
         lng={selectedLng}
-        popupContent={popupContent} 
+        popupContent={popupContent}
       />
     </>
   );
