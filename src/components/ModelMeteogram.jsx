@@ -29,16 +29,16 @@ Windbarb(Highcharts);
 
 const theme = createTheme({
     palette: {
-      primary: {
-        main: '#3f51b5',
-      },
-      background: {
-        default: '#f5f5f5',
-      },
+        primary: {
+            main: '#3f51b5',
+        },
+        background: {
+            default: '#f5f5f5',
+        },
     },
-  });
+});
 
-function ModelMetrogram({ open, handleClose, lat, lng }) {
+function ModelMetrogram({ open, handleClose, lat, lng, popupContent }) {
     const [chartOptions, setChartOptions] = useState(null);
     const [tabIndex, setTabIndex] = useState(0); // State for tab index
     const [data, setData] = useState(null); // State for storing API data
@@ -46,7 +46,7 @@ function ModelMetrogram({ open, handleClose, lat, lng }) {
 
     const fetchData = useCallback(() => {
         if (open && lat !== undefined && lng !== undefined) {
-            
+
             axios.get(`${import.meta.env.VITE_API_URL}/datapts/${lng}/${lat}`)
                 .then((response) => {
                     const apiData = response.data;
@@ -277,67 +277,67 @@ function ModelMetrogram({ open, handleClose, lat, lng }) {
     const isDaytime = (formattedDay) => {
         // Handle the "Now" case
         if (formattedDay === "Now") {
-          const currentHour = new Date().getHours();
-          return currentHour >= 6 && currentHour < 18; // Keep daytime as 6 AM to 6 PM for "Now"
+            const currentHour = new Date().getHours();
+            return currentHour >= 6 && currentHour < 18; // Keep daytime as 6 AM to 6 PM for "Now"
         }
-      
+
         // Extract the time from the formattedDay string
         const timeMatch = formattedDay.match(/(\d{1,2}):(\d{2})/);
         if (!timeMatch) return true; // Default to daytime if we can't parse the time
-      
+
         let [, hours] = timeMatch;
         hours = parseInt(hours);
-      
+
         // Invert the provided night time logic for daytime
         return hours >= 6 && hours < 18;
-      };
+    };
 
-      const getWeatherIcon = (isDay, precipitation) => {
+    const getWeatherIcon = (isDay, precipitation) => {
         if (isDay) {
-          if (precipitation > 1 ) {
-            return `${PartlyClound}`;
-          }
-          return `${ClearDay}`;
+            if (precipitation > 1) {
+                return `${PartlyClound}`;
+            }
+            return `${ClearDay}`;
         } else {
-          if (precipitation > 1 ) {
-            return `${PartlyCloudyNight}`;
-          }
-          return `${ClearNight}`;
+            if (precipitation > 1) {
+                return `${PartlyCloudyNight}`;
+            }
+            return `${ClearNight}`;
         }
-      };
+    };
 
-      
-      const renderCardPerDay = () => {
+
+    const renderCardPerDay = () => {
         if (!data) return null;
-    
+
         try {
             const temperatureData = processTemperatureData(data);
             const pressureData = processPressureData(data);
             const precipitationData = processPrecipitationData(data);
             const windData = processWindData(data);
-    
+
             const groupedTemperatureData = groupByDate(temperatureData);
             const groupedPressureData = groupByDate(pressureData);
             const groupedPrecipitationData = groupByDate(precipitationData);
             const groupedWindSpeed = groupByDate(windData.map(w => [w.x, w.value]));
             const groupedWindDirection = groupByDate(windData.map(w => [w.x, w.direction]));
-    
+
             const days = Object.keys(groupedTemperatureData).sort((a, b) => new Date(b) - new Date(a));
             const limitedDays = days.slice(0, 8);
-    
+
             if (limitedDays.length === 0) {
                 return <Typography color="textSecondary">No upcoming data available.</Typography>;
             }
-    
+
             return (
                 <Box sx={{ overflowX: 'auto', pb: 2 }}>
-                    <Stack 
-                        direction="row" 
-                        spacing={2} 
-                        sx={{ 
-                            minWidth: 'fit-content', 
+                    <Stack
+                        direction="row"
+                        spacing={2}
+                        sx={{
+                            minWidth: 'fit-content',
                             '& > :first-of-type': { ml: 2 },
-                            '& > :last-child': { mr: 2 } 
+                            '& > :last-child': { mr: 2 }
                         }}
                     >
                         {limitedDays.map((day, index) => {
@@ -345,7 +345,7 @@ function ModelMetrogram({ open, handleClose, lat, lng }) {
                             const isDay = isDaytime(formattedDay);
                             const precipitation = groupedPrecipitationData[day][0];
                             const iconSrc = getWeatherIcon(isDay, precipitation);
-    
+
                             return (
                                 <Box
                                     key={index}
@@ -358,9 +358,9 @@ function ModelMetrogram({ open, handleClose, lat, lng }) {
                                         overflow: 'hidden',
                                     }}
                                 >
-                                    <Box sx={{ 
-                                        bgcolor: 'primary.main', 
-                                        color: 'white', 
+                                    <Box sx={{
+                                        bgcolor: 'primary.main',
+                                        color: 'white',
                                         p: 1.5,
                                         display: 'flex',
                                         alignItems: 'center',
@@ -393,12 +393,12 @@ function ModelMetrogram({ open, handleClose, lat, lng }) {
                                                 <Typography sx={{ mr: 4 }}>
                                                     {groupedWindSpeed[day][0].toFixed(1)} m/s
                                                 </Typography>
-                                                <NavigationIcon 
-                                                    sx={{ 
-                                                        mr: 1, 
+                                                <NavigationIcon
+                                                    sx={{
+                                                        mr: 1,
                                                         color: 'gray',
-                                                        transform: `rotate(${groupedWindDirection[day][0]}deg)` 
-                                                    }} 
+                                                        transform: `rotate(${groupedWindDirection[day][0]}deg)`
+                                                    }}
                                                 />
                                                 <Typography>
                                                     {groupedWindDirection[day][0].toFixed(0)}°
@@ -426,7 +426,7 @@ function ModelMetrogram({ open, handleClose, lat, lng }) {
         <ThemeProvider theme={theme}>
             <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xl">
                 <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white' }}>
-                    Weather Forecast
+                        {popupContent}
                     <IconButton
                         aria-label="close"
                         onClick={handleClose}
@@ -436,9 +436,9 @@ function ModelMetrogram({ open, handleClose, lat, lng }) {
                     </IconButton>
                 </DialogTitle>
                 <DialogContent sx={{ bgcolor: 'background.default', p: 0 }}>
-                    <Tabs 
-                        value={tabIndex} 
-                        onChange={handleTabChange} 
+                    <Tabs
+                        value={tabIndex}
+                        onChange={handleTabChange}
                         aria-label="widget tabs"
                         sx={{ bgcolor: 'white', borderBottom: 1, borderColor: 'divider' }}
                     >
