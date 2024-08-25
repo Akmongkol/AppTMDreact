@@ -16,8 +16,9 @@ import ClearNight from '../widget-icon/clear-night.svg';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Divider from '@mui/material/Divider';
+import WidgetGeodata from './WidgetGeodata';
 
-function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, onPopupContentChange }) {
+function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [popupContent, setPopupContent] = useState('');
   const [selectedLat, setSelectedLat] = useState(null);
@@ -201,36 +202,17 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, onPopupCont
                 </Typography>
                 <Divider sx={{ my: 1 }} />
                 <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ width: '100%', my: 2 }}>
-                    {(() => {
-                      const sliderValue = Date.now(); // Replace with your slider value if applicable
-                      const currentWeather = getWeatherData(sliderValue);
-                      if (currentWeather) {
-                        return (
-                          <>
-                          <Box display="flex" flexDirection="column" alignItems="center">
-                            <img
-                              src={getWeatherIcon(isDaytime(sliderValue), currentWeather.precipitation)}
-                              alt="Weather"
-                              style={{ width: 50, height: 50 }}
-                            />
-                            <Typography variant="caption" sx={{ mt: 0.5 }}>
-                                {isDaytime(sliderValue) ? 'กลางวัน' : 'กลางคืน'}
-                              </Typography>
-                              </Box>
-                              <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-                              {currentWeather.temperature}°C
-                            </Typography>
-                          </>
-                        );
-                      } else {
-                        return <Typography sx={{ textAlign: 'center', width: '100%' }}>ไม่มีข้อมูล</Typography>;
-                      }
-                    })()}
-                  </Box>
-                  <Button variant="contained"
-                    fullWidth
-                    onClick={() => setDialogOpen(true)}
-                    sx={{ mt: 1 }}>เพิ่มเติม</Button>
+                  <WidgetGeodata
+                    sliderValue={Date.now()} // Pass slider value or your actual value
+                    getWeatherData={getWeatherData}
+                    getWeatherIcon={getWeatherIcon}
+                    isDaytime={isDaytime}
+                  />
+                </Box>
+                <Button variant="contained"
+                  fullWidth
+                  onClick={() => setDialogOpen(true)}
+                  sx={{ mt: 1 }}>เพิ่มเติม</Button>
               </CardContent>
             </Card>
           </Popup>
