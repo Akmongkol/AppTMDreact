@@ -13,6 +13,7 @@ import TileLayout from './TileLayout';
 import PlayGround from './PlayGround';
 import SelectTile from './SelectTile';
 import GeoDistricts from './GeoData';
+import WidgetCurrentdata from './WidgetCurrentdata';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import axios from 'axios';
@@ -221,30 +222,12 @@ function Map() {
                   </Typography>
                   <Divider sx={{ my: 1 }} />
                   <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ width: '100%', my: 2 }}>
-                    {(() => {
-                      const currentWeather = getWeatherData(sliderValue);
-                      if (currentWeather) {
-                        return (
-                          <>
-                            <Box display="flex" flexDirection="column" alignItems="center">
-                              <img
-                                src={getWeatherIcon(isDaytime(sliderValue), currentWeather.precipitation)}
-                                alt="Weather"
-                                style={{ width: 60, height: 60 }}
-                              />
-                              <Typography variant="caption" sx={{ mt: 0.5 }}>
-                                {isDaytime(sliderValue) ? 'กลางวัน' : 'กลางคืน'}
-                              </Typography>
-                            </Box>
-                            <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-                              {currentWeather.temperature}°C
-                            </Typography>
-                          </>
-                        );
-                      } else {
-                        return <Typography sx={{ textAlign: 'center', width: '100%' }}>ไม่มีข้อมูล</Typography>;
-                      }
-                    })()}
+                  <WidgetCurrentdata
+                      sliderValue={sliderValue}
+                      getWeatherData={getWeatherData}
+                      getWeatherIcon={getWeatherIcon}
+                      isDaytime={isDaytime}
+                    />
                   </Box>
                   <Button 
                     variant="contained" 

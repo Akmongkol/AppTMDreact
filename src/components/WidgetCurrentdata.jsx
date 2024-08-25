@@ -2,7 +2,7 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
-const WidgetGeodata = ({ sliderValue, getWeatherData, getWeatherIcon, isDaytime }) => {
+const WidgetCurrentdata = ({ sliderValue, getWeatherData, getWeatherIcon, isDaytime }) => {
   const currentWeather = getWeatherData(sliderValue);
 
   if (currentWeather) {
@@ -12,7 +12,7 @@ const WidgetGeodata = ({ sliderValue, getWeatherData, getWeatherIcon, isDaytime 
           <img
             src={getWeatherIcon(isDaytime(sliderValue), currentWeather.precipitation)}
             alt="Weather"
-            style={{ width: 50, height: 50 }}
+            style={{ width: 60, height: 60 }}
           />
           <Typography variant="caption" sx={{ mt: 0.5 }}>
             {isDaytime(sliderValue) ? 'กลางวัน' : 'กลางคืน'}
@@ -28,4 +28,4 @@ const WidgetGeodata = ({ sliderValue, getWeatherData, getWeatherIcon, isDaytime 
   }
 };
 
-export default WidgetGeodata;
+export default WidgetCurrentdata;
