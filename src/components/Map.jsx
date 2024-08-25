@@ -198,6 +198,7 @@ function Map() {
           clearMarker={clearGeoDistrictMarker}
           setClearMarker={setClearGeoDistrictMarker}
           onFeatureClick={handleClearPosition}
+          sliderValue={sliderValue} // Pass sliderValue here
         />
         <TileLayout sliderValue={sliderValue} action={selectedLayer} />
         {position && (

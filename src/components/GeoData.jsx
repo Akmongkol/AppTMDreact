@@ -18,7 +18,7 @@ import CardContent from '@mui/material/CardContent';
 import Divider from '@mui/material/Divider';
 import WidgetGeodata from './WidgetGeodata';
 
-function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick }) {
+function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [popupContent, setPopupContent] = useState('');
   const [selectedLat, setSelectedLat] = useState(null);
@@ -203,7 +203,7 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick }) {
                 <Divider sx={{ my: 1 }} />
                 <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ width: '100%', my: 2 }}>
                   <WidgetGeodata
-                    sliderValue={Date.now()} // Pass slider value or your actual value
+                    sliderValue={sliderValue} // Pass slider value or your actual value
                     getWeatherData={getWeatherData}
                     getWeatherIcon={getWeatherIcon}
                     isDaytime={isDaytime}
