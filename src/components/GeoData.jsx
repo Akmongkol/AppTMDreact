@@ -13,7 +13,6 @@ import PartlyClound from '../widget-icon/partly-cloudy-day-drizzle.svg';
 import ClearDay from '../widget-icon/clear-day.svg';
 import PartlyCloudyNight from '../widget-icon/partly-cloudy-night-drizzle.svg';
 import ClearNight from '../widget-icon/clear-night.svg';
-import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Divider from '@mui/material/Divider';
 import WidgetGeodata from './WidgetGeodata';
