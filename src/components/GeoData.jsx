@@ -71,29 +71,23 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
     };
   
     // Bind tooltip with dynamic content
-    layer.bindTooltip(
-      getTooltipContent,
-      { permanent: false, sticky: true }
-    );
+    layer.bindTooltip(getTooltipContent, { permanent: false, sticky: true });
   
     layer.on({
       click: (e) => {
         const { lat, lng } = e.latlng;
   
-        // Determine popup content based on zoom level
         const zoomLevel = map.getZoom();
         const newPopupContent = zoomLevel <= 9
-          ? feature.properties ? `${feature.properties.pro_th}`: 'No data'
+          ? feature.properties ? `${feature.properties.pro_th}` : 'No data'
           : zoomLevel <= 11
             ? feature.properties ? `อ.${feature.properties.amp_th} จ.${feature.properties.pro_th}` : 'No data'
             : feature.properties ? `ต.${feature.properties.tam_th} อ.${feature.properties.amp_th} จ.${feature.properties.pro_th}` : 'No data';
   
         setPopupContent(newPopupContent);
-        // Store selected latitude and longitude
         setSelectedLat(lat);
         setSelectedLng(lng);
   
-        // Fetch weather data based on the selected position
         axios.get(`${import.meta.env.VITE_API_URL}/datapts/${lng}/${lat}`)
           .then((response) => {
             setWeatherData(response.data);
@@ -102,8 +96,23 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
             console.error('Error fetching weather data:', error);
           });
   
-        // Notify Map to clear its position
         onFeatureClick();
+      },
+      mouseover: (e) => {
+        e.target.setStyle({
+          fillColor: 'orange', // Set background color to orange on hover
+          weight: 0.5,
+          color: 'blue',
+          fillOpacity: 0.7
+        });
+      },
+      mouseout: (e) => {
+        e.target.setStyle({
+          fillColor: 'white', // Reset background color to original
+          weight: 0.5,
+          color: 'blue',
+          fillOpacity: 0.1
+        });
       }
     });
   };
