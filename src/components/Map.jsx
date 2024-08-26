@@ -104,12 +104,9 @@ function Map() {
         margin: 15px 15px 15px;
         line-height: 1.4;
       }
-        .css-qfe88o-MuiCardContent-root:last-child {
-         padding-bottom: 0px;
-      }
-      .css-1h57jhf-MuiCardContent-root:last-child {
-        padding-bottom: 0px;
-      }
+   .MuiCardContent-root {
+      padding-bottom: 0 !important;
+    }
     `;
     document.head.appendChild(style);
 
