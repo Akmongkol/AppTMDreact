@@ -38,8 +38,20 @@ const theme = createTheme({
             default: '#f5f5f5',
         },
     },
+    components: {
+        MuiTooltip: {
+          styleOverrides: {
+            tooltip: {
+              fontSize: '0.8rem',
+              padding: '8px 12px',
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            },
+          },
+        },
+      },
 });
 
+  
 function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationName }) {
     const [chartOptions, setChartOptions] = useState(null);
     const [tabIndex, setTabIndex] = useState(0);
