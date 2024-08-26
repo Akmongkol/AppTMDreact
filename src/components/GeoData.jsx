@@ -49,6 +49,9 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
       updateGeoData();
     };
 
+
+    
+
     updateGeoData(); // Update data initially
     map.on('zoomend', onZoomEnd); // Listen for zoom level changes
 
@@ -186,35 +189,30 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
           }}
         >
           <Popup>
-            <Card
-              elevation={0}
-              sx={{
-                minWidth: 100,
-                maxWidth: 200,
-                boxShadow: 'none',
-                border: 'none',
-                backgroundColor: 'transparent'
-              }}
-            >
-              <CardContent>
-                <Typography variant="body1">
+       
+          <CardContent sx={{  maxWidth: '120px', minWidth:'120px', padding:'0px' }}>
+          <Typography  component="div" gutterBottom sx={{ fontWeight: 'bold', textAlign: 'center', fontSize: '0.8rem' }}>
                   {popupContent || 'ไม่ระบุชื่อตำแหน่ง'}
                 </Typography>
                 <Divider sx={{ my: 1 }} />
-                <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ width: '100%', my: 2 }}>
+                <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ width: '100%', my: 1 }}>
                   <WidgetGeodata
-                    sliderValue={sliderValue} // Pass slider value or your actual value
+                    sliderValue={sliderValue} 
                     getWeatherData={getWeatherData}
                     getWeatherIcon={getWeatherIcon}
                     isDaytime={isDaytime}
                   />
-                </Box>
-                <Button variant="contained"
-                  fullWidth
-                  onClick={() => setDialogOpen(true)}
-                  sx={{ mt: 1 }}>เพิ่มเติม</Button>
+                </Box>  
+                <Button
+                    variant="contained"
+                    fullWidth
+                    onClick={() => setDialogOpen(true)}
+                    sx={{  fontSize: '0.75rem' }}
+                  >
+                    เพิ่มเติม
+                  </Button>
               </CardContent>
-            </Card>
+        
           </Popup>
         </Marker>
       )}

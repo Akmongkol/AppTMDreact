@@ -101,8 +101,14 @@ function Map() {
         border-radius: 10px !important;
       }
       .leaflet-popup-content {
-        margin: 13px 19px;
+        margin: 15px 15px 15px;
         line-height: 1.4;
+      }
+        .css-qfe88o-MuiCardContent-root:last-child {
+         padding-bottom: 0px;
+      }
+      .css-1h57jhf-MuiCardContent-root:last-child {
+        padding-bottom: 0px;
       }
     `;
     document.head.appendChild(style);
@@ -204,41 +210,33 @@ function Map() {
         <TileLayout sliderValue={sliderValue} action={selectedLayer} />
         {position && (
           <Marker position={position} ref={markerRef}>
-             <Popup>
-             <Card 
-                elevation={0} 
-                sx={{ 
-                  minWidth: 100, 
-                  maxWidth: 200, 
-              
-                  boxShadow: 'none', 
-                  border: 'none',
-                  backgroundColor: 'transparent'
-                }}
-              >
-                <CardContent>
-                  <Typography variant="h6" component="div" gutterBottom sx={{ fontWeight: 'bold', textAlign: 'center' }}>
-                    {locationName || 'ไม่ระบุชื่อตำแหน่ง'}
-                  </Typography>
-                  <Divider sx={{ my: 1 }} />
-                  <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ width: '100%', my: 2 }}>
+            <Popup>
+
+              <CardContent sx={{ maxWidth: '120px', padding: '0px' }}>
+                <Typography component="div" gutterBottom sx={{ fontWeight: 'bold', textAlign: 'center', fontSize: '0.8rem' }}>
+                  {locationName || 'ไม่ระบุชื่อตำแหน่ง'}
+                </Typography>
+
+                <Divider sx={{ my: 1 }} />
+                <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ width: '100%', my: 1 }}>
                   <WidgetCurrentdata
-                      sliderValue={sliderValue}
-                      getWeatherData={getWeatherData}
-                      getWeatherIcon={getWeatherIcon}
-                      isDaytime={isDaytime}
-                    />
-                  </Box>
-                  <Button 
-                    variant="contained" 
-                    fullWidth 
-                    onClick={() => handleOpen(position[0], position[1])}
-                    sx={{ mt: 1 }}
-                  >
-                    ข้อมูลเพิ่มเติม
-                  </Button>
-                </CardContent>
-              </Card>
+                    sliderValue={sliderValue}
+                    getWeatherData={getWeatherData}
+                    getWeatherIcon={getWeatherIcon}
+                    isDaytime={isDaytime}
+                  />
+                </Box>
+                <Button
+                  variant="contained"
+                  fullWidth
+                  onClick={() => handleOpen(position[0], position[1])}
+                  sx={{ fontSize: '0.75rem' }}
+                >
+                  เพิ่มเติม
+                </Button>
+
+              </CardContent>
+
             </Popup>
           </Marker>
         )}

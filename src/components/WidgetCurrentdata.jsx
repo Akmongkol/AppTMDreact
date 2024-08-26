@@ -12,13 +12,13 @@ const WidgetCurrentdata = ({ sliderValue, getWeatherData, getWeatherIcon, isDayt
           <img
             src={getWeatherIcon(isDaytime(sliderValue), currentWeather.precipitation)}
             alt="Weather"
-            style={{ width: 60, height: 60 }}
+            style={{ width: 35, height: 35}}
           />
-          <Typography variant="caption" sx={{ mt: 0.5 }}>
+          <Typography variant="caption" sx={{ mt: 0 }}>
             {isDaytime(sliderValue) ? 'กลางวัน' : 'กลางคืน'}
           </Typography>
         </Box>
-        <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+        <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2'}}>
           {currentWeather.temperature}°C
         </Typography>
       </>
