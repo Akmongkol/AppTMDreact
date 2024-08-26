@@ -23,24 +23,91 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
   const [selectedLat, setSelectedLat] = useState(null);
   const [selectedLng, setSelectedLng] = useState(null);
   const [geoData, setGeoData] = useState(Provinces);
-  const [weatherData, setWeatherData] = useState(null);
   const map = useMap();
+  const [markerInstance, setMarkerInstance] = useState(null);
+  const [weatherData, setWeatherData] = useState(null);
   const markerRef = useRef(null);
 
   const updateGeoData = () => {
     const zoomLevel = map.getZoom();
-    setGeoData(
-      zoomLevel <= 9 ? Provinces :
-      zoomLevel <= 11 ? Districts :
-      Subdistricts
-    );
+    let newGeoData;
+    if (zoomLevel <= 9) {
+      newGeoData = Provinces;
+    } else if (zoomLevel <= 11) {
+      newGeoData = Districts;
+    } else {
+      newGeoData = Subdistricts;
+    }
+    setGeoData(newGeoData);
   };
 
   useEffect(() => {
+    const onZoomEnd = () => {
+      updateGeoData();
+    };
+
     updateGeoData();
-    map.on('zoomend', updateGeoData);
-    return () => map.off('zoomend', updateGeoData);
+    map.on('zoomend', onZoomEnd);
+
+    return () => {
+      map.off('zoomend', onZoomEnd);
+    };
   }, [map]);
+
+  const onEachFeature = (feature, layer) => {
+    const getTooltipContent = () => {
+      const zoomLevel = map.getZoom();
+      if (zoomLevel <= 9) {
+        return `<div>จังหวัด: ${feature.properties.pro_th || 'No data'}</div>`;
+      } else if (zoomLevel <= 11) {
+        return `<div>อำเภอ: ${feature.properties.amp_th || 'No data'}</div><div>จังหวัด: ${feature.properties.pro_th || 'No data'}</div>`;
+      } else {
+        return `<div>ตำบล: ${feature.properties.tam_th || 'No data'}</div><div>อำเภอ: ${feature.properties.amp_th || 'No data'}</div><div>จังหวัด: ${feature.properties.pro_th || 'No data'}</div>`;
+      }
+    };
+
+    layer.bindTooltip(getTooltipContent, { permanent: false, sticky: true });
+  };
+
+  const handleMapClick = (e) => {
+    const { lat, lng } = e.latlng;
+    setSelectedLat(lat);
+    setSelectedLng(lng);
+
+    // Find the containing feature
+    const point = turf.point([lng, lat]);
+    const containingFeature = geoData.features.find(feature => 
+      turf.booleanPointInPolygon(point, feature)
+    );
+
+    if (containingFeature) {
+      const zoomLevel = map.getZoom();
+      const newPopupContent = zoomLevel <= 9
+        ? `จังหวัด: ${containingFeature.properties.pro_th}`
+        : zoomLevel <= 11
+          ? `อำเภอ: ${containingFeature.properties.amp_th} จังหวัด: ${containingFeature.properties.pro_th}`
+          : `ตำบล: ${containingFeature.properties.tam_th} อำเภอ: ${containingFeature.properties.amp_th} จังหวัด: ${containingFeature.properties.pro_th}`;
+
+      setPopupContent(newPopupContent);
+    } else {
+      setPopupContent('ไม่พบข้อมูลสำหรับตำแหน่งนี้');
+    }
+
+    // Fetch weather data
+    axios.get(`${import.meta.env.VITE_API_URL}/datapts/${lng}/${lat}`)
+      .then((response) => {
+        setWeatherData(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching weather data:', error);
+      });
+
+    onFeatureClick();
+  };
+
+  useMapEvents({
+    click: handleMapClick,
+  });
 
   useEffect(() => {
     if (clearMarker) {
@@ -53,53 +120,10 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
   }, [clearMarker, setClearMarker]);
 
   useEffect(() => {
-    if (selectedLat && selectedLng && markerRef.current) {
-      markerRef.current.openPopup();
+    if (selectedLat && selectedLng && markerInstance) {
+      markerInstance.openPopup();
     }
-  }, [selectedLat, selectedLng]);
-
-  const fetchWeatherData = (lng, lat) => {
-    axios.get(`${import.meta.env.VITE_API_URL}/datapts/${lng}/${lat}`)
-      .then((response) => setWeatherData(response.data))
-      .catch((error) => console.error('Error fetching weather data:', error));
-  };
-
-  const handleLocationSelect = (lat, lng, content) => {
-    setSelectedLat(lat);
-    setSelectedLng(lng);
-    setPopupContent(content);
-    fetchWeatherData(lng, lat);
-    onFeatureClick();
-  };
-
-  const handleMapClick = (e) => {
-    const { lat, lng } = e.latlng;
-    handleLocationSelect(lat, lng, 'ตำแหน่งที่เลือก');
-  };
-
-  useMapEvents({ click: handleMapClick });
-
-  const onEachFeature = (feature, layer) => {
-    const getTooltipContent = () => {
-      const zoomLevel = map.getZoom();
-      const { pro_th, amp_th, tam_th } = feature.properties;
-      return zoomLevel <= 9 ? `จังหวัด: ${pro_th || 'ไม่มีข้อมูล'}` :
-             zoomLevel <= 11 ? `อำเภอ: ${amp_th || 'ไม่มีข้อมูล'}\nจังหวัด: ${pro_th || 'ไม่มีข้อมูล'}` :
-             `ตำบล: ${tam_th || 'ไม่มีข้อมูล'}\nอำเภอ: ${amp_th || 'ไม่มีข้อมูล'}\nจังหวัด: ${pro_th || 'ไม่มีข้อมูล'}`;
-    };
-
-    layer.bindTooltip(getTooltipContent, { permanent: false, sticky: true });
-
-    layer.on('click', (e) => {
-      const centroid = turf.centroid(feature);
-      const [longitude, latitude] = centroid.geometry.coordinates;
-      const zoomLevel = map.getZoom();
-      const content = zoomLevel <= 9 ? feature.properties.pro_th :
-                      zoomLevel <= 11 ? `${feature.properties.amp_th} จังหวัด: ${feature.properties.pro_th}` :
-                      `${feature.properties.tam_th} อำเภอ: ${feature.properties.amp_th} จังหวัด: ${feature.properties.pro_th}`;
-      handleLocationSelect(latitude, longitude, content || 'ไม่มีข้อมูล');
-    });
-  };
+  }, [selectedLat, selectedLng, markerInstance]);
 
   const isDaytime = (timestamp) => {
     const date = new Date(timestamp);
@@ -108,14 +132,21 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
   };
 
   const getWeatherIcon = (isDay, precipitation) => {
-    return isDay ? (precipitation > 1 ? PartlyClound : ClearDay) : (precipitation > 1 ? PartlyCloudyNight : ClearNight);
+    if (isDay) {
+      return precipitation > 1 ? PartlyClound : ClearDay;
+    } else {
+      return precipitation > 1 ? PartlyCloudyNight : ClearNight;
+    }
   };
 
   const getWeatherData = (timestamp) => {
     if (!weatherData || !weatherData.data || !weatherData.time || !weatherData.time.datetime) return null;
 
     const datetimes = weatherData.time.datetime;
-    const index = datetimes.findIndex(dateStr => new Date(dateStr.replace('_', 'T') + 'Z').getTime() > timestamp) - 1;
+    const index = datetimes.findIndex(dateStr => {
+      const apiDate = new Date(dateStr.replace('_', 'T') + 'Z');
+      return apiDate.getTime() > timestamp;
+    }) - 1;
 
     if (index < 0 || index >= weatherData.data[0].data.length) return null;
 
@@ -147,9 +178,15 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
         onEachFeature={onEachFeature}
       />
       {selectedLat && selectedLng && (
-        <Marker ref={markerRef} position={[selectedLat, selectedLng]}>
+        <Marker
+          ref={markerRef}
+          position={[selectedLat, selectedLng]}
+          eventHandlers={{
+            add: (e) => setMarkerInstance(e.target)
+          }}
+        >
           <Popup>
-            <CardContent sx={{ maxWidth: '120px', minWidth: '120px', padding: '0px' }}>
+            <CardContent sx={{ maxWidth: '120px', minWidth:'120px', padding:'0px' }}>
               <Typography component="div" gutterBottom sx={{ fontWeight: 'bold', textAlign: 'center', fontSize: '0.8rem' }}>
                 {popupContent || 'ไม่ระบุชื่อตำแหน่ง'}
               </Typography>
