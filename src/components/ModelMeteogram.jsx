@@ -25,6 +25,7 @@ import ClearDay from '../widget-icon/clear-day.svg';
 import PartlyCloudyNight from '../widget-icon/partly-cloudy-night-drizzle.svg';
 import ClearNight from '../widget-icon/clear-night.svg';
 import WaterDropIcon from '@mui/icons-material/WaterDrop';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 
 // Initialize the windbarb module
 Windbarb(Highcharts);
@@ -485,16 +486,31 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
     return (
         <ThemeProvider theme={theme}>
             <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xl">
-                <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white' }}>
-                    {popupContent ? popupContent : locationName}
-                    <IconButton
-                        aria-label="close"
-                        onClick={handleClose}
-                        sx={{ position: 'absolute', right: 8, top: 8, color: 'white' }}
-                    >
-                        <CloseIcon />
-                    </IconButton>
-                </DialogTitle>
+            <DialogTitle 
+    sx={{ 
+      bgcolor: 'primary.main', 
+      color: 'white',
+      display: 'flex',
+      alignItems: 'center',
+      position: 'relative',
+      padding: '16px'
+    }}
+  >
+    <LocationOnIcon sx={{ marginRight: 1 }} />
+    {popupContent ? popupContent : locationName}
+    <IconButton
+      aria-label="close"
+      onClick={handleClose}
+      sx={{ 
+        position: 'absolute', 
+        right: 8, 
+        top: 8, 
+        color: 'white' 
+      }}
+    >
+      <CloseIcon />
+    </IconButton>
+  </DialogTitle>
                 <DialogContent sx={{ bgcolor: 'background.default', p: 0 }}>
                     <Tabs
                         value={tabIndex}
