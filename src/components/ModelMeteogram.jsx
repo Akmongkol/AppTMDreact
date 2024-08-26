@@ -19,10 +19,12 @@ import OpacityIcon from '@mui/icons-material/Opacity';
 import AirIcon from '@mui/icons-material/Air';
 import CompressIcon from '@mui/icons-material/Compress';
 import NavigationIcon from '@mui/icons-material/Navigation';
+import Tooltip from '@mui/material/Tooltip';
 import PartlyClound from '../widget-icon/partly-cloudy-day-drizzle.svg';
 import ClearDay from '../widget-icon/clear-day.svg';
 import PartlyCloudyNight from '../widget-icon/partly-cloudy-night-drizzle.svg';
 import ClearNight from '../widget-icon/clear-night.svg';
+import WaterDropIcon from '@mui/icons-material/WaterDrop';
 
 // Initialize the windbarb module
 Windbarb(Highcharts);
@@ -38,7 +40,7 @@ const theme = createTheme({
     },
 });
 
-function ModelMetrogram({ open, handleClose, lat, lng, popupContent,locationName}) {
+function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationName }) {
     const [chartOptions, setChartOptions] = useState(null);
     const [tabIndex, setTabIndex] = useState(0); // State for tab index
     const [data, setData] = useState(null); // State for storing API data
@@ -341,7 +343,7 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent,locationName
                         }}
                     >
                         {limitedDays.map((day, index) => {
-                            const formattedDay = index === 0 ? "Now" : formatDayCard(day);
+                            const formattedDay = index === 0 ? "ตอนนี้" : formatDayCard(day);
                             const isDay = isDaytime(formattedDay);
                             const precipitation = groupedPrecipitationData[day][0];
                             const iconSrc = getWeatherIcon(isDay, precipitation);
@@ -373,36 +375,56 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent,locationName
                                     <Box sx={{ p: 2 }}>
                                         <Stack spacing={1.5}>
                                             <Box display="flex" alignItems="center" justifyContent="space-between">
-                                                <img src={iconSrc} alt="Weather" style={{ width: 100, height: 100 }} />
-                                                <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                                                    {Math.round(groupedTemperatureData[day][0])}°C
-                                                </Typography>
+                                                <Tooltip title={`ปริมาณฝน: ${precipitation.toFixed(1)} มม.`} placement="top">
+                                                    <img src={iconSrc} alt="Weather" style={{ width: 100, height: 100 }} />
+                                                </Tooltip>
+                                                <Tooltip title="อุณหภูมิ" placement="top">
+                                                    <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                                                        {Math.round(groupedTemperatureData[day][0])}°C
+                                                    </Typography>
+                                                </Tooltip>
                                             </Box>
                                             <Box display="flex" alignItems="center">
-                                                <CompressIcon sx={{ mr: 1, color: 'green' }} />
-                                                <Typography sx={{ mr: 2 }}>
-                                                    {Math.round(groupedPressureData[day][0])} hPa
-                                                </Typography>
-                                                <OpacityIcon sx={{ mr: 1, color: 'blue' }} />
-                                                <Typography>
-                                                    {precipitation.toFixed(1)} mm
-                                                </Typography>
+                                                <Tooltip title="ความกดอากาศ" placement="top">
+                                                    <Box display="flex" alignItems="center">
+                                                        <CompressIcon sx={{ mr: 1, color: 'green' }} />
+                                                        <Typography sx={{ mr: 2 }}>
+                                                            {Math.round(groupedPressureData[day][0])} hPa
+                                                        </Typography>
+                                                    </Box>
+                                                </Tooltip>
+                                                <Tooltip title="ปริมาณน้ำฝน" placement="top">
+                                                    <Box display="flex" alignItems="center">
+                                                        <OpacityIcon sx={{ mr: 1, color: 'blue' }} />
+                                                        <Typography>
+                                                            {precipitation.toFixed(1)} mm
+                                                        </Typography>
+                                                    </Box>
+                                                </Tooltip>
                                             </Box>
                                             <Box display="flex" alignItems="center">
-                                                <AirIcon sx={{ mr: 1, color: 'gray' }} />
-                                                <Typography sx={{ mr: 4 }}>
-                                                    {groupedWindSpeed[day][0].toFixed(1)} m/s
-                                                </Typography>
-                                                <NavigationIcon
-                                                    sx={{
-                                                        mr: 1,
-                                                        color: 'gray',
-                                                        transform: `rotate(${groupedWindDirection[day][0]}deg)`
-                                                    }}
-                                                />
-                                                <Typography>
-                                                    {groupedWindDirection[day][0].toFixed(0)}°
-                                                </Typography>
+                                                <Tooltip title="ความเร็วลม" placement="top">
+                                                    <Box display="flex" alignItems="center">
+                                                        <AirIcon sx={{ mr: 1, color: 'gray' }} />
+                                                        <Typography sx={{ mr: 4 }}>
+                                                            {groupedWindSpeed[day][0].toFixed(1)} m/s
+                                                        </Typography>
+                                                    </Box>
+                                                </Tooltip>
+                                                <Tooltip title="ทิศทางลม" placement="top">
+                                                    <Box display="flex" alignItems="center">
+                                                        <NavigationIcon
+                                                            sx={{
+                                                                mr: 1,
+                                                                color: 'gray',
+                                                                transform: `rotate(${groupedWindDirection[day][0]}deg)`
+                                                            }}
+                                                        />
+                                                        <Typography>
+                                                            {groupedWindDirection[day][0].toFixed(0)}°
+                                                        </Typography>
+                                                    </Box>
+                                                </Tooltip>
                                             </Box>
                                         </Stack>
                                     </Box>
@@ -426,7 +448,7 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent,locationName
         <ThemeProvider theme={theme}>
             <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xl">
                 <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white' }}>
-                {popupContent ? popupContent : locationName}
+                    {popupContent ? popupContent : locationName}
                     <IconButton
                         aria-label="close"
                         onClick={handleClose}
@@ -443,7 +465,7 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent,locationName
                         sx={{ bgcolor: 'white', borderBottom: 1, borderColor: 'divider' }}
                     >
                         <Tab label="พยากรณ์ 24 ชม." />
-                        <Tab label="กราฟ" />
+                        <Tab label="กราฟ 7 วัน" />
                     </Tabs>
                     <Box sx={{ p: 2 }}>
                         {tabIndex === 1 && chartOptions ? (
@@ -471,4 +493,3 @@ export default ModelMetrogram;
 
 
 
-// dsds
