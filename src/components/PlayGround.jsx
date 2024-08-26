@@ -176,7 +176,7 @@ function PlayGround({ onSliderChange }) {
             onSliderChange(newValue);
           }}
           sx={{
-            width: { xs: '80%', md: '95%' }, // Responsive width
+            width: { xs: '80%', md: '90%' }, // Responsive width
             marginTop: 2,
             marginLeft: 2,
             marginRight: 5
