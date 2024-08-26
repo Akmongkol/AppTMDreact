@@ -442,8 +442,8 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent,locationName
                         aria-label="widget tabs"
                         sx={{ bgcolor: 'white', borderBottom: 1, borderColor: 'divider' }}
                     >
-                        <Tab label="Daily Data" />
-                        <Tab label="Chart" />
+                        <Tab label="พยากรณ์ 24 ชม." />
+                        <Tab label="กราฟ" />
                     </Tabs>
                     <Box sx={{ p: 2 }}>
                         {tabIndex === 1 && chartOptions ? (
@@ -468,3 +468,6 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent,locationName
 }
 
 export default ModelMetrogram;
+
+
+

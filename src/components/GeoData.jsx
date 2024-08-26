@@ -59,15 +59,14 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
   }, [map]);
 
   const onEachFeature = (feature, layer) => {
-    // Function to determine tooltip content based on zoom level
     const getTooltipContent = () => {
       const zoomLevel = map.getZoom();
       if (zoomLevel <= 9) {
-        return `<div>จังหวัด: ${feature.properties.pro_th || 'No data'}</div>`;
+        return `<div>${feature.properties.pro_th || 'No data'}</div>`;
       } else if (zoomLevel <= 11) {
-        return `<div>อำเภอ: ${feature.properties.amp_th || 'No data'}</div><div>จังหวัด: ${feature.properties.pro_th || 'No data'}</div>`;
+        return `<div>อ.${feature.properties.amp_th || 'No data'}</div><div>จ.${feature.properties.pro_th || 'No data'}</div>`;
       } else {
-        return `<div>ตำบล: ${feature.properties.tam_th || 'No data'}</div><div>อำเภอ: ${feature.properties.amp_th || 'No data'}</div><div>จังหวัด: ${feature.properties.pro_th || 'No data'}</div>`;
+        return `<div>ต.${feature.properties.tam_th || 'No data'}</div><div>อ.${feature.properties.amp_th || 'No data'}</div><div>จ.${feature.properties.pro_th || 'No data'}</div>`;
       }
     };
   
@@ -84,10 +83,10 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
         // Determine popup content based on zoom level
         const zoomLevel = map.getZoom();
         const newPopupContent = zoomLevel <= 9
-          ? feature.properties ? `จังหวัด: ${feature.properties.pro_th}`: 'No data'
+          ? feature.properties ? `${feature.properties.pro_th}`: 'No data'
           : zoomLevel <= 11
-            ? feature.properties ? `อำเภอ: ${feature.properties.amp_th} จังหวัด: ${feature.properties.pro_th}` : 'No data'
-            : feature.properties ? `ตำบล: ${feature.properties.tam_th} อำเภอ: ${feature.properties.amp_th} จังหวัด: ${feature.properties.pro_th}` : 'No data';
+            ? feature.properties ? `อ.${feature.properties.amp_th} จ.${feature.properties.pro_th}` : 'No data'
+            : feature.properties ? `ต.${feature.properties.tam_th} อ.${feature.properties.amp_th} จ.${feature.properties.pro_th}` : 'No data';
   
         setPopupContent(newPopupContent);
         // Store selected latitude and longitude
