@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { GeoJSON, Marker, Popup, useMap } from 'react-leaflet';
+import { GeoJSON, Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -21,11 +21,11 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
   const [popupContent, setPopupContent] = useState('');
   const [selectedLat, setSelectedLat] = useState(null);
   const [selectedLng, setSelectedLng] = useState(null);
-  const [geoData, setGeoData] = useState(Provinces); // Default data
+  const [geoData, setGeoData] = useState(Provinces);
   const map = useMap();
   const [markerInstance, setMarkerInstance] = useState(null);
   const [weatherData, setWeatherData] = useState(null);
-  const markerRef = useRef(null); // Ref for the marker instance
+  const markerRef = useRef(null);
 
   const updateGeoData = () => {
     const zoomLevel = map.getZoom();
@@ -37,29 +37,23 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
     } else {
       newGeoData = Subdistricts;
     }
-
     setGeoData(newGeoData);
   };
 
   useEffect(() => {
-    // Update data on zoom level change
     const onZoomEnd = () => {
       updateGeoData();
     };
 
-
-    
-
-    updateGeoData(); // Update data initially
-    map.on('zoomend', onZoomEnd); // Listen for zoom level changes
+    updateGeoData();
+    map.on('zoomend', onZoomEnd);
 
     return () => {
-      map.off('zoomend', onZoomEnd); // Clean up event listener
+      map.off('zoomend', onZoomEnd);
     };
   }, [map]);
 
   const onEachFeature = (feature, layer) => {
-    // Function to determine tooltip content based on zoom level
     const getTooltipContent = () => {
       const zoomLevel = map.getZoom();
       if (zoomLevel <= 9) {
@@ -109,19 +103,23 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
     });
   };
 
+  useMapEvents({
+    click: handleMapClick,
+  });
+
   useEffect(() => {
     if (clearMarker) {
       setSelectedLat(null);
       setSelectedLng(null);
       setPopupContent('');
-      setWeatherData(null); // Clear weather data when clearing the marker
-      setClearMarker(false); // Reset the clear marker flag
+      setWeatherData(null);
+      setClearMarker(false);
     }
   }, [clearMarker, setClearMarker]);
 
   useEffect(() => {
     if (selectedLat && selectedLng && markerInstance) {
-      markerInstance.openPopup(); // Open popup by default
+      markerInstance.openPopup();
     }
   }, [selectedLat, selectedLng, markerInstance]);
 
@@ -144,7 +142,7 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
 
     const datetimes = weatherData.time.datetime;
     const index = datetimes.findIndex(dateStr => {
-      const apiDate = new Date(dateStr.replace('_', 'T') + 'Z');  // Convert to UTC
+      const apiDate = new Date(dateStr.replace('_', 'T') + 'Z');
       return apiDate.getTime() > timestamp;
     }) - 1;
 
@@ -172,7 +170,7 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
   return (
     <>
       <GeoJSON
-        key={JSON.stringify(geoData)} // Force re-render on geoData change
+        key={JSON.stringify(geoData)}
         data={geoData}
         style={geojsonStyle}
         onEachFeature={onEachFeature}
@@ -182,34 +180,32 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
           ref={markerRef}
           position={[selectedLat, selectedLng]}
           eventHandlers={{
-            add: (e) => setMarkerInstance(e.target) // Store the marker instance
+            add: (e) => setMarkerInstance(e.target)
           }}
         >
           <Popup>
-       
-          <CardContent sx={{  maxWidth: '120px', minWidth:'120px', padding:'0px' }}>
-          <Typography  component="div" gutterBottom sx={{ fontWeight: 'bold', textAlign: 'center', fontSize: '0.8rem' }}>
-                  {popupContent || 'ไม่ระบุชื่อตำแหน่ง'}
-                </Typography>
-                <Divider sx={{ my: 1 }} />
-                <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ width: '100%', my: 1 }}>
-                  <WidgetGeodata
-                    sliderValue={sliderValue} 
-                    getWeatherData={getWeatherData}
-                    getWeatherIcon={getWeatherIcon}
-                    isDaytime={isDaytime}
-                  />
-                </Box>  
-                <Button
-                    variant="contained"
-                    fullWidth
-                    onClick={() => setDialogOpen(true)}
-                    sx={{  fontSize: '0.75rem' }}
-                  >
-                    เพิ่มเติม
-                  </Button>
-              </CardContent>
-        
+            <CardContent sx={{ maxWidth: '120px', minWidth:'120px', padding:'0px' }}>
+              <Typography component="div" gutterBottom sx={{ fontWeight: 'bold', textAlign: 'center', fontSize: '0.8rem' }}>
+                {popupContent || 'ไม่ระบุชื่อตำแหน่ง'}
+              </Typography>
+              <Divider sx={{ my: 1 }} />
+              <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ width: '100%', my: 1 }}>
+                <WidgetGeodata
+                  sliderValue={sliderValue} 
+                  getWeatherData={getWeatherData}
+                  getWeatherIcon={getWeatherIcon}
+                  isDaytime={isDaytime}
+                />
+              </Box>  
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={() => setDialogOpen(true)}
+                sx={{ fontSize: '0.75rem' }}
+              >
+                เพิ่มเติม
+              </Button>
+            </CardContent>
           </Popup>
         </Marker>
       )}
