@@ -125,7 +125,7 @@ function PlayGround({ onSliderChange }) {
       sliderIntervalRef.current = null;
     } else {
       // Play
-      const intervalDuration = 6000; // 6 seconds
+      const intervalDuration = 2500; // 6 seconds
       sliderIntervalRef.current = setInterval(() => {
         setSliderValue(prevValue => {
           const nextValue = prevValue + threeHours;
