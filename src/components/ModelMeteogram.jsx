@@ -42,13 +42,12 @@ const theme = createTheme({
 
 function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationName }) {
     const [chartOptions, setChartOptions] = useState(null);
-    const [tabIndex, setTabIndex] = useState(0); // State for tab index
-    const [data, setData] = useState(null); // State for storing API data
-    const [error, setError] = useState(null); // State for error handling
+    const [tabIndex, setTabIndex] = useState(0);
+    const [data, setData] = useState(null);
+    const [error, setError] = useState(null);
 
     const fetchData = useCallback(() => {
         if (open && lat !== undefined && lng !== undefined) {
-
             axios.get(`${import.meta.env.VITE_API_URL}/datapts/${lng}/${lat}`)
                 .then((response) => {
                     const apiData = response.data;
@@ -57,6 +56,7 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
                         const pressureData = processPressureData(apiData);
                         const precipitationData = processPrecipitationData(apiData);
                         const windData = processWindData(apiData);
+                        const humidityData = processHumidityData(apiData); // New function to process humidity data
 
                         setData(apiData);
 
@@ -95,6 +95,14 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
                                     opposite: true,
                                     min: 0,
                                 },
+                                { // New yAxis for humidity
+                                    title: {
+                                        text: 'Humidity (%)',
+                                    },
+                                    opposite: true,
+                                    min: 0,
+                                    max: 100,
+                                },
                             ],
                             tooltip: {
                                 shared: true,
@@ -111,6 +119,8 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
                                                 value = `${point.y.toFixed(2)} hPa`;
                                             } else if (seriesName === 'Precipitation') {
                                                 value = `${point.y.toFixed(2)} mm`;
+                                            } else if (seriesName === 'Humidity') {
+                                                value = `${point.y.toFixed(2)}%`;
                                             }
                                             return `<span style="color:${point.color}">\u25CF</span> ${seriesName}: <b>${value}</b><br/>`;
                                         })
@@ -157,6 +167,14 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
                                     },
                                     zIndex: 5,
                                 },
+                                { // New series for humidity
+                                    name: 'Humidity',
+                                    type: 'spline',
+                                    yAxis: 3,
+                                    color: '#8A2BE2', // Purple color for humidity
+                                    zIndex: 1,
+                                    data: humidityData,
+                                },
                             ],
                         });
                         setError(null);
@@ -191,6 +209,12 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
     const processPrecipitationData = (apiData) => {
         return apiData.data.find(item => item.name === 'p3h').data.map((precip, index) => [
             convertToUTC7(apiData.time.datetime[index]), precip
+        ]);
+    };
+
+    const processHumidityData = (apiData) => {
+        return apiData.data.find(item => item.name === 'rhum').data.map((humidity, index) => [
+            convertToUTC7(apiData.time.datetime[index]), humidity
         ]);
     };
 
@@ -317,12 +341,14 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
             const pressureData = processPressureData(data);
             const precipitationData = processPrecipitationData(data);
             const windData = processWindData(data);
+            const humidityData = processHumidityData(data);
 
             const groupedTemperatureData = groupByDate(temperatureData);
             const groupedPressureData = groupByDate(pressureData);
             const groupedPrecipitationData = groupByDate(precipitationData);
             const groupedWindSpeed = groupByDate(windData.map(w => [w.x, w.value]));
             const groupedWindDirection = groupByDate(windData.map(w => [w.x, w.direction]));
+            const groupedHumidityData = groupByDate(humidityData);
 
             const days = Object.keys(groupedTemperatureData).sort((a, b) => new Date(b) - new Date(a));
             const limitedDays = days.slice(0, 8);
@@ -393,14 +419,14 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
                                                         </Typography>
                                                     </Box>
                                                 </Tooltip>
-                                                <Tooltip title="ปริมาณน้ำฝน" placement="top">
-                                                    <Box display="flex" alignItems="center">
-                                                        <OpacityIcon sx={{ mr: 1, color: 'blue' }} />
-                                                        <Typography>
-                                                            {precipitation.toFixed(1)} mm
-                                                        </Typography>
-                                                    </Box>
-                                                </Tooltip>
+                                                <Tooltip title="ความชื้นสัมพัทธ์" placement="top">
+                                                <Box display="flex" alignItems="center">
+                                                    <WaterDropIcon sx={{ mr: 1, color: '#8A2BE2' }} />
+                                                    <Typography>
+                                                        {Math.round(groupedHumidityData[day][0])}%
+                                                    </Typography>
+                                                </Box>
+                                            </Tooltip>
                                             </Box>
                                             <Box display="flex" alignItems="center">
                                                 <Tooltip title="ความเร็วลม" placement="top">
@@ -468,18 +494,25 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
                         <Tab label="กราฟ 7 วัน" />
                     </Tabs>
                     <Box sx={{ p: 2 }}>
-                        {tabIndex === 1 && chartOptions ? (
-                            <HighchartsReact highcharts={Highcharts} options={chartOptions} />
-                        ) : tabIndex === 0 ? (
+                        {tabIndex === 0 || tabIndex === 1 ? (
                             error ? (
                                 <Typography color="error">{error}</Typography>
+                            ) : chartOptions ? (
+                                tabIndex === 1 ? (
+                                    <HighchartsReact highcharts={Highcharts} options={chartOptions} />
+                                ) : (
+                                    renderCardPerDay()
+                                )
                             ) : (
-                                renderCardPerDay()
+                                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                                    <CircularProgress />
+                                    <Typography sx={{ ml: 2 }}>กำลังโหลดข้อมูล...</Typography>
+                                </Box>
                             )
                         ) : (
                             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                                 <CircularProgress />
-                                <Typography sx={{ ml: 2 }}>Loading data...</Typography>
+                                <Typography sx={{ ml: 2 }}>กำลังโหลดข้อมูล...</Typography>
                             </Box>
                         )}
                     </Box>
