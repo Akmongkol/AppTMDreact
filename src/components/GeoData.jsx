@@ -83,10 +83,10 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
     if (containingFeature) {
       const zoomLevel = map.getZoom();
       const newPopupContent = zoomLevel <= 9
-        ? `จังหวัด: ${containingFeature.properties.pro_th}`
+        ? `${containingFeature.properties.pro_th}`
         : zoomLevel <= 11
-          ? `อำเภอ: ${containingFeature.properties.amp_th} จังหวัด: ${containingFeature.properties.pro_th}`
-          : `ตำบล: ${containingFeature.properties.tam_th} อำเภอ: ${containingFeature.properties.amp_th} จังหวัด: ${containingFeature.properties.pro_th}`;
+          ? `อ.${containingFeature.properties.amp_th} จ.${containingFeature.properties.pro_th}`
+          : `ต.${containingFeature.properties.tam_th} อ.${containingFeature.properties.amp_th} จ.${containingFeature.properties.pro_th}`;
 
       setPopupContent(newPopupContent);
     } else {
