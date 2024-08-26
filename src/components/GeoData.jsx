@@ -4,7 +4,6 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import axios from 'axios';
-import * as turf from '@turf/turf';
 import Subdistricts from '../config/subdistricts.json';
 import Districts from '../config/districts.json';
 import Provinces from '../config/provinces.json';
@@ -71,18 +70,17 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
         return `<div>ตำบล: ${feature.properties.tam_th || 'No data'}</div><div>อำเภอ: ${feature.properties.amp_th || 'No data'}</div><div>จังหวัด: ${feature.properties.pro_th || 'No data'}</div>`;
       }
     };
-
+  
     // Bind tooltip with dynamic content
     layer.bindTooltip(
       getTooltipContent,
       { permanent: false, sticky: true }
     );
-
+  
     layer.on({
       click: (e) => {
-        const centroid = turf.centroid(feature);
-        const [longitude, latitude] = centroid.geometry.coordinates;
-
+        const { lat, lng } = e.latlng;
+  
         // Determine popup content based on zoom level
         const zoomLevel = map.getZoom();
         const newPopupContent = zoomLevel <= 9
@@ -90,21 +88,21 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
           : zoomLevel <= 11
             ? feature.properties ? `อำเภอ: ${feature.properties.amp_th} จังหวัด: ${feature.properties.pro_th}` : 'No data'
             : feature.properties ? `ตำบล: ${feature.properties.tam_th} อำเภอ: ${feature.properties.amp_th} จังหวัด: ${feature.properties.pro_th}` : 'No data';
-
+  
         setPopupContent(newPopupContent);
         // Store selected latitude and longitude
-        setSelectedLat(latitude);
-        setSelectedLng(longitude);
-
+        setSelectedLat(lat);
+        setSelectedLng(lng);
+  
         // Fetch weather data based on the selected position
-        axios.get(`${import.meta.env.VITE_API_URL}/datapts/${longitude}/${latitude}`)
+        axios.get(`${import.meta.env.VITE_API_URL}/datapts/${lng}/${lat}`)
           .then((response) => {
             setWeatherData(response.data);
           })
           .catch((error) => {
             console.error('Error fetching weather data:', error);
           });
-
+  
         // Notify Map to clear its position
         onFeatureClick();
       }

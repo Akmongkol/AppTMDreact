@@ -14,7 +14,6 @@
     "@emotion/styled": "^11.13.0",
     "@mui/icons-material": "^5.16.7",
     "@mui/material": "^5.16.7",
-    "@turf/turf": "^7.1.0",
     "axios": "^1.7.3",
     "highcharts-react-official": "^3.2.1",
     "leaflet": "^1.9.4",
