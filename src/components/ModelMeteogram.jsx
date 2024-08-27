@@ -300,7 +300,7 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
 
 
 
-    const formatDayCard = (dateString) => {
+    const formatDayCard = (dateString, isFirst = false) => {
         // Assuming dateString is in the format "วัน 1 เดือน 2567 เวลา 00:00 น."
         const parts = dateString.split(' ');
         if (parts.length < 6) {
@@ -309,10 +309,15 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
 
         const dayNames = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
         const day = dayNames.find(d => parts[0].includes(d)) || parts[0];
+        const date = parts[1];
         const time = parts[5].slice(0, 5); // Get HH:MM from "HH:MM:SS"
 
-        return `${day}, ${time}`;
+        if (isFirst) {
+            return `${day} ${date},`;
+        }
+        return `${day} ${date}, ${time} น.`;
     };
+
     const isDaytime = (formattedDay) => {
         // Handle the "Now" case
         if (formattedDay === "Now") {
@@ -382,7 +387,9 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
                         }}
                     >
                         {limitedDays.map((day, index) => {
-                            const formattedDay = index === 0 ? "ตอนนี้" : formatDayCard(day);
+                            const formattedDay = index === 0 
+                                ? `${formatDayCard(day, true)} ปัจจุบัน ` 
+                                : formatDayCard(day);
                             const isDay = isDaytime(formattedDay);
                             const precipitation = groupedPrecipitationData[day][0];
                             const iconSrc = getWeatherIcon(isDay, precipitation);
