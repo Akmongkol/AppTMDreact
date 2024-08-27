@@ -22,6 +22,9 @@ import ClearDay from '../widget-icon/clear-day.svg';
 import PartlyCloudyNight from '../widget-icon/partly-cloudy-night-drizzle.svg';
 import ClearNight from '../widget-icon/clear-night.svg';
 
+import ScaleBar from './ScaleBar';
+
+
 function RectangleAndLines() {
   const map = useMap();
 
@@ -190,7 +193,12 @@ function Map() {
       <div className='input-container'>
         <Searchinput onLocationChange={handleLocationChange} />
       </div>
-      <SelectTile onSelect={handleSelect} />
+      <>
+        <SelectTile onSelect={handleSelect} />
+      </>
+
+
+
       <MapContainer center={position || [13.7563, 100.5018]} zoom={6} zoomControl={false} style={{ height: '100vh', width: '100vw' }}>
         <TileLayer
           url="https://api.maptiler.com/maps/backdrop/256/{z}/{x}/{y}.png?key=ShNzB5Vk7GowmweaWj5p"
@@ -236,11 +244,20 @@ function Map() {
 
             </Popup>
           </Marker>
+
         )}
+
+
       </MapContainer>
+
       <div className='playlayer'>
         <PlayGround onSliderChange={setSliderValue} />
       </div>
+      {/* <div className='ScaleBar'>
+      <ScaleBar  />
+      </div> */}
+
+
       {dialogPosition && (
         <ModelMetrogram
           open={open}
@@ -250,7 +267,9 @@ function Map() {
           locationName={locationName}
         />
       )}
+
     </div>
+
   );
 }
 
