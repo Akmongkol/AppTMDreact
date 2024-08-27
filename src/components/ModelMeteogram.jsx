@@ -41,18 +41,18 @@ const theme = createTheme({
     },
     components: {
         MuiTooltip: {
-          styleOverrides: {
-            tooltip: {
-              fontSize: '0.8rem',
-              padding: '8px 12px',
-              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            styleOverrides: {
+                tooltip: {
+                    fontSize: '0.8rem',
+                    padding: '8px 12px',
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                },
             },
-          },
         },
-      },
+    },
 });
 
-  
+
 function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationName }) {
     const [chartOptions, setChartOptions] = useState(null);
     const [tabIndex, setTabIndex] = useState(0);
@@ -336,6 +336,41 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
         return hours >= 6 && hours < 18;
     };
 
+
+    const getWindDirectionName = (degrees) => {
+        const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+        const index = Math.round(degrees / 22.5) % 16;
+        return directions[index];
+    };
+
+    const getThaiWindDirectionName = (direction) => {
+        const thaiDirections = {
+            'N': 'เหนือ',
+            'NNE': 'เหนือค่อนไปตะวันออกเฉียงเหนือ',
+            'NE': 'ตะวันออกเฉียงเหนือ',
+            'ENE': 'ตะวันออกค่อนไปตะวันออกเฉียงเหนือ',
+            'E': 'ตะวันออก',
+            'ESE': 'ตะวันออกค่อนไปตะวันออกเฉียงใต้',
+            'SE': 'ตะวันออกเฉียงใต้',
+            'SSE': 'ใต้ค่อนไปตะวันออกเฉียงใต้',
+            'S': 'ใต้',
+            'SSW': 'ใต้ค่อนไปตะวันตกเฉียงใต้',
+            'SW': 'ตะวันตกเฉียงใต้',
+            'WSW': 'ตะวันตกค่อนไปตะวันตกเฉียงใต้',
+            'W': 'ตะวันตก',
+            'WNW': 'ตะวันตกค่อนไปตะวันตกเฉียงเหนือ',
+            'NW': 'ตะวันตกเฉียงเหนือ',
+            'NNW': 'เหนือค่อนไปตะวันตกเฉียงเหนือ'
+        };
+        return thaiDirections[direction] || direction;
+    };
+
+    const getOppositeWindDirectionName = (degrees) => {
+        const oppositeDegrees = (degrees + 180) % 360;
+        return getWindDirectionName(oppositeDegrees);
+    };
+    
+
     const getWeatherIcon = (isDay, precipitation) => {
         if (isDay) {
             if (precipitation > 1) {
@@ -387,12 +422,16 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
                         }}
                     >
                         {limitedDays.map((day, index) => {
-                            const formattedDay = index === 0 
-                                ? `${formatDayCard(day, true)} ปัจจุบัน ` 
+                            const formattedDay = index === 0
+                                ? `${formatDayCard(day, true)} ปัจจุบัน `
                                 : formatDayCard(day);
                             const isDay = isDaytime(formattedDay);
                             const precipitation = groupedPrecipitationData[day][0];
                             const iconSrc = getWeatherIcon(isDay, precipitation);
+                            const windDirection = groupedWindDirection[day][0];
+                            const arrowDirection = (windDirection + 180) % 360;
+                            const oppositeWindDirectionName = getOppositeWindDirectionName(windDirection);
+                            const thaiOppositeWindDirectionName = getThaiWindDirectionName(oppositeWindDirectionName);
 
                             return (
                                 <Box
@@ -440,13 +479,13 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
                                                     </Box>
                                                 </Tooltip>
                                                 <Tooltip title="ความชื้นสัมพัทธ์" placement="top">
-                                                <Box display="flex" alignItems="center">
-                                                    <WaterDropIcon sx={{ mr: 1, color: '#8A2BE2' }} />
-                                                    <Typography>
-                                                        {Math.round(groupedHumidityData[day][0])}%
-                                                    </Typography>
-                                                </Box>
-                                            </Tooltip>
+                                                    <Box display="flex" alignItems="center">
+                                                        <WaterDropIcon sx={{ mr: 1, color: '#8A2BE2' }} />
+                                                        <Typography>
+                                                            {Math.round(groupedHumidityData[day][0])}%
+                                                        </Typography>
+                                                    </Box>
+                                                </Tooltip>
                                             </Box>
                                             <Box display="flex" alignItems="center">
                                                 <Tooltip title="ความเร็วลม" placement="top">
@@ -457,17 +496,17 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
                                                         </Typography>
                                                     </Box>
                                                 </Tooltip>
-                                                <Tooltip title="ทิศทางลม" placement="top">
+                                                <Tooltip title={`ทิศทางลม: ${thaiOppositeWindDirectionName}`} placement="top">
                                                     <Box display="flex" alignItems="center">
                                                         <NavigationIcon
                                                             sx={{
                                                                 mr: 1,
                                                                 color: 'gray',
-                                                                transform: `rotate(${groupedWindDirection[day][0]}deg)`
+                                                                transform: `rotate(${arrowDirection}deg)`
                                                             }}
                                                         />
                                                         <Typography>
-                                                            {groupedWindDirection[day][0].toFixed(0)}°
+                                                            {oppositeWindDirectionName} {/* ({windDirection.toFixed(0)}°) */}
                                                         </Typography>
                                                     </Box>
                                                 </Tooltip>
@@ -493,31 +532,31 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
     return (
         <ThemeProvider theme={theme}>
             <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xl">
-            <DialogTitle 
-    sx={{ 
-      bgcolor: 'primary.main', 
-      color: 'white',
-      display: 'flex',
-      alignItems: 'center',
-      position: 'relative',
-      padding: '16px'
-    }}
-  >
-    <LocationOnIcon sx={{ marginRight: 1 }} />
-    {popupContent ? popupContent : locationName}
-    <IconButton
-      aria-label="close"
-      onClick={handleClose}
-      sx={{ 
-        position: 'absolute', 
-        right: 8, 
-        top: 8, 
-        color: 'white' 
-      }}
-    >
-      <CloseIcon />
-    </IconButton>
-  </DialogTitle>
+                <DialogTitle
+                    sx={{
+                        bgcolor: 'primary.main',
+                        color: 'white',
+                        display: 'flex',
+                        alignItems: 'center',
+                        position: 'relative',
+                        padding: '16px'
+                    }}
+                >
+                    <LocationOnIcon sx={{ marginRight: 1 }} />
+                    {popupContent ? popupContent : locationName}
+                    <IconButton
+                        aria-label="close"
+                        onClick={handleClose}
+                        sx={{
+                            position: 'absolute',
+                            right: 8,
+                            top: 8,
+                            color: 'white'
+                        }}
+                    >
+                        <CloseIcon />
+                    </IconButton>
+                </DialogTitle>
                 <DialogContent sx={{ bgcolor: 'background.default', p: 0 }}>
                     <Tabs
                         value={tabIndex}
