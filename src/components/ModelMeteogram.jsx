@@ -125,7 +125,7 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
                                             const seriesName = point.series.name;
                                             let value = point.y;
                                             if (seriesName === 'Wind') {
-                                                value = `${point.point.value.toFixed(2)} m/s at ${point.point.direction.toFixed(2)}°`;
+                                                value = `${point.point.value.toFixed(2)} m/s at ${getWindDirectionName(point.point.direction)} ${point.point.direction.toFixed(2)}°`;
                                             } else if (seriesName === 'Temperature') {
                                                 value = `${point.y.toFixed(2)}°C`;
                                             } else if (seriesName === 'Pressure') {
@@ -238,7 +238,7 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
         return windSpeed.map((speed, index) => ({
             x: convertToUTC7(apiData.time.datetime[index]),
             value: speed,
-            direction: windDirection[index],
+            direction: getOppositeWindDirection(windDirection[index]),
         }));
     };
 
@@ -365,11 +365,9 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
         return thaiDirections[direction] || direction;
     };
 
-    const getOppositeWindDirectionName = (degrees) => {
-        const oppositeDegrees = (degrees + 180) % 360;
-        return getWindDirectionName(oppositeDegrees);
+    const getOppositeWindDirection = (degrees) => {
+        return (degrees + 180) % 360;
     };
-    
 
     const getWeatherIcon = (isDay, precipitation) => {
         if (isDay) {
@@ -429,8 +427,12 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
                             const precipitation = groupedPrecipitationData[day][0];
                             const iconSrc = getWeatherIcon(isDay, precipitation);
                             const windDirection = groupedWindDirection[day][0];
-                            const arrowDirection = (windDirection + 180) % 360;
-                            const oppositeWindDirectionName = getOppositeWindDirectionName(windDirection);
+
+
+                            const windDirectionName = getWindDirectionName(windDirection);
+                            const thaiWindDirectionName = getThaiWindDirectionName(windDirectionName);
+                            const oppositeWindDirection = getOppositeWindDirection(windDirection);
+                            const oppositeWindDirectionName = getWindDirectionName(oppositeWindDirection);
                             const thaiOppositeWindDirectionName = getThaiWindDirectionName(oppositeWindDirectionName);
 
                             return (
@@ -496,17 +498,17 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
                                                         </Typography>
                                                     </Box>
                                                 </Tooltip>
-                                                <Tooltip title={`ทิศทางลม: ${thaiOppositeWindDirectionName}`} placement="top">
+                                                <Tooltip title={`ทิศทางลม: ${thaiWindDirectionName}`} placement="top">
                                                     <Box display="flex" alignItems="center">
                                                         <NavigationIcon
                                                             sx={{
                                                                 mr: 1,
                                                                 color: 'gray',
-                                                                transform: `rotate(${arrowDirection}deg)`
+                                                                transform: `rotate(${oppositeWindDirection}deg)`
                                                             }}
                                                         />
                                                         <Typography>
-                                                            {oppositeWindDirectionName} {/* ({windDirection.toFixed(0)}°) */}
+                                                            {windDirectionName} {/* ({windDirection.toFixed(0)}°) */}
                                                         </Typography>
                                                     </Box>
                                                 </Tooltip>
