@@ -78,7 +78,7 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
                                 zoomType: 'x',
                             },
                             title: {
-                                text: 'Meteogram',
+                                text: 'แผนภูมิสภาพอากาศ',
                             },
                             xAxis: {
                                 type: 'datetime',
@@ -93,7 +93,7 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
                                     title: {
                                         text: 'Temperature (°C)',
                                     },
-                                    opposite: false,
+                                    opposite: true,
                                 },
                                 {
                                     title: {
@@ -105,7 +105,7 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
                                     title: {
                                         text: 'Precipitation (mm)',
                                     },
-                                    opposite: true,
+                                    opposite: false,
                                     min: 0,
                                 },
                                 { // New yAxis for humidity
