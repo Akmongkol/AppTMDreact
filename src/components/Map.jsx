@@ -91,8 +91,7 @@ function Map() {
   }, [weatherData]);
 
 
-  useEffect(() => {
-    // เพิ่ม custom CSS สำหรับ Popup แบบกระจก
+ /*  useEffect(() => {
     const style = document.createElement('style');
     style.textContent = `
       .leaflet-popup-content-wrapper, .leaflet-popup-tip {
@@ -117,7 +116,7 @@ function Map() {
     return () => {
       document.head.removeChild(style);
     };
-  }, []);
+  }, []); */
 
 
 
@@ -230,7 +229,7 @@ function Map() {
         <TileLayout sliderValue={sliderValue} action={selectedLayer} />
         {position && (
           <Marker position={position} ref={markerRef}>
-            <Popup>
+            <Popup className="custom-popup">
 
               <CardContent sx={{ maxWidth: '120px', padding: '0px' }}>
                 <Typography component="div" gutterBottom sx={{ fontWeight: 'bold', textAlign: 'center', fontSize: '0.8rem' }}>
