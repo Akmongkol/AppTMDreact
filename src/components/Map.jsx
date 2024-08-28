@@ -21,7 +21,9 @@ import ClearDay from '../widget-icon/clear-day.svg';
 import PartlyCloudyNight from '../widget-icon/partly-cloudy-night-drizzle.svg';
 import ClearNight from '../widget-icon/clear-night.svg';
 
-// import ScaleBar from './ScaleBar';
+import Bar from './Bar';
+import Air from './Air'
+import Temp from './Temp'
 
 
 function RectangleAndLines() {
@@ -187,6 +189,20 @@ function Map() {
     };
   };
 
+  // Render content based on selectedLayer
+  const renderScaleBar = () => {
+    switch (selectedLayer) {
+      case 'p3h':
+        return <Bar />;
+      case 'mslp':
+        return <Air />;
+        case 't2m':
+        return <Temp />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className='map-container'>
       <div className='input-container'>
@@ -252,11 +268,10 @@ function Map() {
       <div className='playlayer'>
         <PlayGround onSliderChange={setSliderValue} />
       </div>
-      {/* <div className='ScaleBar'>
-      <ScaleBar  />
-      </div> */}
-
-
+      <div className='ScaleBar'>
+        {renderScaleBar()}
+      </div>
+      
       {dialogPosition && (
         <ModelMetrogram
           open={open}

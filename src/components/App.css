@@ -36,11 +36,9 @@
   outline: none;
 }
 
-
 .ScaleBar {
   position: absolute;
   z-index: 1000;
-  bottom: 45px; /* ขยับขึ้นจากขอบล่าง 20px */
-  left: 86%; /* ตรงกลางแนวนอน */
-  transform: translateX(-50%); /* ขยับครึ่งหนึ่งของความกว้างเพื่อให้ตรงกลาง */
+  bottom: 20px; /* Adjust as needed */
+  right: 20px; /* Adjust as needed */ /* Optional: you can remove this or adjust it as needed */
 }
