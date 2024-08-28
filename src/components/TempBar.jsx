@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
 
-const ColorBar = () => {
+const TempBar = () => {
   return (
     <Box
       sx={{
@@ -49,4 +49,4 @@ const ColorBar = () => {
   );
 };
 
-export default ColorBar;
+export default TempBar;

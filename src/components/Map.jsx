@@ -21,9 +21,10 @@ import ClearDay from '../widget-icon/clear-day.svg';
 import PartlyCloudyNight from '../widget-icon/partly-cloudy-night-drizzle.svg';
 import ClearNight from '../widget-icon/clear-night.svg';
 
-import Bar from './Bar';
-import Air from './Air'
-import Temp from './Temp'
+import RainBar from './RainBar';
+import AirBar from './AirBar'
+import Temp from './TempBar'
+import TempBar from './TempBar';
 
 
 function RectangleAndLines() {
@@ -192,11 +193,11 @@ function Map() {
   const renderScaleBar = () => {
     switch (selectedLayer) {
       case 'p3h':
-        return <Bar />;
+        return <RainBar />;
       case 'mslp':
-        return <Air />;
+        return <AirBar />;
         case 't2m':
-        return <Temp />;
+        return <TempBar />;
       default:
         return null;
     }
