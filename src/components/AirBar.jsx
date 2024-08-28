@@ -1,17 +1,17 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
 
-const Bar = () => {
+const AirBar = () => {
   return (
     <Box
       sx={{
         position: 'relative',
-        width: '320px',  // Fixed width for debugging
+        width: '320px',  // Adjust width as needed
         height: '30px',
-        background: 'linear-gradient(to right, #00FF00, #FFFF00, #FF7F00, #FF0000, #FF00FF)',
+        background: 'linear-gradient(to right, #8B0000 0%, #B22222 10%, #FF4500 20%, #FFA500 30%, #FFFF00 40%, #F0E68C 50%, #ADD8E6 60%, #87CEEB 70%, #4682B4 80%, #00008B 100%)',  // Customized gradient
         borderRadius: '5px',
         marginBottom: '20px',
-        border: '1px solid black',  // Added border for visibility
+        border: '1px solid black',
       }}
     >
       {/* Labels */}
@@ -26,7 +26,7 @@ const Bar = () => {
           padding: '0 0px',
         }}
       >
-        {Array.from({ length: 11 }, (_, i) => i * 10).map((value, index) => (
+        {['980', '984', '988', '992', '996', '1000', '1004', '1008', '1012', '1016', '1020', '1030'].map((value, index) => (
           <Typography key={index} sx={{ color: 'black', fontSize: '12px' }}>
             {value}
           </Typography>
@@ -43,10 +43,10 @@ const Bar = () => {
           fontSize: '14px',
         }}
       >
-        ปริมาณฝนสะสม หน่วย มิลลิเมตร (mm)
+        ความกดอากาศ หน่วย เฮกโตปาสคาล (hPa)
       </Box>
     </Box>
   );
 };
 
-export default Bar;
+export default AirBar;
