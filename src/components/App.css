@@ -43,7 +43,16 @@
   right: 20px; /* Adjust as needed */ /* Optional: you can remove this or adjust it as needed */
 }
 
-
+@media (max-width: 1300px) {
+  .ScaleBar {
+    bottom: 140px;
+    right: 52%;
+    width: 150px;
+  }
+  .playlayer {
+    bottom: 10px;
+  }
+}
 
 /* popuppppppppppppppppppppppppppppppppppppppppppp */
 .custom-popup .leaflet-popup-content-wrapper {

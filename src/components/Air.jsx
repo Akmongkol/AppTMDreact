@@ -6,7 +6,7 @@ const ColorBar = () => {
     <Box
       sx={{
         position: 'relative',
-        width: '350px',  // Adjust width as needed
+        width: '320px',  // Adjust width as needed
         height: '30px',
         background: 'linear-gradient(to right, #8B0000 0%, #B22222 10%, #FF4500 20%, #FFA500 30%, #FFFF00 40%, #F0E68C 50%, #ADD8E6 60%, #87CEEB 70%, #4682B4 80%, #00008B 100%)',  // Customized gradient
         borderRadius: '5px',
