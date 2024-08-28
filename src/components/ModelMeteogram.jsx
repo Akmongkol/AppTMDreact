@@ -318,21 +318,23 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
         return `${day} ${date}, ${time} น.`;
     };
 
-    const isDaytime = (formattedDay) => {
-        // Handle the "Now" case
+   
+    
+    const isDaytime = (formattedDay, index) => {
+        if (index === 0) {
+            // For the first card, use the current time
+            const currentHour = new Date().getHours();
+            return currentHour >= 6 && currentHour < 18;
+        }
+        // For other cards, use the existing logic
         if (formattedDay === "Now") {
             const currentHour = new Date().getHours();
-            return currentHour >= 6 && currentHour < 18; // Keep daytime as 6 AM to 6 PM for "Now"
+            return currentHour >= 6 && currentHour < 18;
         }
-
-        // Extract the time from the formattedDay string
         const timeMatch = formattedDay.match(/(\d{1,2}):(\d{2})/);
-        if (!timeMatch) return true; // Default to daytime if we can't parse the time
-
+        if (!timeMatch) return true;
         let [, hours] = timeMatch;
         hours = parseInt(hours);
-
-        // Invert the provided night time logic for daytime
         return hours >= 6 && hours < 18;
     };
 
@@ -371,15 +373,9 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
 
     const getWeatherIcon = (isDay, precipitation) => {
         if (isDay) {
-            if (precipitation > 1) {
-                return `${PartlyClound}`;
-            }
-            return `${ClearDay}`;
+            return precipitation > 1 ? `${PartlyClound}` : `${ClearDay}`;
         } else {
-            if (precipitation > 1) {
-                return `${PartlyCloudyNight}`;
-            }
-            return `${ClearNight}`;
+            return precipitation > 1 ? `${PartlyCloudyNight}` : `${ClearNight}`;
         }
     };
 
@@ -421,9 +417,9 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
                     >
                         {limitedDays.map((day, index) => {
                             const formattedDay = index === 0
-                                ? `${formatDayCard(day, true)} ปัจจุบัน `
+                                ? `${formatDayCard(day, true)} ปัจจุบัน`
                                 : formatDayCard(day);
-                            const isDay = isDaytime(formattedDay);
+                            const isDay = isDaytime(formattedDay, index);
                             const precipitation = groupedPrecipitationData[day][0];
                             const iconSrc = getWeatherIcon(isDay, precipitation);
                             const windDirection = groupedWindDirection[day][0];
@@ -432,8 +428,8 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
                             const windDirectionName = getWindDirectionName(windDirection);
                             const thaiWindDirectionName = getThaiWindDirectionName(windDirectionName);
                             const oppositeWindDirection = getOppositeWindDirection(windDirection);
-                            const oppositeWindDirectionName = getWindDirectionName(oppositeWindDirection);
-                            const thaiOppositeWindDirectionName = getThaiWindDirectionName(oppositeWindDirectionName);
+                          
+                      
 
                             return (
                                 <Box
