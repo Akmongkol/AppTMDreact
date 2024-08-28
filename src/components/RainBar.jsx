@@ -38,7 +38,7 @@ const RainBar = () => {
         sx={{
           position: 'absolute',
           top: '-20px',
-          right: '20px',
+          right: '50px',
           color: 'black',
           fontSize: '14px',
         }}

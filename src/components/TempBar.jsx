@@ -38,7 +38,7 @@ const TempBar = () => {
         sx={{
           position: 'absolute',
           top: '-20px',
-          right: '35px',
+          right: '50px',
           color: 'black',
           fontSize: '14px',
         }}
