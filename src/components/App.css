@@ -70,16 +70,6 @@
 
 }
 
-.custom-popup .leaflet-popup-content {
-  margin: 10px;
-  color: #333;
-}
-
-
-.custom-popup .MuiTypography-root {
-  color: #333;
-  font-weight: 600;
-}
 
 .custom-popup .MuiDivider-root {
   background-color: rgba(0, 0, 0, 0.1);
