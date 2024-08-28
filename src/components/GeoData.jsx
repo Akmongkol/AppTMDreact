@@ -193,7 +193,7 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
             add: (e) => setMarkerInstance(e.target) // Store the marker instance
           }}
         >
-          <Popup>
+          <Popup className="custom-popup">
        
           <CardContent sx={{  maxWidth: '120px', minWidth:'120px', padding:'0px' }}>
           <Typography  component="div" gutterBottom sx={{ fontWeight: 'bold', textAlign: 'center', fontSize: '0.8rem' }}>
