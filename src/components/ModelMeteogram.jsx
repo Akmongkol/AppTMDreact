@@ -373,9 +373,9 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
 
     const getWeatherIcon = (isDay, precipitation) => {
         if (isDay) {
-            return precipitation > 1 ? `${PartlyClound}` : `${ClearDay}`;
+            return precipitation > 0 ? `${PartlyClound}` : `${ClearDay}`;
         } else {
-            return precipitation > 1 ? `${PartlyCloudyNight}` : `${ClearNight}`;
+            return precipitation > 0 ? `${PartlyCloudyNight}` : `${ClearNight}`;
         }
     };
 

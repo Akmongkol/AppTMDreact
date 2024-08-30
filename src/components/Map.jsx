@@ -92,32 +92,17 @@ function Map() {
   }, [weatherData]);
 
 
- /*  useEffect(() => {
-    const style = document.createElement('style');
-    style.textContent = `
-      .leaflet-popup-content-wrapper, .leaflet-popup-tip {
-        background: rgba(255, 255, 255, 0.25) !important;
-        backdrop-filter: blur(10px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.3) !important;
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37) !important;
-      }
-      .leaflet-popup-content-wrapper {
-        border-radius: 10px !important;
-      }
-      .leaflet-popup-content {
-        margin: 15px 15px 15px;
-        line-height: 1.4;
-      }
-   .MuiCardContent-root {
-      padding-bottom: 0 !important;
-    }
-    `;
-    document.head.appendChild(style);
-
-    return () => {
-      document.head.removeChild(style);
+  useEffect(() => {
+    const updateMapHeight = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
     };
-  }, []); */
+
+    window.addEventListener('resize', updateMapHeight);
+    updateMapHeight();
+
+    return () => window.removeEventListener('resize', updateMapHeight);
+  }, []);
 
 
 
@@ -161,9 +146,9 @@ function Map() {
 
   const getWeatherIcon = (isDay, precipitation) => {
     if (isDay) {
-      return precipitation > 1 ? PartlyClound : ClearDay;
+      return precipitation > 0 ? PartlyClound : ClearDay;
     } else {
-      return precipitation > 1 ? PartlyCloudyNight : ClearNight;
+      return precipitation > 0 ? PartlyCloudyNight : ClearNight;
     }
   };
 
@@ -203,18 +188,21 @@ function Map() {
     }
   };
 
+
+
   return (
     <div className='map-container'>
       <div className='input-container'>
         <Searchinput onLocationChange={handleLocationChange} />
       </div>
-      <>
-        <SelectTile onSelect={handleSelect} />
-      </>
+      <SelectTile onSelect={handleSelect} />
 
-
-
-      <MapContainer center={position || [13.7563, 100.5018]} zoom={6} zoomControl={false} style={{ height: '100vh', width: '100vw' }}>
+      <MapContainer 
+        center={position || [13.7563, 100.5018]} 
+        zoom={6} 
+        zoomControl={false} 
+        style={{ height: 'calc(var(--vh, 1vh) * 100)', width: '100%' }}
+      >
         <TileLayer
           url="https://api.maptiler.com/maps/backdrop/256/{z}/{x}/{y}.png?key=ShNzB5Vk7GowmweaWj5p"
           attribution='<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>'
@@ -225,13 +213,12 @@ function Map() {
           clearMarker={clearGeoDistrictMarker}
           setClearMarker={setClearGeoDistrictMarker}
           onFeatureClick={handleClearPosition}
-          sliderValue={sliderValue} // Pass sliderValue here
+          sliderValue={sliderValue}
         />
         <TileLayout sliderValue={sliderValue} action={selectedLayer} />
         {position && (
           <Marker position={position} ref={markerRef}>
             <Popup className="custom-popup">
-
               <CardContent sx={{ maxWidth: '120px', padding: '0px' }}>
                 <Typography component="div" gutterBottom sx={{ fontWeight: 'bold', textAlign: 'center', fontSize: '0.8rem' }}>
                   {locationName || 'ไม่ระบุชื่อตำแหน่ง'}
@@ -255,14 +242,10 @@ function Map() {
                   เพิ่มเติม
                 </Button>
 
-              </CardContent>
-
+                </CardContent>
             </Popup>
           </Marker>
-
         )}
-
-
       </MapContainer>
 
       <div className='playlayer'>
@@ -281,9 +264,7 @@ function Map() {
           locationName={locationName}
         />
       )}
-
     </div>
-
   );
 }
 
