@@ -155,7 +155,7 @@ function PlayGround({ onSliderChange }) {
         width: { xs: 300, md: 700}, // Responsive width
         maxWidth: 700,
         margin: 'auto',
-        mb: '5%'
+        mb: 5
       }}
     >
       <IconButton onClick={handlePlayPause} sx={{ mr: 1, mb:1 }}>
