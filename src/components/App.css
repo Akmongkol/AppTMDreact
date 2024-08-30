@@ -47,7 +47,7 @@
   right: 20px; /* Adjust as needed */ /* Optional: you can remove this or adjust it as needed */
 }
 
-@media (max-width: 1300px) {
+@media (max-width: 1500px) {
   .ScaleBar {
     bottom: 148px;
     right: 52%;

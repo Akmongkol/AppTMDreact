@@ -1,51 +1,85 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Tooltip } from '@mui/material';
 
 const RainBar = () => {
+  const gradientColors = [
+    '#ffffff00 0%',
+    '#3ec6e8ff 9.52%',
+    '#45f04dff 19.05%',
+    '#fefe00ff 28.57%',
+    '#fa9728ff 47.62%',
+    '#fc602fff 66.67%',
+    '#fd1d0eff 85.71%',
+    '#cd0000ff 100%'
+  ];
+
+  const gradientStyle = `linear-gradient(to right, ${gradientColors.join(', ')})`;
+
+  const labelStyle = {
+    position: 'absolute',
+    top: '50%',
+    transform: 'translate(-50%, -50%)',
+    color: 'white',
+    fontSize: '10px',
+    fontWeight: 'bold',
+    textShadow: `
+      -1px -1px 0 #000,  
+      1px -1px 0 #000,
+      -1px 1px 0 #000,
+      1px 1px 0 #000
+    `,
+  };
+
   return (
-    <Box
+    <Tooltip 
+      title="ปริมาณฝนสะสม 3 ชั่วโมง (มม.)" 
+      arrow 
+      placement="top"
       sx={{
-        position: 'relative',
-        width: '320px',  // Fixed width for debugging
-        height: '30px',
-        background: 'linear-gradient(to right, #00FF00, #FFFF00, #FF7F00, #FF0000, #FF00FF)',
-        borderRadius: '5px',
-        marginBottom: '20px',
-        border: '1px solid black',  // Added border for visibility
+        '& .MuiTooltip-tooltip': {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          color: 'white',
+          fontSize: '14px',
+          fontWeight: 'bold',
+          padding: '8px 12px',
+          borderRadius: '4px',
+        },
+        '& .MuiTooltip-arrow': {
+          color: 'rgba(0, 0, 0, 0.8)',
+        },
       }}
     >
-      {/* Labels */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: '30%',
-          left: '0%',
-          display: 'flex',
-          justifyContent: 'space-between',
-          width: '100%',
-          padding: '0 0px',
-        }}
-      >
-        {Array.from({ length: 11 }, (_, i) => i * 10).map((value, index) => (
-          <Typography key={index} sx={{ color: 'black', fontSize: '12px' }}>
-            {value}
+      <Box sx={{ position: 'relative', width: '320px', marginBottom: '20px' }}>
+        <Box
+          sx={{
+            position: 'relative',
+            width: '100%',
+            height: '30px',
+            background: gradientStyle,
+            borderRadius: '5px',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.1)',
+          }}
+        >
+          {/* 'mm' label */}
+          <Typography sx={{ ...labelStyle, left: '-5%' }}>
+            (mm)
           </Typography>
-        ))}
-      </Box>
 
-      {/* Label text */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: '-20px',
-          right: '50px',
-          color: 'black',
-          fontSize: '14px',
-        }}
-      >
-        ปริมาณฝนสะสม หน่วย มิลลิเมตร (mm)
+          {/* Labels on the gradient */}
+          {Array.from({ length: 11 }, (_, i) => i * 10).map((value) => (
+            <Typography
+              key={value}
+              sx={{
+                ...labelStyle,
+                left: `${value === 0 ? 2.5 : (value / 105) * 100}%`,
+              }}
+            >
+              {value}
+            </Typography>
+          ))}
+        </Box>
       </Box>
-    </Box>
+    </Tooltip>
   );
 };
 
