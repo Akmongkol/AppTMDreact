@@ -23,7 +23,7 @@ import ClearNight from '../widget-icon/clear-night.svg';
 
 import RainBar from './RainBar';
 import AirBar from './AirBar'
-import Temp from './TempBar'
+import RhumBar from './RhumBar'
 import TempBar from './TempBar';
 
 
@@ -146,9 +146,9 @@ function Map() {
 
   const getWeatherIcon = (isDay, precipitation) => {
     if (isDay) {
-      return precipitation > 0 ? PartlyClound : ClearDay;
+      return precipitation > 0.1 ? PartlyClound : ClearDay;
     } else {
-      return precipitation > 0 ? PartlyCloudyNight : ClearNight;
+      return precipitation > 0.1 ? PartlyCloudyNight : ClearNight;
     }
   };
 
@@ -181,8 +181,10 @@ function Map() {
         return <RainBar />;
       case 'mslp':
         return <AirBar />;
-        case 't2m':
+      case 't2m':
         return <TempBar />;
+        case 'rhum':
+          return <RhumBar />;
       default:
         return null;
     }
@@ -197,10 +199,10 @@ function Map() {
       </div>
       <SelectTile onSelect={handleSelect} />
 
-      <MapContainer 
-        center={position || [13.7563, 100.5018]} 
-        zoom={6} 
-        zoomControl={false} 
+      <MapContainer
+        center={position || [13.7563, 100.5018]}
+        zoom={6}
+        zoomControl={false}
         style={{ height: 'calc(var(--vh, 1vh) * 100)', width: '100%' }}
       >
         <TileLayer
@@ -242,7 +244,7 @@ function Map() {
                   เพิ่มเติม
                 </Button>
 
-                </CardContent>
+              </CardContent>
             </Popup>
           </Marker>
         )}
@@ -254,7 +256,7 @@ function Map() {
       <div className='ScaleBar'>
         {renderScaleBar()}
       </div>
-      
+
       {dialogPosition && (
         <ModelMetrogram
           open={open}
