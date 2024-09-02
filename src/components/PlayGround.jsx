@@ -28,7 +28,7 @@ function PlayGround({ onSliderChange }) {
   const [isPlaying, setIsPlaying] = useState(false); // Play/Pause state
   const sliderIntervalRef = useRef(null); // Reference for the slider interval
 
-  const threeDays = 3 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
+  const threeDays = 7 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
   const threeHours = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
 
   
