@@ -35,7 +35,7 @@ const RainBar = () => {
     transform: 'translateX(-50%)',
   };
 
-  const rainValues = [5, 25, 50, 75, 100, 125, 150, 175, 200];
+  const rainValues = [15, 25, 50, 75, 100, 125, 150, 175, 200];
   const padding = 5; 
   return (
     <Tooltip 

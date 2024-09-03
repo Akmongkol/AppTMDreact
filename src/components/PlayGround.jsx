@@ -6,7 +6,8 @@ import IconButton from '@mui/material/IconButton';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import axios from 'axios';
-import { Card } from '@mui/material';
+import { Card, useMediaQuery } from '@mui/material';
+
 
 function PlayGround({ onSliderChange }) {
   // Custom ValueLabel component
@@ -25,26 +26,28 @@ function PlayGround({ onSliderChange }) {
   const [marks, setMarks] = useState([]);
   const [minValue, setMinValue] = useState(0);
   const [maxValue, setMaxValue] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false); // Play/Pause state
-  const sliderIntervalRef = useRef(null); // Reference for the slider interval
+  const [isPlaying, setIsPlaying] = useState(false);
+  const sliderIntervalRef = useRef(null);
 
-  const threeDays = 7 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
+
+  const isMobile = useMediaQuery('(max-width:900px)');
+
+  const threeDays = 3 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
+  const sevenDays = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
   const threeHours = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
 
-  
   useEffect(() => {
     axios.get(`${import.meta.env.VITE_API_URL}/recent-folder`)
       .then(response => {
         const mostRecentFolder3 = response.data.most_recent_folder_3;
         if (mostRecentFolder3 && mostRecentFolder3.length > 0) {
           const currentTime = new Date().getTime();
-          const threeHoursAgo = currentTime - (3 * 60 * 60 * 1000); // 3 hours in milliseconds
+          const threeHoursAgo = currentTime - (3 * 60 * 60 * 1000);
           let startDate;
 
-          // Find the first timestamp that is greater than the current time minus 3 hours
           for (let dateStr of mostRecentFolder3) {
             let year = parseInt(dateStr.slice(0, 4), 10);
-            let month = parseInt(dateStr.slice(4, 6), 10) - 1; // Adjust month to be zero-based
+            let month = parseInt(dateStr.slice(4, 6), 10) - 1;
             let day = parseInt(dateStr.slice(6, 8), 10);
             let hours = parseInt(dateStr.slice(8, 10), 10);
 
@@ -55,7 +58,6 @@ function PlayGround({ onSliderChange }) {
             }
           }
 
-          // If no suitable time found, use the last available time
           if (!startDate) {
             let lastDateStr = mostRecentFolder3[mostRecentFolder3.length - 1];
             let year = parseInt(lastDateStr.slice(0, 4), 10);
@@ -65,7 +67,7 @@ function PlayGround({ onSliderChange }) {
             startDate = new Date(year, month, day, hours).getTime();
           }
 
-          let endDate = startDate + threeDays;
+          let endDate = startDate + (isMobile ? threeDays : sevenDays);
 
           setMinValue(startDate);
           setMaxValue(endDate);
@@ -94,7 +96,7 @@ function PlayGround({ onSliderChange }) {
         clearInterval(sliderIntervalRef.current);
       }
     };
-  }, [onSliderChange]);
+  }, [onSliderChange, isMobile]);
 
   function formatThaiDateTooltip(date) {
     const dayNames = [
