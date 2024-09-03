@@ -3,7 +3,8 @@ import { Box, Typography, Tooltip } from '@mui/material';
 
 const RainBar = () => {
   const colors = [
-    "#ffffff00", "#d3ffff00", "#a8ffff00", "#7dffff00", "#5de2f300", "#3ec6e8ff", "#3fd0c1ff", "#41db9aff",
+    "#3ec6e8ff","#3ec6e8ff","#3ec6e8ff", "#3fd0c1ff",  "#3ec6e8ff",
+    "#41db9aff",
     "#43e574ff", "#45f04dff", "#47fb27ff", "#84fc1aff", "#c1fd0dff", "#fefe00ff", "#fde806ff", "#fcd20dff",
     "#fbbc14ff", "#faa71bff", "#faa11fff", "#fa9c23ff", "#fa9728ff", "#fb922cff", "#fb8d30ff", "#fb8835ff",
     "#fb8339ff", "#fc7e3eff", "#fc7439ff", "#fc6a34ff", "#fc602fff", "#fc572aff", "#fc4d26ff", "#fc4321ff",
@@ -15,7 +16,7 @@ const RainBar = () => {
     "#dc0e90ff", "#d90e90ff", "#d60d90ff", "#d30d90ff", "#d00c8fff", "#cd0c8fff", "#ca0b8fff", "#c70b8fff",
     "#c50a8fff", "#c2098eff", "#bf098eff", "#bc088eff", "#b9088eff", "#b6078eff", "#b3078dff", "#b0068dff",
     "#ad068dff", "#aa058dff", "#a8058dff", "#a5048cff", "#a2048cff", "#9f038cff", "#9c038cff", "#99028cff",
-    "#96028bff", "#93018bff", "#90018bff", "#8d008bff", "#8b008bff"
+    "#96028bff", "#93018bff", "#90018bff", "#8d008bff", "#8b008bff", "#8b008bff","#8b008bff","#8b008bff"
   ];
 
   const gradientStyle = `linear-gradient(to right, ${colors.map((color, index) => `${color} ${(index / (colors.length - 1)) * 100}%`).join(', ')})`;
@@ -34,8 +35,8 @@ const RainBar = () => {
     transform: 'translateX(-50%)',
   };
 
-  const rainValues = [0, 25, 50, 75, 100, 125, 150, 175, 200];
-
+  const rainValues = [5, 25, 50, 75, 100, 125, 150, 175, 200];
+  const padding = 5; 
   return (
     <Tooltip 
       title="ปริมาณน้ำฝนใน 3 ชั่วโมง (Precipitation in 3 hours)" 
@@ -55,20 +56,20 @@ const RainBar = () => {
         },
       }}
     >
-      <Box sx={{ position: 'relative', width: '320px', marginBottom: '20px', display: 'flex', alignItems: 'center' }}>
+       <Box sx={{ position: 'relative', width: '320px', marginBottom: '20px', display: 'flex', alignItems: 'center' }}>
         <Typography sx={{ 
           position: 'absolute',
           top: '50%',
           transform: 'translate(-50%, -50%)',
           color: 'white',
-       fontSize: '10px',
-       fontWeight: 'bold',
-       textShadow: `
-         -1px -1px 0 #000,  
-         1px -1px 0 #000,
-         -1px 1px 0 #000,
-         1px 1px 0 #000
-       `,
+          fontSize: '10px',
+          fontWeight: 'bold',
+          textShadow: `
+            -1px -1px 0 #000,  
+            1px -1px 0 #000,
+            -1px 1px 0 #000,
+            1px 1px 0 #000
+          `,
           left: '-5%'
         }}>
           (มม.)
@@ -92,9 +93,8 @@ const RainBar = () => {
               key={value} 
               sx={{
                 ...labelStyle,
-                left: `${((value / 200) * (100 - 10)) + 5}%`,
-                ...(index === 0 && { transform: 'translateX(0)' }),
-                ...(index === rainValues.length - 1 && { transform: 'translateX(-100%)' }),
+                left: `${padding + (index / (rainValues.length - 1)) * (100 - 2 * padding)}%`,
+                transform: 'translateX(-50%)',
               }}
             >
               {value}
