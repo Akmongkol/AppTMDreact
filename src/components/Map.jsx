@@ -82,6 +82,7 @@ function Map() {
   const [clearGeoDistrictMarker, setClearGeoDistrictMarker] = useState(false);
   const [locationName, setLocationName] = useState('');
   const [weatherData, setWeatherData] = useState(null);
+  const [dailyWeatherData, setDailyWeatherData] = useState(null);
   const markerRef = useRef(null);
 
   useEffect(() => {
@@ -92,6 +93,14 @@ function Map() {
         })
         .catch((error) => {
           console.error('Error fetching weather data:', error);
+        });
+
+      axios.get(`${import.meta.env.VITE_API_URL}/datapts-day/${position[1]}/${position[0]}`)
+        .then((response) => {
+          setDailyWeatherData(response.data);
+        })
+        .catch((error) => {
+          console.error('Error fetching daily weather data:', error);
         });
     }
   }, [position]);
@@ -195,8 +204,8 @@ function Map() {
         return <AirBar />;
       case 't2m':
         return <TempBar />;
-        case 'rhum':
-          return <RhumBar />;
+      case 'rhum':
+        return <RhumBar />;
       default:
         return null;
     }
@@ -245,8 +254,8 @@ function Map() {
                     getWeatherData={getWeatherData}
                     getWeatherIcon={getWeatherIcon}
                     isDaytime={isDaytime}
-                  />
-                </Box>
+                    dailyStats={dailyWeatherData ? dailyWeatherData.daily_stats_t2m : null}
+                  />           </Box>
                 <Button
                   variant="contained"
                   fullWidth
@@ -255,7 +264,6 @@ function Map() {
                 >
                   เพิ่มเติม
                 </Button>
-
               </CardContent>
             </Popup>
           </Marker>

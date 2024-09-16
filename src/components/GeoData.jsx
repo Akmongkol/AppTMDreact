@@ -25,6 +25,7 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
   const map = useMap();
   const [markerInstance, setMarkerInstance] = useState(null);
   const [weatherData, setWeatherData] = useState(null);
+  const [dailyWeatherData, setDailyWeatherData] = useState(null);
   const markerRef = useRef(null); // Ref for the marker instance
 
   const updateGeoData = () => {
@@ -48,7 +49,7 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
     };
 
 
-    
+
 
     updateGeoData(); // Update data initially
     map.on('zoomend', onZoomEnd); // Listen for zoom level changes
@@ -69,25 +70,25 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
         return `<div>ต.${feature.properties.tam_th || 'No data'}</div><div>อ.${feature.properties.amp_th || 'No data'}</div><div>จ.${feature.properties.pro_th || 'No data'}</div>`;
       }
     };
-  
+
     // Bind tooltip with dynamic content
     layer.bindTooltip(getTooltipContent, { permanent: false, sticky: true });
-  
+
     layer.on({
       click: (e) => {
         const { lat, lng } = e.latlng;
-  
+
         const zoomLevel = map.getZoom();
         const newPopupContent = zoomLevel <= 9
           ? feature.properties ? `${feature.properties.pro_th}` : 'No data'
           : zoomLevel <= 11
             ? feature.properties ? `อ.${feature.properties.amp_th} จ.${feature.properties.pro_th}` : 'No data'
             : feature.properties ? `ต.${feature.properties.tam_th} อ.${feature.properties.amp_th} จ.${feature.properties.pro_th}` : 'No data';
-  
+
         setPopupContent(newPopupContent);
         setSelectedLat(lat);
         setSelectedLng(lng);
-  
+
         axios.get(`${import.meta.env.VITE_API_URL}/datapts/${lng}/${lat}`)
           .then((response) => {
             setWeatherData(response.data);
@@ -95,7 +96,17 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
           .catch((error) => {
             console.error('Error fetching weather data:', error);
           });
-  
+
+        axios.get(`${import.meta.env.VITE_API_URL}/datapts-day/${lng}/${lat}`)
+          .then((response) => {
+            setDailyWeatherData(response.data);
+          })
+          .catch((error) => {
+            console.error('Error fetching daily weather data:', error);
+          });
+
+
+
         onFeatureClick();
       },
       mouseover: (e) => {
@@ -194,30 +205,31 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
           }}
         >
           <Popup className="custom-popup">
-       
-          <CardContent sx={{  maxWidth: '120px', minWidth:'120px', padding:'0px' }}>
-          <Typography  component="div" gutterBottom sx={{ fontWeight: 'bold', textAlign: 'center', fontSize: '0.8rem' }}>
-                  {popupContent || 'ไม่ระบุชื่อตำแหน่ง'}
-                </Typography>
-                <Divider sx={{ my: 1 }} />
-                <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ width: '100%', my: 1 }}>
-                  <WidgetGeodata
-                    sliderValue={sliderValue} 
-                    getWeatherData={getWeatherData}
-                    getWeatherIcon={getWeatherIcon}
-                    isDaytime={isDaytime}
-                  />
-                </Box>  
-                <Button
-                    variant="contained"
-                    fullWidth
-                    onClick={() => setDialogOpen(true)}
-                    sx={{  fontSize: '0.75rem' }}
-                  >
-                    เพิ่มเติม
-                  </Button>
-              </CardContent>
-        
+
+            <CardContent sx={{ maxWidth: '120px', padding: '0px' }}>
+              <Typography component="div" gutterBottom sx={{ fontWeight: 'bold', textAlign: 'center', fontSize: '0.8rem' }}>
+                {popupContent || 'ไม่ระบุชื่อตำแหน่ง'}
+              </Typography>
+              <Divider sx={{ my: 1 }} />
+              <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ width: '100%', my: 1 }}>
+                <WidgetGeodata
+                  sliderValue={sliderValue}
+                  getWeatherData={getWeatherData}
+                  getWeatherIcon={getWeatherIcon}
+                  isDaytime={isDaytime}
+                  dailyStats={dailyWeatherData ? dailyWeatherData.daily_stats_t2m : null}
+                />
+              </Box>
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={() => setDialogOpen(true)}
+                sx={{ fontSize: '0.75rem' }}
+              >
+                เพิ่มเติม
+              </Button>
+            </CardContent>
+
           </Popup>
         </Marker>
       )}

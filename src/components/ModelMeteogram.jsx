@@ -65,11 +65,11 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
                 .then((response) => {
                     const apiData = response.data;
                     try {
-                        const temperatureData = processTemperatureData(apiData);
-                        const pressureData = processPressureData(apiData);
-                        const precipitationData = processPrecipitationData(apiData);
-                        const windData = processWindData(apiData);
-                        const humidityData = processHumidityData(apiData); // New function to process humidity data
+                        const temperatureData = processTemperatureData(apiData).slice(0, 56);
+                        const pressureData = processPressureData(apiData).slice(0, 56);
+                        const precipitationData = processPrecipitationData(apiData).slice(0, 56);
+                        const windData = processWindData(apiData).slice(0, 56);
+                        const humidityData = processHumidityData(apiData).slice(0, 56);
 
                         setData(apiData);
 
