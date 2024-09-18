@@ -4,8 +4,7 @@ import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
 import Chip from '@mui/material/Chip';
 import { styled } from '@mui/material/styles';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import DeviceThermostatIcon from '@mui/icons-material/DeviceThermostat';
 import WarningIcon from '@mui/icons-material/Warning';
 
 const TemperatureTypography = styled(Typography)(({ theme }) => ({
@@ -36,8 +35,6 @@ const formatDateTime = (date) => {
 const WidgetCurrentdata = ({ sliderValue, getWeatherData, getWeatherIcon, isDaytime, dailyStats }) => {
   const currentWeather = getWeatherData(sliderValue);
   const currentDate = new Date(sliderValue);
-
-  /* console.log('Slider time:', currentDate.toLocaleString('th-TH')); */
 
   if (currentWeather && dailyStats) {
     const rainIntensity = getRainIntensity(currentWeather.precipitation);
@@ -81,19 +78,19 @@ const WidgetCurrentdata = ({ sliderValue, getWeatherData, getWeatherIcon, isDayt
               />
             </Tooltip>
           </Box>
-          <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" flex={1} height="100%" sx={{ pb: 1 , pt:1 }}>
+          <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" flex={1} height="100%" sx={{ pb: 1 , pt:1 ,pl:1.5}}>
             <TemperatureTypography variant="h6" sx={{ textAlign: 'center' }}>  
               {Math.round(currentWeather.temperature)}°C
             </TemperatureTypography>
             <Box display="flex" alignItems="center" justifyContent="center">
               <Box display="flex" alignItems="center">
-                <ArrowUpwardIcon color="error" sx={{ fontSize: 15, mr: 0.5 }} />
+                <DeviceThermostatIcon color="error" sx={{ fontSize: 15, mr: 0.5 }} />
                 <Typography variant="caption">
                   {maxTemp}°
                 </Typography>
               </Box>
               <Box display="flex" alignItems="center">
-                <ArrowDownwardIcon color="primary" sx={{ fontSize: 15, mr: 0.5 }} />
+                <DeviceThermostatIcon color="primary" sx={{ fontSize: 15, mr: 0.5 }} />
                 <Typography variant="caption">
                   {minTemp}°
                 </Typography>

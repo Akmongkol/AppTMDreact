@@ -206,7 +206,7 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
         >
           <Popup className="custom-popup">
 
-            <CardContent sx={{ maxWidth: '120px', padding: '0px' }}>
+            <CardContent sx={{ maxWidth: '135px', padding: '0px' }}>
               <Typography component="div" gutterBottom sx={{ fontWeight: 'bold', textAlign: 'center', fontSize: '0.8rem' }}>
                 {popupContent || 'ไม่ระบุชื่อตำแหน่ง'}
               </Typography>

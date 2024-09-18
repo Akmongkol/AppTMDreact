@@ -26,7 +26,7 @@ import PartlyCloudyNight from '../widget-icon/partly-cloudy-night-drizzle.svg';
 import ClearNight from '../widget-icon/clear-night.svg';
 import WaterDropIcon from '@mui/icons-material/WaterDrop';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-
+import DailyForecast from './ModelDaily';
 // Initialize the windbarb module
 Windbarb(Highcharts);
 
@@ -52,11 +52,11 @@ const theme = createTheme({
     },
 });
 
-
 function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationName }) {
     const [chartOptions, setChartOptions] = useState(null);
     const [tabIndex, setTabIndex] = useState(0);
     const [data, setData] = useState(null);
+    const [dailyData, setDailyData] = useState(null);
     const [error, setError] = useState(null);
 
     const fetchData = useCallback(() => {
@@ -108,7 +108,7 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
                                     opposite: false,
                                     min: 0,
                                 },
-                                { // New yAxis for humidity
+                                {
                                     title: {
                                         text: 'Humidity (%)',
                                     },
@@ -180,11 +180,11 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
                                     },
                                     zIndex: 5,
                                 },
-                                { // New series for humidity
+                                {
                                     name: 'Humidity',
                                     type: 'spline',
                                     yAxis: 3,
-                                    color: '#8A2BE2', // Purple color for humidity
+                                    color: '#8A2BE2',
                                     zIndex: 1,
                                     data: humidityData,
                                 },
@@ -203,9 +203,26 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
         }
     }, [open, lat, lng]);
 
+
+    const fetchDailyData = useCallback(() => {
+        if (open && lat !== undefined && lng !== undefined) {
+            axios.get(`${import.meta.env.VITE_API_URL}/datapts-day/${lng}/${lat}`)
+                .then((response) => {
+                    setDailyData(response.data);
+                    setError(null);
+                })
+                .catch((error) => {
+                    setError('Error fetching daily data from API');
+                    console.error('Error fetching daily data from API:', error);
+                });
+        }
+    }, [open, lat, lng]);
+
+
     useEffect(() => {
         fetchData();
-    }, [fetchData]);
+        fetchDailyData();
+    }, [fetchData, fetchDailyData]);
 
     const processTemperatureData = (apiData) => {
         return apiData.data.find(item => item.name === 't2m').data.map((temp, index) => [
@@ -523,11 +540,14 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
         }
     };
 
+
+    
+   
     const handleTabChange = (event, newValue) => {
         setTabIndex(newValue);
     };
 
-    return (
+     return (
         <ThemeProvider theme={theme}>
             <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xl">
                 <DialogTitle
@@ -563,29 +583,23 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
                         sx={{ bgcolor: 'white', borderBottom: 1, borderColor: 'divider' }}
                     >
                         <Tab label="พยากรณ์ 24 ชม." />
+                        <Tab label="พยากรณ์ประจำวัน" />
                         <Tab label="กราฟ 7 วัน" />
                     </Tabs>
                     <Box sx={{ p: 2 }}>
-                        {tabIndex === 0 || tabIndex === 1 ? (
-                            error ? (
-                                <Typography color="error">{error}</Typography>
-                            ) : chartOptions ? (
-                                tabIndex === 1 ? (
-                                    <HighchartsReact highcharts={Highcharts} options={chartOptions} />
-                                ) : (
-                                    renderCardPerDay()
-                                )
-                            ) : (
-                                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                                    <CircularProgress />
-                                    <Typography sx={{ ml: 2 }}>กำลังโหลดข้อมูล...</Typography>
-                                </Box>
-                            )
-                        ) : (
+                        {error ? (
+                            <Typography color="error">{error}</Typography>
+                        ) : !data ? (
                             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                                 <CircularProgress />
                                 <Typography sx={{ ml: 2 }}>กำลังโหลดข้อมูล...</Typography>
                             </Box>
+                        ) : (
+                            <>
+                                {tabIndex === 0 && renderCardPerDay()}
+                                {tabIndex === 1 && <DailyForecast dailyData={dailyData} />}
+                                {tabIndex === 2 && <HighchartsReact highcharts={Highcharts} options={chartOptions} />}
+                            </>
                         )}
                     </Box>
                 </DialogContent>
@@ -595,6 +609,3 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
 }
 
 export default ModelMetrogram;
-
-
-
