@@ -1,15 +1,16 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Map from './components/Map'
-import NotFound from './NotFound';
+import Notfound from './Notfound';
 
 function App() {
   return (
     <BrowserRouter>
-    <Routes>
-      <Route path="/" element={<Map />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
-  </BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Map />} />
+        {/* Catch-all route for 404 */}
+        <Route path="*" element={<Notfound />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
