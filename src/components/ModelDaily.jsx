@@ -14,12 +14,11 @@ const DailyForecast = ({ dailyData }) => {
         return <Typography color="error">ไม่สามารถโหลดข้อมูลพยากรณ์รายวันได้</Typography>;
     }
 
-    const temperatureStats = dailyData.daily_stats_t2m;
-    const precipitationStats = dailyData.daily_stats_p3h;
+    const temperatureStats = dailyData.daily_stats_t2m.slice(0, 7);
+    const precipitationStats = dailyData.daily_stats_p3h.slice(0, 7);
 
-    if (!Array.isArray(temperatureStats) || temperatureStats.length === 0 ||
-        !Array.isArray(precipitationStats) || precipitationStats.length === 0) {
-        console.error("Temperature or precipitation stats is not an array or is empty");
+    if (temperatureStats.length === 0 || precipitationStats.length === 0) {
+        console.error("Temperature or precipitation stats is empty after slicing");
         return <Typography color="textSecondary">ไม่มีข้อมูลพยากรณ์อากาศในอนาคต</Typography>;
     }
 
@@ -130,12 +129,9 @@ const DailyForecast = ({ dailyData }) => {
                                     </Box>
                                 )}
 
-
                                 <Stack spacing={1.5}>
                                     <Box display="flex" alignItems="center" justifyContent="space-between">
-                                        
-                                            <img src={iconSrc} alt="Weather" style={{ width: 100, height: 100 }} />
-                                   
+                                        <img src={iconSrc} alt="Weather" style={{ width: 100, height: 100 }} />
                                         <Box>
                                             <Tooltip title="อุณหภูมิสูงสุด" placement="top">
                                                 <Box display="flex" alignItems="center">
@@ -164,7 +160,6 @@ const DailyForecast = ({ dailyData }) => {
                                                 </Typography>
                                             </Box>
                                         </Tooltip>
-
                                     </Box>
                                 </Stack>
                             </Box>
