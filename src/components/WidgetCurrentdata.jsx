@@ -43,8 +43,8 @@ const WidgetCurrentdata = ({ sliderValue, getWeatherData, getWeatherIcon, isDayt
     const formattedDate = `${(currentDate.getDate()).toString().padStart(2, '0')}/${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getFullYear() + 543}`;
 
     const dailyStat = dailyStats.find(stat => stat.date === formattedDate);
-    const maxTemp = dailyStat ? Math.ceil(dailyStat.max) : 'N/A';
-    const minTemp = dailyStat ? Math.ceil(dailyStat.min) : 'N/A';
+    const maxTemp = dailyStat ? Math.round(dailyStat.max) : 'N/A';
+    const minTemp = dailyStat ? Math.round(dailyStat.min) : 'N/A';
 
     return (
       <Box display="flex" flexDirection="column" alignItems="center" width="100%">

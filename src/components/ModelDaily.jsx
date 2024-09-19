@@ -137,7 +137,7 @@ const DailyForecast = ({ dailyData }) => {
                                                 <Box display="flex" alignItems="center">
                                                     <DeviceThermostatIcon sx={{ color: 'red', mr: 0.5 }} />
                                                     <Typography variant="h6" sx={{ fontWeight: 'bold', }}>
-                                                        {Math.round(tempStats.max)}°C
+                                                    {Math.round(tempStats.max)}°C
                                                     </Typography>
                                                 </Box>
                                             </Tooltip>
@@ -145,7 +145,7 @@ const DailyForecast = ({ dailyData }) => {
                                                 <Box display="flex" alignItems="center">
                                                     <DeviceThermostatIcon sx={{ color: 'blue', mr: 0.5 }} />
                                                     <Typography variant="h6" sx={{ fontWeight: 'bold', }}>
-                                                        {Math.round(tempStats.min)}°C
+                                                    {Math.round(tempStats.min)}°C
                                                     </Typography>
                                                 </Box>
                                             </Tooltip>
