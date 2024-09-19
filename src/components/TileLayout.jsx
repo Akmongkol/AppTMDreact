@@ -5,7 +5,7 @@ import 'leaflet-velocity'; // Import the plugin
 import L from 'leaflet';
 import axios from 'axios';
 
-function TileLayout({ sliderValue, action }) {
+function TileLayout({ sliderValue, action, windDisplayed }) {
     const map = useMap();
     const weatherChartRef = useRef(null); // Ref for weather chart layer
     const velocityLayerRef = useRef(null); // Ref for wind layer
@@ -19,7 +19,6 @@ function TileLayout({ sliderValue, action }) {
         // Convert sliderValue to a Date object
         const date = new Date(sliderValue);
 
-
         // Format the date as YYYYMMDDHH00
         const formattedDate = date
             .toISOString()
@@ -27,38 +26,46 @@ function TileLayout({ sliderValue, action }) {
             .replace(/[-T:]/g, "") // Remove dashes, colons, and T
             .concat("00"); // Append "00" for minutes
 
-        // Fetch and set wind layer
-        axios.get(`${import.meta.env.VITE_API_URL}/streamlines/${formattedDate}`)
-            .then(response => {
-                const data = response.data;
+        // If windDisplayed is true, fetch and set wind layer
+        if (windDisplayed) {
+            axios.get(`${import.meta.env.VITE_API_URL}/streamlines/${formattedDate}`)
+                .then(response => {
+                    const data = response.data;
 
-                // Remove existing velocity layer if it exists
-                if (velocityLayerRef.current) {
-                    map.removeLayer(velocityLayerRef.current);
-                }
+                    // Remove existing velocity layer if it exists
+                    if (velocityLayerRef.current) {
+                        map.removeLayer(velocityLayerRef.current);
+                    }
 
-                // Create the velocity layer
-                const newVelocityLayer = L.velocityLayer({
-                    displayValues: true,
-                    displayOptions: {
-                        velocityType: "Global Wind",
-                        position: "bottomleft",
-                        emptyString: "No wind data",
-                    },
-                    data: data,
-                    opacity: 0.8,
-                    maxVelocity: 10,
+                    // Create the velocity layer
+                    const newVelocityLayer = L.velocityLayer({
+                        displayValues: true,
+                        displayOptions: {
+                            velocityType: "Global Wind",
+                            position: "bottomleft",
+                            emptyString: "No wind data",
+                        },
+                        data: data,
+                        opacity: 0.8,
+                        maxVelocity: 10,
+                    });
+
+                    // Add the new velocity layer to the map
+                    newVelocityLayer.addTo(map);
+
+                    // Update the ref to the new velocity layer
+                    velocityLayerRef.current = newVelocityLayer;
+                })
+                .catch(error => {
+                    console.error('Error fetching wind data:', error);
                 });
-
-                // Add the new velocity layer to the map
-                newVelocityLayer.addTo(map);
-
-                // Update the ref to the new velocity layer
-                velocityLayerRef.current = newVelocityLayer;
-            })
-            .catch(error => {
-                console.error('Error fetching wind data:', error);
-            });
+        } else {
+            // Remove the velocity layer if windDisplayed is false
+            if (velocityLayerRef.current) {
+                map.removeLayer(velocityLayerRef.current);
+                velocityLayerRef.current = null; // Reset the ref
+            }
+        }
 
         // Fetch and set weather chart tile layer
         if (weatherChartRef.current) {
@@ -82,7 +89,7 @@ function TileLayout({ sliderValue, action }) {
                 map.removeLayer(weatherChartRef.current);
             }
         };
-    }, [map, sliderValue, action]); // Dependency array includes `map`, `sliderValue`, and `action`
+    }, [map, sliderValue, action, windDisplayed]); // Include windDisplayed in the dependency array
 
     return null;
 }

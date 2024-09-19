@@ -82,6 +82,7 @@ function Map() {
   const [clearGeoDistrictMarker, setClearGeoDistrictMarker] = useState(false);
   const [locationName, setLocationName] = useState('');
   const [weatherData, setWeatherData] = useState(null);
+  const [WindDisplayed, setWindDisplayed] = useState(true);
   const [dailyWeatherData, setDailyWeatherData] = useState(null);
   const markerRef = useRef(null);
 
@@ -211,6 +212,10 @@ function Map() {
     }
   };
 
+  // Callback function to handle switch value changes from PlayGround
+  const handleSwitchChange = (checked) => {
+    setWindDisplayed(checked);
+  };
 
 
   return (
@@ -238,7 +243,7 @@ function Map() {
           onFeatureClick={handleClearPosition}
           sliderValue={sliderValue}
         />
-        <TileLayout sliderValue={sliderValue} action={selectedLayer} />
+        <TileLayout sliderValue={sliderValue} action={selectedLayer} windDisplayed={WindDisplayed} />
         {position && (
           <Marker position={position} ref={markerRef}>
             <Popup className="custom-popup">
@@ -271,7 +276,7 @@ function Map() {
       </MapContainer>
 
       <div className='playlayer'>
-        <PlayGround onSliderChange={setSliderValue} />
+        <PlayGround onSliderChange={setSliderValue} onSwitchChange={handleSwitchChange} />
       </div>
       <div className='ScaleBar'>
         {renderScaleBar()}
