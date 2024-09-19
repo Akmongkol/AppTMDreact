@@ -207,7 +207,7 @@ function PlayGround({ onSliderChange, onSwitchChange }) {
       <Box sx={{ position: 'absolute', top: 2, right: 10 }}>
         <FormControlLabel
           control={<WindSwitch checked={switchChecked}
-            onChange={handleSwitchChange} />}
+            onChange={handleSwitchChange} id="windswitch" name="windswitch" />}
           label="แสดงลม"
         />
       </Box>
