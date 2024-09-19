@@ -145,7 +145,7 @@ function PlayGround({ onSliderChange, onSwitchChange }) {
     setIsPlaying(!isPlaying);
   };
 
-  const Android12Switch = styled(Switch)(({ theme }) => ({
+  const WindSwitch = styled(Switch)(({ theme }) => ({
     padding: 8,
     '& .MuiSwitch-track': {
       borderRadius: 22 / 2,
@@ -203,7 +203,7 @@ function PlayGround({ onSliderChange, onSwitchChange }) {
     >
       {/* Switch positioned on top-right */}
       <Box sx={{ position: 'absolute', top: 2, right: 10, display: 'flex', alignItems: 'center' }}>
-        <Android12Switch checked={switchChecked}
+        <WindSwitch checked={switchChecked}
           onChange={handleSwitchChange} />
         <Typography variant="body2" sx={{ mr: 1 }}>
           แสดงลม
