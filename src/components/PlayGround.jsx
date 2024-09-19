@@ -6,6 +6,8 @@ import IconButton from '@mui/material/IconButton';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import Switch from '@mui/material/Switch';
+import FormControl from '@mui/material/FormControl';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import axios from 'axios';
 import { Card, Typography, useMediaQuery } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -202,12 +204,12 @@ function PlayGround({ onSliderChange, onSwitchChange }) {
       }}
     >
       {/* Switch positioned on top-right */}
-      <Box sx={{ position: 'absolute', top: 2, right: 10, display: 'flex', alignItems: 'center' }}>
-        <WindSwitch checked={switchChecked}
-          onChange={handleSwitchChange} />
-        <Typography variant="body2" sx={{ mr: 1 }}>
-          แสดงลม
-        </Typography>
+      <Box sx={{ position: 'absolute', top: 2, right: 10 }}>
+        <FormControlLabel
+          control={<WindSwitch checked={switchChecked}
+            onChange={handleSwitchChange} />}
+          label="แสดงลม"
+        />
       </Box>
 
       <IconButton onClick={handlePlayPause} sx={{ mr: 1, mb: 1 }}>
