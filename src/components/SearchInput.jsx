@@ -107,7 +107,7 @@ function Searchinput({ onLocationChange, initialLocation }) {
     };
 
     return (
-        <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', minWidth: '330px'}}>
+        <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', minWidth: '295px'}}>
             <Box sx={{ flexGrow: 1, marginRight: 1 }}>
                 <Autocomplete
                     freeSolo

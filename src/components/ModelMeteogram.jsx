@@ -563,7 +563,7 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
                     <LocationOnIcon sx={{ marginRight: 1 }} />
                     {popupContent ? popupContent : locationName}
                     <IconButton
-                        aria-label="close"
+                   
                         onClick={handleClose}
                         sx={{
                             position: 'absolute',
@@ -579,7 +579,7 @@ function ModelMetrogram({ open, handleClose, lat, lng, popupContent, locationNam
                     <Tabs
                         value={tabIndex}
                         onChange={handleTabChange}
-                        aria-label="widget tabs"
+                  
                         sx={{ bgcolor: 'white', borderBottom: 1, borderColor: 'divider' }}
                     >
                         <Tab label="พยากรณ์ 24 ชม." />
