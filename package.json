@@ -15,6 +15,7 @@
     "@mui/icons-material": "^5.16.7",
     "@mui/material": "^5.16.7",
     "axios": "^1.7.3",
+    "highcharts": "^11.4.8",
     "highcharts-react-official": "^3.2.1",
     "leaflet": "^1.9.4",
     "leaflet-velocity": "^2.1.4",
