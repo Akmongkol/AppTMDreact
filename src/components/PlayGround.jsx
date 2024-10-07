@@ -58,15 +58,14 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
         // Function to format time to Thai format
         const formatradarThaiDate = (timestamp) => {
           // Convert timestamp from seconds to milliseconds
-  const date = new Date(timestamp * 1000); // Assuming timestamp is in seconds
-
-  // Adjust for UTC+7
-  const thaiTime = new Date(date.getTime() + 7 * 60 * 60 * 1000); // Add 7 hours
-
-          const dayNames = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
-          const day = dayNames[thaiTime.getDay()];
-          const dayNumber = thaiTime.getDate();
-          return `${day} ${dayNumber}`;
+          const date = new Date(timestamp * 1000); // Assuming timestamp is in seconds
+        
+          // Adjust for UTC+7
+          const thaiTime = new Date(date.getTime()); 
+          const hours = thaiTime.getHours().toString().padStart(2, '0');
+          const minutes = thaiTime.getMinutes().toString().padStart(2, '0');
+        
+          return `${hours}:${minutes} น.`;
         };
 
 
@@ -184,13 +183,13 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
 
   const formatradarThaiDateTooltip = (timestamp) => {
     const date = new Date(timestamp * 1000); // Assuming timestamp is in seconds
-        const thaiTime = new Date(date.getTime()); // Add 7 hours
-        const dayNames = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
-        const day = dayNames[thaiTime.getDay()];
-        const dayNumber = thaiTime.getDate();
-        const hours = thaiTime.getHours().toString().padStart(2, '0');
-        const minutes = thaiTime.getMinutes().toString().padStart(2, '0');
-        return `${day} ${dayNumber} เวลา ${hours}:${minutes}`;
+    const thaiTime = new Date(date.getTime()); // Add 7 hours
+    const dayNames = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
+    const day = dayNames[thaiTime.getDay()];
+    const dayNumber = thaiTime.getDate();
+    const hours = thaiTime.getHours().toString().padStart(2, '0');
+    const minutes = thaiTime.getMinutes().toString().padStart(2, '0');
+    return `${day} ${dayNumber} เวลา ${hours}:${minutes}`;
   };
 
   function formatThaiDate(date) {
@@ -208,11 +207,11 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
     } else {
       // Set the appropriate interval duration based on the action
       const intervalDuration = action === 'radar' ? 1000 : 2500; // 1 second for radar, 2.5 seconds for others
-  
+
       sliderIntervalRef.current = setInterval(() => {
         setSliderValue(prevValue => {
           let nextValue;
-  
+
           if (action === 'radar') {
             const currentIndex = radarData.findIndex(item => item.time === prevValue);
             if (currentIndex >= 0) {
@@ -222,13 +221,13 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
               // Fallback in case the current value is not found
               nextValue = radarData[0].time;
             }
-  
+
             // Update the map frames or perform any other logic
             const selectedData = radarData.find(item => item.time === nextValue);
             if (selectedData) {
               setPath(selectedData.path); // Set path based on the nextValue
             }
-  
+
           } else {
             nextValue = prevValue + threeHours;
             if (nextValue > maxValue) {
@@ -236,16 +235,16 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
               return minValue;
             }
           }
-  
+
           onSliderChange(nextValue);
           return nextValue;
         });
       }, intervalDuration);
     }
-  
+
     setIsPlaying(!isPlaying);
   };
-  
+
 
   const WindSwitch = styled(Switch)(({ theme }) => ({
     padding: 8,
@@ -279,11 +278,11 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
   const handleSwitchChange = (e) => {
     const checked = e.target.checked;
 
-  // Only change switch state if action is not radar
-  if (action !== 'radar') {
-    setSwitchChecked(checked);
-    onSwitchChange(checked); // Notify parent component
-  }
+    // Only change switch state if action is not radar
+    if (action !== 'radar') {
+      setSwitchChecked(checked);
+      onSwitchChange(checked); // Notify parent component
+    }
   };
 
   return (

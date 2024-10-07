@@ -113,7 +113,7 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
         e.target.setStyle({
           fillColor: 'orange', // Set background color to orange on hover
           weight: 0.5,
-          color: 'blue',
+      
           fillOpacity: 0.7
         });
       },
@@ -121,7 +121,7 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
         e.target.setStyle({
           fillColor: 'white', // Reset background color to original
           weight: 0.5,
-          color: 'blue',
+       
           fillOpacity: 0.1
         });
       }
@@ -181,11 +181,11 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
   };
 
   const geojsonStyle = {
-    weight: 0.5,
+    weight: 0.3,
     color: "blue",
     opacity: 1,
-    fillColor: "white",
-    fillOpacity: 0.1
+
+    fillOpacity: 0
   };
 
   return (
