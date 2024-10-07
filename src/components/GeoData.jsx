@@ -16,7 +16,7 @@ import CardContent from '@mui/material/CardContent';
 import Divider from '@mui/material/Divider';
 import WidgetGeodata from './WidgetGeodata';
 
-function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue }) {
+function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue, action }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [popupContent, setPopupContent] = useState('');
   const [selectedLat, setSelectedLat] = useState(null);
@@ -196,7 +196,7 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
         style={geojsonStyle}
         onEachFeature={onEachFeature}
       />
-      {selectedLat && selectedLng && (
+      {selectedLat && selectedLng && action !== 'radar' && (
         <Marker
           ref={markerRef}
           position={[selectedLat, selectedLng]}
