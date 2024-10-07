@@ -50,6 +50,12 @@ function RectangleAndLines() {
 
     map.fitBounds(bounds);
 
+    // Set zoom level based on device width
+    const isMobile = window.innerWidth < 768;
+    const zoomLevel = isMobile ? 6 : 6;  // Use 8 for mobile, 13 for larger screens
+
+    map.setZoom(zoomLevel);
+
     const rectangle = L.rectangle(bounds, { color: "#FFFFFF00", weight: 1 }).addTo(map);
 
     const corners = rectangle.getBounds();
@@ -238,7 +244,6 @@ function Map() {
 
       <MapContainer
         center={position || [13.7563, 100.5018]}
-        zoom={6}
         zoomControl={false}
         style={{ height: 'calc(var(--vh, 1vh) * 100)', width: '100%' }}
       >
