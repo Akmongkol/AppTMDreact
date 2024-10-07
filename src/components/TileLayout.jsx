@@ -5,7 +5,7 @@ import 'leaflet-velocity'; // Import the plugin
 import L from 'leaflet';
 import axios from 'axios';
 
-function TileLayout({ sliderValue, action, windDisplayed }) {
+function TileLayout({ sliderValue, action, windDisplayed,path }) {
     const map = useMap();
     const weatherChartRef = useRef(null); // Ref for weather chart layer
     const velocityLayerRef = useRef(null); // Ref for wind layer
@@ -67,18 +67,25 @@ function TileLayout({ sliderValue, action, windDisplayed }) {
             }
         }
 
-        // Fetch and set weather chart tile layer
-        if (weatherChartRef.current) {
-            map.removeLayer(weatherChartRef.current);
-        }
+      
+        
+        let tileLayerUrl;
 
+        if (action === 'radar' && path) {
+            // Use radar API path
+            tileLayerUrl = `https://wxmap.tmd.go.th${path}/{z}/{x}/{y}.png`;
+        } else {
+            // Use weather chart API path
+            tileLayerUrl = `${import.meta.env.VITE_API_URL}/fcst/tiled/${formattedDate}/${action}/{z}/{x}/{y}/`;
+        }
         weatherChartRef.current = L.tileLayer(
-            `${import.meta.env.VITE_API_URL}/fcst/tiled/${formattedDate}/${action}/{z}/{x}/{y}/`,
+            tileLayerUrl,
             {
                 opacity: 0.9,
                 crossOrigin: true,
             }
         ).addTo(map);
+        
 
         // Cleanup function to remove layers when the component unmounts
         return () => {
@@ -89,7 +96,7 @@ function TileLayout({ sliderValue, action, windDisplayed }) {
                 map.removeLayer(weatherChartRef.current);
             }
         };
-    }, [map, sliderValue, action, windDisplayed]); // Include windDisplayed in the dependency array
+    }, [map, sliderValue, action, windDisplayed,path]); // Include windDisplayed in the dependency array
 
     return null;
 }

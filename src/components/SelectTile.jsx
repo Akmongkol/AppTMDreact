@@ -5,6 +5,7 @@ import WaterDropIcon from '@mui/icons-material/WaterDrop';
 import AirIcon from '@mui/icons-material/Air';
 import ThermostatIcon from '@mui/icons-material/Thermostat';
 import AcUnitIcon from '@mui/icons-material/AcUnit';
+import RadarIcon from '@mui/icons-material/Radar';
 import { useTheme } from '@mui/material/styles';
 
 function SelectTile({ onSelect }) {
@@ -51,6 +52,11 @@ function SelectTile({ onSelect }) {
                     icon={<AcUnitIcon style={getIconStyle('rhum')} />}
                     tooltipTitle="ความชื้น"
                     onClick={() => handleActionClick('rhum')}
+                />
+                <SpeedDialAction
+                    icon={<RadarIcon style={getIconStyle('radar')} />}
+                    tooltipTitle="เรดาร์"
+                    onClick={() => handleActionClick('radar')}
                 />
             </SpeedDial>
         </div>

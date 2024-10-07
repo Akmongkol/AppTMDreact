@@ -83,6 +83,8 @@ function Map() {
   const [locationName, setLocationName] = useState('');
   const [weatherData, setWeatherData] = useState(null);
   const [WindDisplayed, setWindDisplayed] = useState(true);
+  const [path, setPath] = useState(null);
+  
   const [dailyWeatherData, setDailyWeatherData] = useState(null);
   const markerRef = useRef(null);
 
@@ -151,6 +153,12 @@ function Map() {
   };
 
   const handleSelect = (value) => {
+    if (value === 'radar') {
+      setPosition(null); // Clear the position when 'radar' is selected
+      setWindDisplayed(false); // Disable wind display for radar
+    } else {
+      setWindDisplayed(true); // Enable wind display for other layers
+    }
     setSelectedLayer(value);
   };
 
@@ -243,7 +251,7 @@ function Map() {
           onFeatureClick={handleClearPosition}
           sliderValue={sliderValue}
         />
-        <TileLayout sliderValue={sliderValue} action={selectedLayer} windDisplayed={WindDisplayed} />
+        <TileLayout sliderValue={sliderValue} action={selectedLayer} windDisplayed={WindDisplayed} path={path} />
         {position && (
           <Marker position={position} ref={markerRef}>
             <Popup className="custom-popup">
@@ -276,7 +284,7 @@ function Map() {
       </MapContainer>
 
       <div className='playlayer'>
-        <PlayGround onSliderChange={setSliderValue} onSwitchChange={handleSwitchChange} />
+        <PlayGround onSliderChange={setSliderValue} onSwitchChange={handleSwitchChange} action={selectedLayer} setPath={setPath} />
       </div>
       <div className='ScaleBar'>
         {renderScaleBar()}
