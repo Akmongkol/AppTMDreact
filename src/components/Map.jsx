@@ -89,6 +89,7 @@ function Map() {
   const [locationName, setLocationName] = useState('');
   const [weatherData, setWeatherData] = useState(null);
   const [WindDisplayed, setWindDisplayed] = useState(true);
+  const [windDisplayStatus, setWindDisplayStatus] = useState(true); // Add this line
   const [path, setPath] = useState(null);
   
   const [dailyWeatherData, setDailyWeatherData] = useState(null);
@@ -159,13 +160,14 @@ function Map() {
   };
 
   const handleSelect = (value) => {
-    if (value === 'radar') {
-      setPosition(null); // Clear the position when 'radar' is selected
-      setWindDisplayed(false); // Disable wind display for radar
-    } else {
-      setWindDisplayed(true); // Enable wind display for other layers
-    }
     setSelectedLayer(value);
+    setPosition(null); // Clear the position when 'radar' is selected
+
+    if (value === 'radar') {
+      setWindDisplayed(false); // Set WindDisplayed to false if 'radar' is selected
+    } else {
+      setWindDisplayed(windDisplayStatus); // Restore to last known state when switching away from radar
+    }
   };
 
   const handleClearPosition = () => {
@@ -229,6 +231,7 @@ function Map() {
   // Callback function to handle switch value changes from PlayGround
   const handleSwitchChange = (checked) => {
     setWindDisplayed(checked);
+    setWindDisplayStatus(checked); // Sync the new status when switch is toggled
   };
 
 
@@ -255,6 +258,7 @@ function Map() {
           setClearMarker={setClearGeoDistrictMarker}
           onFeatureClick={handleClearPosition}
           sliderValue={sliderValue}
+          action={selectedLayer}
         />
         <TileLayout sliderValue={sliderValue} action={selectedLayer} windDisplayed={WindDisplayed} path={path} />
         {position && (

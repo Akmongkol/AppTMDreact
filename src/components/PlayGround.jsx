@@ -303,13 +303,21 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
         position: 'relative',
       }}
     >
-      <Box sx={{ position: 'absolute', top: 2, right: 10 }}>
-        <FormControlLabel
-          control={<WindSwitch checked={switchChecked} onChange={handleSwitchChange} disabled={action === 'radar'} id="windswitch" name="windswitch" />}
-          label="แสดงลม"
-        />
-      </Box>
-
+       {action !== 'radar' && (
+    <Box sx={{ position: 'absolute', top: 2, right: 10 }}>
+      <FormControlLabel
+        control={
+          <WindSwitch
+            checked={switchChecked}
+            onChange={handleSwitchChange}
+            id="windswitch"
+            name="windswitch"
+          />
+        }
+        label="แสดงลม"
+      />
+    </Box>
+  )}
       <IconButton onClick={handlePlayPause} sx={{ mr: 1, mb: 1 }}>
         {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
       </IconButton>
