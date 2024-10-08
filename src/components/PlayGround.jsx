@@ -160,8 +160,6 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
 
       if (selectedData) {
         setPath(selectedData.path); // Set path in Map state
-      } else {
-        console.warn('No corresponding path found for the selected slider value');
       }
     }
   }, [sliderValue, radarData, action, setPath]);
