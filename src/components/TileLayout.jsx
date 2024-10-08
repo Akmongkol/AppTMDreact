@@ -11,25 +11,23 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
     const velocityLayerRef = useRef(null);
 
     useEffect(() => {
-        // Define the async function to handle layer updates
-        const updateLayers = async () => {
-            // Check if sliderValue is a valid date
-            if (!sliderValue || isNaN(new Date(sliderValue).getTime())) return;
+        // Check if sliderValue is a valid date
+        if (!sliderValue || isNaN(new Date(sliderValue).getTime())) return;
 
-            const date = new Date(sliderValue);
-            const formattedDate = date
-                .toISOString()
-                .slice(0, 13)
-                .replace(/[-T:]/g, "")
-                .concat("00");
+        const date = new Date(sliderValue);
+        const formattedDate = date
+            .toISOString()
+            .slice(0, 13)
+            .replace(/[-T:]/g, "")
+            .concat("00");
 
-            // Initialize wind layer data
-            let windLayerData = null;
+        // Initialize wind layer data
+        let windLayerData = null;
 
-            // Handle wind layer
-            if (windDisplayed) {
-                try {
-                    const response = await axios.get(`${import.meta.env.VITE_API_URL}/streamlines/${formattedDate}`);
+        // Handle wind layer
+        if (windDisplayed) {
+            axios.get(`${import.meta.env.VITE_API_URL}/streamlines/${formattedDate}`)
+                .then((response) => {
                     windLayerData = response.data;
 
                     // Remove existing velocity layer if it exists
@@ -53,38 +51,35 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
                     // Add the new velocity layer to the map
                     newVelocityLayer.addTo(map);
                     velocityLayerRef.current = newVelocityLayer;
-                } catch (error) {
+                })
+                .catch((error) => {
                     console.error('Error fetching wind data:', error);
-                }
-            } else {
-                // Remove the velocity layer if windDisplayed is false
-                if (velocityLayerRef.current) {
-                    map.removeLayer(velocityLayerRef.current);
-                    velocityLayerRef.current = null;
-                }
+                });
+        } else {
+            // Remove the velocity layer if windDisplayed is false
+            if (velocityLayerRef.current) {
+                map.removeLayer(velocityLayerRef.current);
+                velocityLayerRef.current = null;
             }
+        }
 
-            // Handle tile layer
-            const tileLayerUrl = action === 'radar' && path 
-                ? `https://wxmap.tmd.go.th${path}/{z}/{x}/{y}.png` 
-                : `${import.meta.env.VITE_API_URL}/fcst/tiled/${formattedDate}/${action}/{z}/{x}/{y}/`;
+        // Handle tile layer
+        const tileLayerUrl = action === 'radar' && path 
+            ? `https://wxmap.tmd.go.th${path}/{z}/{x}/{y}.png` 
+            : `${import.meta.env.VITE_API_URL}/fcst/tiled/${formattedDate}/${action}/{z}/{x}/{y}/`;
 
-            // Remove the previous weather chart layer if it exists
-            if (weatherChartRef.current) {
-                map.removeLayer(weatherChartRef.current);
-            }
+        // Remove the previous weather chart layer if it exists
+        if (weatherChartRef.current) {
+            map.removeLayer(weatherChartRef.current);
+        }
 
-            // Add the new weather chart layer
-            const newTileLayer = L.tileLayer(tileLayerUrl, {
-                opacity: 0.9,
-                crossOrigin: true,
-            });
-            newTileLayer.addTo(map);
-            weatherChartRef.current = newTileLayer;
-        };
-
-        // Call the async function
-        updateLayers();
+        // Add the new weather chart layer
+        const newTileLayer = L.tileLayer(tileLayerUrl, {
+            opacity: 0.9,
+            crossOrigin: true,
+        });
+        newTileLayer.addTo(map);
+        weatherChartRef.current = newTileLayer;
 
         // Cleanup function to remove layers when the component unmounts
         return () => {

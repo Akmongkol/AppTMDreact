@@ -59,12 +59,12 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
         const formatradarThaiDate = (timestamp) => {
           // Convert timestamp from seconds to milliseconds
           const date = new Date(timestamp * 1000); // Assuming timestamp is in seconds
-        
+
           // Adjust for UTC+7
-          const thaiTime = new Date(date.getTime()); 
+          const thaiTime = new Date(date.getTime());
           const hours = thaiTime.getHours().toString().padStart(2, '0');
           const minutes = thaiTime.getMinutes().toString().padStart(2, '0');
-        
+
           return `${hours}:${minutes} น.`;
         };
 
@@ -158,17 +158,13 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
   useEffect(() => {
     if (action === 'radar' && radarData.length > 0) {
       const selectedData = radarData.find(item => item.time === sliderValue);
-      console.log('Slider Value:', sliderValue);
-      console.log('Selected Data:', selectedData);
 
       if (selectedData) {
         setPath(selectedData.path); // Step 2: Set path in Map state
+
       } else {
         console.warn('No corresponding path found for the selected slider value');
-        setPath(null); // Reset or handle it gracefully
       }
-    } else if (action !== 'radar') {
-      setPath(null); // Reset path if not radar
     }
   }, [sliderValue, radarData, action, setPath]);
 
@@ -208,42 +204,38 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
       // Set the appropriate interval duration based on the action
       const intervalDuration = action === 'radar' ? 1000 : 2500; // 1 second for radar, 2.5 seconds for others
 
+      // Initialize the current index if not already set
+      let currentIndex = radarData.findIndex(item => item.time === sliderValue);
+      if (currentIndex === -1) {
+        currentIndex = 0; // Fallback to the first item if the current value is not found
+      }
+
       sliderIntervalRef.current = setInterval(() => {
         setSliderValue(prevValue => {
-          let nextValue;
+          let nextIndex;
 
           if (action === 'radar') {
-            const currentIndex = radarData.findIndex(item => item.time === prevValue);
-            if (currentIndex >= 0) {
-              // Loop back to the start if at the end
-              nextValue = currentIndex < radarData.length - 1 ? radarData[currentIndex + 1].time : radarData[0].time;
-            } else {
-              // Fallback in case the current value is not found
-              nextValue = radarData[0].time;
-            }
-
-            // Update the map frames or perform any other logic
-            const selectedData = radarData.find(item => item.time === nextValue);
-            if (selectedData) {
-              setPath(selectedData.path); // Set path based on the nextValue
-            }
-
+            // Move to the next index and loop back if at the end
+            nextIndex = (currentIndex + 1) % radarData.length; // Loop back to start
+            currentIndex = nextIndex; // Update the current index for the next iteration
+            return radarData[nextIndex].time; // Return the new time value
           } else {
-            nextValue = prevValue + threeHours;
+            // For non-radar actions, increment time by three hours
+            let nextValue = prevValue + threeHours;
             if (nextValue > maxValue) {
-              onSliderChange(minValue);
+              onSliderChange(minValue); // Reset to minValue if over max
               return minValue;
             }
+            onSliderChange(nextValue);
+            return nextValue;
           }
-
-          onSliderChange(nextValue);
-          return nextValue;
         });
       }, intervalDuration);
     }
 
     setIsPlaying(!isPlaying);
   };
+
 
 
   const WindSwitch = styled(Switch)(({ theme }) => ({
@@ -302,21 +294,21 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
         position: 'relative',
       }}
     >
-       {action !== 'radar' && (
-    <Box sx={{ position: 'absolute', top: 2, right: 10 }}>
-      <FormControlLabel
-        control={
-          <WindSwitch
-            checked={switchChecked}
-            onChange={handleSwitchChange}
-            id="windswitch"
-            name="windswitch"
+      {action !== 'radar' && (
+        <Box sx={{ position: 'absolute', top: 2, right: 10 }}>
+          <FormControlLabel
+            control={
+              <WindSwitch
+                checked={switchChecked}
+                onChange={handleSwitchChange}
+                id="windswitch"
+                name="windswitch"
+              />
+            }
+            label="แสดงลม"
           />
-        }
-        label="แสดงลม"
-      />
-    </Box>
-  )}
+        </Box>
+      )}
       <IconButton onClick={handlePlayPause} sx={{ mr: 1, mb: 1 }}>
         {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
       </IconButton>
