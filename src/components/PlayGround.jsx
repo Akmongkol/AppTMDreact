@@ -47,8 +47,8 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
 
       if (radarData && radarData.length > 4) {
         const lastFourData = radarData.slice(-4);
-        const minValue = lastFourData[0].time;
-        const maxValue = lastFourData[3].time;
+        const minValue = lastFourData[0].time * 1000; // Convert to milliseconds
+        const maxValue = lastFourData[3].time * 1000; // Convert to milliseconds
 
         setSliderValue(minValue);
         onSliderChange(minValue);
@@ -68,9 +68,8 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
           return `${hours}:${minutes} น.`;
         };
 
-
         const marksArray = lastFourData.map((item) => ({
-          value: item.time,
+          value: item.time * 1000, // Convert to milliseconds
           label: formatradarThaiDate(item.time),
         }));
         setMarks(marksArray);
@@ -157,11 +156,10 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
   // Handle slider value change and path setting
   useEffect(() => {
     if (action === 'radar' && radarData.length > 0) {
-      const selectedData = radarData.find(item => item.time === sliderValue);
+      const selectedData = radarData.find(item => item.time * 1000 === sliderValue);
 
       if (selectedData) {
-        setPath(selectedData.path); // Step 2: Set path in Map state
-
+        setPath(selectedData.path); // Set path in Map state
       } else {
         console.warn('No corresponding path found for the selected slider value');
       }
@@ -179,7 +177,7 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
 
   const formatradarThaiDateTooltip = (timestamp) => {
     const date = new Date(timestamp * 1000); // Assuming timestamp is in seconds
-    const thaiTime = new Date(date.getTime()); // Add 7 hours
+    const thaiTime = new Date(date.getTime());
     const dayNames = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
     const day = dayNames[thaiTime.getDay()];
     const dayNumber = thaiTime.getDate();
@@ -205,7 +203,7 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
       const intervalDuration = action === 'radar' ? 1000 : 2500; // 1 second for radar, 2.5 seconds for others
 
       // Initialize the current index if not already set
-      let currentIndex = radarData.findIndex(item => item.time === sliderValue);
+      let currentIndex = radarData.findIndex(item => item.time * 1000 === sliderValue);
       if (currentIndex === -1) {
         currentIndex = 0; // Fallback to the first item if the current value is not found
       }
@@ -218,7 +216,7 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
             // Move to the next index and loop back if at the end
             nextIndex = (currentIndex + 1) % radarData.length; // Loop back to start
             currentIndex = nextIndex; // Update the current index for the next iteration
-            return radarData[nextIndex].time; // Return the new time value
+            return radarData[nextIndex].time * 1000; // Return the new time value in milliseconds
           } else {
             // For non-radar actions, increment time by three hours
             let nextValue = prevValue + threeHours;
@@ -235,8 +233,6 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
 
     setIsPlaying(!isPlaying);
   };
-
-
 
   const WindSwitch = styled(Switch)(({ theme }) => ({
     padding: 8,

@@ -161,12 +161,14 @@ function Map() {
 
   const handleSelect = (value) => {
     setSelectedLayer(value);
-    setPosition(null); // Clear the position when 'radar' is selected
-
+    
     if (value === 'radar') {
-      setWindDisplayed(false); // Set WindDisplayed to false if 'radar' is selected
+      setPosition(null); // Clear the location when 'radar' is selected
+      setWeatherData(null); // Clear the weather data when radar is selected
+      setWindDisplayed(false); // Hide wind data for radar view
     } else {
-      setWindDisplayed(windDisplayStatus); // Restore to last known state when switching away from radar
+      // Restore wind display if not on radar view
+      setWindDisplayed(windDisplayStatus); 
     }
   };
 
