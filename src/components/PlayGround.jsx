@@ -174,14 +174,14 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
   }
 
   const formatradarThaiDateTooltip = (timestamp) => {
-    const date = new Date(timestamp * 1000); // Assuming timestamp is in seconds
+    const date = new Date(timestamp);
     const thaiTime = new Date(date.getTime());
     const dayNames = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
     const day = dayNames[thaiTime.getDay()];
     const dayNumber = thaiTime.getDate();
     const hours = thaiTime.getHours().toString().padStart(2, '0');
     const minutes = thaiTime.getMinutes().toString().padStart(2, '0');
-    return `${day} ${dayNumber} เวลา ${hours}:${minutes}`;
+    return `${day} ${dayNumber} เวลา ${hours}:${minutes} น.`;
   };
 
   function formatThaiDate(date) {
