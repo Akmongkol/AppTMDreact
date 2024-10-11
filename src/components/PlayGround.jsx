@@ -115,10 +115,10 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
         }
 
         let endDate = startDate + (isMobile ? 3 * 24 * 60 * 60 * 1000 : 7 * 24 * 60 * 60 * 1000);
-        setMinValue(startDate);
-        setMaxValue(endDate);
         setSliderValue(startDate);
         onSliderChange(startDate);
+        setMinValue(startDate);
+        setMaxValue(endDate);
 
         const marksArray = [];
         for (let timestamp = startDate; timestamp <= endDate; timestamp += threeHours) {

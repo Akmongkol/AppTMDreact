@@ -7,7 +7,7 @@ import ThermostatIcon from '@mui/icons-material/Thermostat';
 import AcUnitIcon from '@mui/icons-material/AcUnit';
 import RadarIcon from '@mui/icons-material/Radar';
 import { useTheme } from '@mui/material/styles';
-// import ReactGA from 'react-ga4';  // Import ReactGA for event tracking
+import ReactGA from 'react-ga4';  // Import ReactGA for event tracking
 
 function SelectTile({ onSelect }) {
     const [open, setOpen] = useState(true);
@@ -18,11 +18,10 @@ function SelectTile({ onSelect }) {
         setActiveAction(value);
         onSelect(value);
 
-        // ReactGA.event({
-        //     category: 'User',
-        //     action: 'Click',
-        //     label: value, // Use the action label for better tracking
-        // });
+        ReactGA.event({
+            category: 'User',
+            action: value,
+        });
     };
 
     const theme = useTheme();
