@@ -35,7 +35,7 @@ function SelectTile({ onSelect }) {
       MuiTooltip: {
         styleOverrides: {
           tooltip: {
-            fontSize: '16px', // Increase font size
+            fontSize: '15px', // Increase font size
             backgroundColor: theme.palette.grey[700], // Change background color
             padding: '10px', // Add padding
             maxWidth: 'none', // Allow tooltip to grow in width
