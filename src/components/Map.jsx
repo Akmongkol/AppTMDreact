@@ -86,7 +86,7 @@ function Map() {
   const [sliderValue, setSliderValue] = useState(0);
   const [selectedLayer, setSelectedLayer] = useState('p3h');
   const [clearGeoDistrictMarker, setClearGeoDistrictMarker] = useState(false);
-  const [locationName, setLocationName] = useState('');
+  const [locationName, setLocationName] = useState(null);
   const [weatherData, setWeatherData] = useState(null);
   const [WindDisplayed, setWindDisplayed] = useState(true);
   const [windDisplayStatus, setWindDisplayStatus] = useState(true); // Add this line
