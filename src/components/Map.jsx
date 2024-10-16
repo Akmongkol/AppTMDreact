@@ -162,7 +162,7 @@ function Map() {
   const handleSelect = (value) => {
     setSelectedLayer(value);
     
-    if (value === 'radar') {
+    if (value === 'radar' || value === "sat") {
       setPosition(null); // Clear the location when 'radar' is selected
       setWeatherData(null); // Clear the weather data when radar is selected
       setWindDisplayed(false); // Hide wind data for radar view

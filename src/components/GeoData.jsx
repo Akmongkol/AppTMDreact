@@ -196,7 +196,7 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
         style={geojsonStyle}
         onEachFeature={onEachFeature}
       />
-      {selectedLat && selectedLng && action !== 'radar' && (
+      {selectedLat && selectedLng && action !== 'radar' && action !== 'sat' && (
         <Marker
           ref={markerRef}
           position={[selectedLat, selectedLng]}
