@@ -7,6 +7,7 @@ import AirIcon from '@mui/icons-material/Air';
 import ThermostatIcon from '@mui/icons-material/Thermostat';
 import AcUnitIcon from '@mui/icons-material/AcUnit';
 import RadarIcon from '@mui/icons-material/Radar';
+import SatelliteAltIcon from '@mui/icons-material/SatelliteAlt';
 import { useTheme, createTheme, ThemeProvider } from '@mui/material/styles';
 import ReactGA from 'react-ga4'; // Import ReactGA for event tracking
 
@@ -97,7 +98,7 @@ function SelectTile({ onSelect }) {
             onClick={() => handleActionClick('radar')}
           />
           <SpeedDialAction
-            icon={<RadarIcon style={getIconStyle('sat')} />}
+            icon={<SatelliteAltIcon style={getIconStyle('sat')} />}
             tooltipTitle="ดาวเทียม"
             title="ดาวเทียม"
             onClick={() => handleActionClick('sat')}
