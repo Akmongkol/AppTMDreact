@@ -65,9 +65,14 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
             }
 
             // Handle tile layer
-            const tileLayerUrl = action === 'radar' && path 
-                ? `https://wxmap.tmd.go.th${path}/{z}/{x}/{y}.png` 
-                : `${import.meta.env.VITE_API_URL}/fcst/tiled/${formattedDate}/${action}/{z}/{x}/{y}/`;
+        let tileLayerUrl = '';
+        if (action === 'radar' && path) {
+            tileLayerUrl = `https://wxmap.tmd.go.th${path}/{z}/{x}/{y}.png`;
+        } else if (action === 'sat' && path) {
+            tileLayerUrl = `https://wxmap.tmd.go.th${path}/{z}/{x}/{y}.png`;
+        } else {
+            tileLayerUrl = `${import.meta.env.VITE_API_URL}/fcst/tiled/${formattedDate}/${action}/{z}/{x}/{y}/`;
+        }
 
             // Remove the previous weather chart layer if it exists
             if (weatherChartRef.current) {

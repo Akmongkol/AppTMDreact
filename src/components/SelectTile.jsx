@@ -96,6 +96,12 @@ function SelectTile({ onSelect }) {
             title="เรดาร์"
             onClick={() => handleActionClick('radar')}
           />
+          <SpeedDialAction
+            icon={<RadarIcon style={getIconStyle('sat')} />}
+            tooltipTitle="ดาวเทียม"
+            title="ดาวเทียม"
+            onClick={() => handleActionClick('sat')}
+          />
         </SpeedDial>
       </Box>
     </ThemeProvider>

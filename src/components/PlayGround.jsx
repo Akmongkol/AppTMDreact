@@ -16,7 +16,7 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
   function ValueLabelComponent(props) {
     const { children, open, value } = props;
     let formattedValue;
-    if (action === 'radar') {
+    if (action === 'radar' && 'sat') {
       formattedValue = formatradarThaiDateTooltip(value); // Use the function to format for radar
     } else {
       formattedValue = formatThaiDateTooltip(new Date(value));; // Default formatting for other actions
@@ -35,6 +35,7 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [switchChecked, setSwitchChecked] = useState(true);
   const [radarData, setRadarData] = useState([]); // Store radar data here
+  const [satData, setSatData] = useState([]); // Store radar data here
   const sliderIntervalRef = useRef(null);
   const isMobile = useMediaQuery('(max-width:900px)');
   const threeHours = 3 * 60 * 60 * 1000; // Three hours in milliseconds
@@ -74,6 +75,49 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
         }));
         setMarks(marksArray);
         setRadarData(lastFourData); // Store the radar data
+      } else {
+        console.warn('Insufficient data in radar response');
+      }
+    } catch (error) {
+      console.error('Error fetching radar data:', error);
+    }
+  };
+
+  // Function to fetch radar data
+  const fetchSatData = async () => {
+    try {
+      const response = await axios.get('https://wxmap.tmd.go.th/api/tiles/sat');
+      const satData = response.data.satellite.B07;
+
+      if (satData && satData.length > 4) {
+        const lastFourData = satData.slice(-4);
+        const minValue = lastFourData[0].time * 1000; // Convert to milliseconds
+        const maxValue = lastFourData[3].time * 1000; // Convert to milliseconds
+
+        setSliderValue(minValue);
+        onSliderChange(minValue);
+        setMinValue(minValue);
+        setMaxValue(maxValue);
+
+        // Function to format time to Thai format
+        const formatradarThaiDate = (timestamp) => {
+          // Convert timestamp from seconds to milliseconds
+          const date = new Date(timestamp * 1000); // Assuming timestamp is in seconds
+
+          // Adjust for UTC+7
+          const thaiTime = new Date(date.getTime());
+          const hours = thaiTime.getHours().toString().padStart(2, '0');
+          const minutes = thaiTime.getMinutes().toString().padStart(2, '0');
+
+          return `${hours}:${minutes} น.`;
+        };
+
+        const marksArray = lastFourData.map((item) => ({
+          value: item.time * 1000, // Convert to milliseconds
+          label: formatradarThaiDate(item.time),
+        }));
+        setMarks(marksArray);
+        setSatData(lastFourData); // Store the radar data
       } else {
         console.warn('Insufficient data in radar response');
       }
@@ -141,6 +185,8 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
   useEffect(() => {
     if (action === 'radar') {
       fetchRadarData();
+    } else if (action === 'sat') {
+      fetchSatData();
     } else {
       fetchRecentFolderData();
     }
@@ -163,6 +209,17 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
       }
     }
   }, [sliderValue, radarData, action, setPath]);
+
+  // Handle slider value change and path setting
+  useEffect(() => {
+    if (action === 'sat' && satData.length > 0) {
+      const selectedData = satData.find(item => item.time * 1000 === sliderValue);
+
+      if (selectedData) {
+        setPath(selectedData.path); // Set path in Map state
+      }
+    }
+  }, [sliderValue, satData, action, setPath]);
 
   function formatThaiDateTooltip(date) {
     const dayNames = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
@@ -198,7 +255,7 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
       sliderIntervalRef.current = null;
     } else {
       // Set the appropriate interval duration based on the action
-      const intervalDuration = action === 'radar' ? 1000 : 2500; // 1 second for radar, 2.5 seconds for others
+      const intervalDuration = (action === 'radar' || action === 'sat') ? 1000 : 2500; // 1 second for radar and sat, 2.5 seconds for others
 
       // Initialize the current index if not already set
       let currentIndex = radarData.findIndex(item => item.time * 1000 === sliderValue);
@@ -215,8 +272,14 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
             nextIndex = (currentIndex + 1) % radarData.length; // Loop back to start
             currentIndex = nextIndex; // Update the current index for the next iteration
             return radarData[nextIndex].time * 1000; // Return the new time value in milliseconds
-          } else {
-            // For non-radar actions, increment time by three hours
+          } else if (action === 'sat') {
+            // Move to the next index and loop back if at the end
+            nextIndex = (currentIndex + 1) % satData.length; // Loop back to start
+            currentIndex = nextIndex; // Update the current index for the next iteration
+            return satData[nextIndex].time * 1000; // Return the new time value in milliseconds
+          }
+          else {
+            // For non-radar and non-sat actions, increment time by three hours
             let nextValue = prevValue + threeHours;
             if (nextValue > maxValue) {
               onSliderChange(minValue); // Reset to minValue if over max
@@ -265,7 +328,7 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
     const checked = e.target.checked;
 
     // Only change switch state if action is not radar
-    if (action !== 'radar') {
+    if (action !== 'radar' || action !== 'sat') {
       setSwitchChecked(checked);
       onSwitchChange(checked); // Notify parent component
     }
@@ -288,7 +351,7 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
         position: 'relative',
       }}
     >
-      {action !== 'radar' && (
+      {(action !== 'radar' && action !== 'sat') && (
         <Box sx={{ position: 'absolute', top: 2, right: 10 }}>
           <FormControlLabel
             control={
@@ -312,7 +375,7 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
           value={sliderValue}
           min={minValue}
           max={maxValue}
-          step={action === 'radar' ? null : threeHours}
+          step={action === 'radar' || action === 'sat' ? null : threeHours}
           marks={marks}
           valueLabelDisplay="auto"
           slots={{ valueLabel: ValueLabelComponent }}
