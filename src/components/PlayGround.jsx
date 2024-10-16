@@ -6,10 +6,14 @@ import IconButton from '@mui/material/IconButton';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import Switch from '@mui/material/Switch';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import FormControl from '@mui/material/FormControl';
 import axios from 'axios';
 import { Card, useMediaQuery } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import ReactGA from 'react-ga4'; // Import ReactGA for event tracking
 
 function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
   // Custom ValueLabel component
@@ -39,6 +43,8 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
   const sliderIntervalRef = useRef(null);
   const isMobile = useMediaQuery('(max-width:900px)');
   const threeHours = 3 * 60 * 60 * 1000; // Three hours in milliseconds
+  // State for the selected satellite type (default to "B03")
+  const [satType, setSatType] = useState('B03');
 
   // Function to fetch radar data
   const fetchRadarData = async () => {
@@ -84,10 +90,10 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
   };
 
   // Function to fetch radar data
-  const fetchSatData = async () => {
+  const fetchSatData = async (type) => {
     try {
       const response = await axios.get('https://wxmap.tmd.go.th/api/tiles/sat');
-      const satData = response.data.satellite.B07;
+      const satData = response.data.satellite[type];
 
       if (satData && satData.length > 4) {
         const lastFourData = satData.slice(-4);
@@ -334,6 +340,24 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
     }
   };
 
+  // Fetch satellite data based on selected satellite type
+  useEffect(() => {
+    if (action === 'sat') {
+      fetchSatData(satType);
+    }
+  }, [satType, action]);
+
+  // Handle radio button change
+  const handleSatTypeChange = (event) => {
+    const selectedType = event.target.value;
+    setSatType(selectedType);
+
+    ReactGA.event({
+      category: 'User',
+      action: selectedType,
+    });
+  };
+
   return (
     <Card
       sx={{
@@ -364,6 +388,22 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
             }
             label="แสดงลม"
           />
+        </Box>
+      )}
+      {(action == 'sat') && (
+        <Box sx={{ position: 'absolute', top: 2, right: 10 }}>
+          <FormControl>
+            <RadioGroup
+              row
+              aria-labelledby="demo-row-radio-buttons-group-label"
+              name="row-radio-buttons-group"
+              value={satType} // Set the current value to the selected satType
+              onChange={handleSatTypeChange} // Update the satType when a radio button is selected
+            >
+              <FormControlLabel value="B03" control={<Radio />} label="B03" />
+              <FormControlLabel value="B07" control={<Radio />} label="B07" />
+            </RadioGroup>
+          </FormControl>
         </Box>
       )}
       <IconButton onClick={handlePlayPause} sx={{ mr: 1, mb: 1 }}>
