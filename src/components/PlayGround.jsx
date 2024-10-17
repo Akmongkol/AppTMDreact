@@ -53,7 +53,7 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
         const response = await axios.get('https://wxmap.tmd.go.th/api/tiles/radar');
         const radarData = response.data.radar.var0_1_203_surface;
 
-        if (radarData && radarData.length > 4) {
+        if (radarData && radarData.length > 0) {
           const lastFourData = radarData.slice(-4);
           const minValue = lastFourData[0].time * 1000; // Convert to milliseconds
           const maxValue = lastFourData[3].time * 1000; // Convert to milliseconds
@@ -82,8 +82,6 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
           }));
           setMarks(marksArray);
           setRadarData(lastFourData); // Store the radar data
-        } else {
-          console.warn('Insufficient data in radar response');
         }
       } catch (error) {
         console.error('Error fetching radar data:', error);
@@ -94,7 +92,7 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
         const response = await axios.get('https://wxmap.tmd.go.th/api/tiles/sat');
         const satData = response.data.satellite[type];
 
-        if (satData && satData.length > 4) {
+        if (satData && satData.length > 0) {
           const lastFourData = satData.slice(-4);
           const minValue = lastFourData[0].time * 1000; // Convert to milliseconds
           const maxValue = lastFourData[3].time * 1000; // Convert to milliseconds
@@ -123,9 +121,7 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
           }));
           setMarks(marksArray);
           setSatData(lastFourData); // Store the radar data
-        } else {
-          console.warn('Insufficient data in radar response');
-        }
+        } 
       } catch (error) {
         console.error('Error fetching radar data:', error);
       }
