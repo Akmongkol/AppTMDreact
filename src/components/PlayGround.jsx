@@ -278,7 +278,7 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
             return radarData[nextIndex].time * 1000; // Return the new time value in milliseconds
           } else if(action === 'sat'){
              // Move to the next index and loop back if at the end
-             nextIndex = (currentIndex + 1) % satDataData.length; // Loop back to start
+             nextIndex = (currentIndex + 1) % satData.length; // Loop back to start
              currentIndex = nextIndex; // Update the current index for the next iteration
              return satData[nextIndex].time * 1000; // Return the new time value in milliseconds
           } else {
