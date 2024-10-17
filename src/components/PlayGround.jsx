@@ -271,11 +271,16 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
         setSliderValue(prevValue => {
           let nextIndex;
 
-          if (action === 'radar' || action === 'sat') {
+          if (action === 'radar') {
             // Move to the next index and loop back if at the end
             nextIndex = (currentIndex + 1) % radarData.length; // Loop back to start
             currentIndex = nextIndex; // Update the current index for the next iteration
             return radarData[nextIndex].time * 1000; // Return the new time value in milliseconds
+          } else if(action === 'sat'){
+             // Move to the next index and loop back if at the end
+             nextIndex = (currentIndex + 1) % satDataData.length; // Loop back to start
+             currentIndex = nextIndex; // Update the current index for the next iteration
+             return satData[nextIndex].time * 1000; // Return the new time value in milliseconds
           } else {
             // For non-radar and non-sat actions, increment time by three hours
             let nextValue = prevValue + threeHours;
