@@ -25,6 +25,7 @@ import RainBar from './RainBar';
 import AirBar from './AirBar'
 import RhumBar from './RhumBar'
 import TempBar from './TempBar';
+import RadarBar from './RadarBar';
 
 // Import the images directly from leaflet's package
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -225,6 +226,8 @@ function Map() {
         return <TempBar />;
       case 'rhum':
         return <RhumBar />;
+        case 'radar':
+          return <RadarBar />;
       default:
         return null;
     }
