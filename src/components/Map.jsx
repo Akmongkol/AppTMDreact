@@ -32,6 +32,9 @@ import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
+// SEO
+import { Helmet } from 'react-helmet';
+
 // Override the default marker icon
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -92,7 +95,7 @@ function Map() {
   const [WindDisplayed, setWindDisplayed] = useState(true);
   const [windDisplayStatus, setWindDisplayStatus] = useState(true); // Add this line
   const [path, setPath] = useState(null);
-  
+
   const [dailyWeatherData, setDailyWeatherData] = useState(null);
   const markerRef = useRef(null);
 
@@ -162,14 +165,14 @@ function Map() {
 
   const handleSelect = (value) => {
     setSelectedLayer(value);
-    
+
     if (value === 'radar' || value === "sat") {
       setPosition(null); // Clear the location when 'radar' is selected
       setWeatherData(null); // Clear the weather data when radar is selected
       setWindDisplayed(false); // Hide wind data for radar view
     } else {
       // Restore wind display if not on radar view
-      setWindDisplayed(windDisplayStatus); 
+      setWindDisplayed(windDisplayStatus);
     }
   };
 
@@ -226,8 +229,8 @@ function Map() {
         return <TempBar />;
       case 'rhum':
         return <RhumBar />;
-        case 'radar':
-          return <RadarBar />;
+      case 'radar':
+        return <RadarBar />;
       default:
         return null;
     }
@@ -242,6 +245,15 @@ function Map() {
 
   return (
     <div className='map-container'>
+
+      <Helmet>
+        <title>{locationName ? `พยากรณ์อากาศ ${locationName}` : 'แผนที่พยากรณ์อากาศ กรมอุตุนิยมวิทยา'}</title>
+        <meta name="description" content={weatherData ? `ตำแหน่งพยากรณ์อากาศ ${locationName}` : "ตรวจสอบพยากรณ์อากาศและข้อมูลสดบนแผนที่"} />
+        <meta name="keywords" content="พยากรณ์อากาศ, แผนที่, สภาพอากาศ, กรมอุตุนิยมวิทยา, weather, forecast, map, wxmap, wxmaptmd " />
+        <link rel="canonical" href="https://wxmap.tmd.go.th" />
+
+      </Helmet>
+
       <div className='input-container'>
         <Searchinput onLocationChange={handleLocationChange} />
       </div>
