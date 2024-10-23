@@ -33,7 +33,7 @@ import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
 // SEO
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 
 // Override the default marker icon
 delete L.Icon.Default.prototype._getIconUrl;
