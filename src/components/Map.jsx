@@ -91,6 +91,7 @@ function Map() {
   const [selectedLayer, setSelectedLayer] = useState('p3h');
   const [clearGeoDistrictMarker, setClearGeoDistrictMarker] = useState(false);
   const [locationName, setLocationName] = useState(null);
+  const [popupContent, setPopupContent] = useState('');
   const [weatherData, setWeatherData] = useState(null);
   const [WindDisplayed, setWindDisplayed] = useState(true);
   const [windDisplayStatus, setWindDisplayStatus] = useState(true); // Add this line
@@ -145,12 +146,19 @@ function Map() {
     if (selectedItem) {
       setPosition([selectedItem.lat, selectedItem.lng]);
       setLocationName(selectedItem.title);
+      setPopupContent(''); // Clear popupContent when searching
       setClearGeoDistrictMarker(true);
     } else {
       setPosition(null);
       setLocationName('');
+      setPopupContent('');
       setWeatherData(null);
     }
+  };
+
+  const handlePopupContentChange = (content) => {
+    setPopupContent(content);
+    setLocationName(null); // Clear locationName when clicking on map
   };
 
   const handleOpen = (lat, lng) => {
@@ -247,7 +255,13 @@ function Map() {
     <div className='map-container'>
 
       <Helmet>
-        <title>{locationName ? `พยากรณ์อากาศ ${locationName}` : 'แผนที่พยากรณ์อากาศ กรมอุตุนิยมวิทยา'}</title>
+          <title>
+          {locationName 
+            ? `พยากรณ์อากาศ ${locationName}` 
+            : popupContent 
+              ? `พยากรณ์อากาศ ${popupContent}` 
+              : 'แผนที่พยากรณ์อากาศ กรมอุตุนิยมวิทยา'}
+        </title>
         <meta name="description" content={weatherData ? `ตำแหน่งพยากรณ์อากาศ ${locationName}` : "ตรวจสอบพยากรณ์อากาศและข้อมูลสดบนแผนที่"} />
         <meta name="keywords" content="พยากรณ์อากาศ, แผนที่, สภาพอากาศ, กรมอุตุนิยมวิทยา, weather, forecast, map, wxmap, wxmaptmd " />
         <link rel="canonical" href="https://wxmap.tmd.go.th" />
@@ -273,12 +287,13 @@ function Map() {
         />
         <RectangleAndLines />
         <GeoDistricts
-          clearMarker={clearGeoDistrictMarker}
-          setClearMarker={setClearGeoDistrictMarker}
-          onFeatureClick={handleClearPosition}
-          sliderValue={sliderValue}
-          action={selectedLayer}
-        />
+        clearMarker={clearGeoDistrictMarker}
+        setClearMarker={setClearGeoDistrictMarker}
+        onFeatureClick={handleClearPosition}
+        sliderValue={sliderValue}
+        action={selectedLayer}
+        onPopupContentChange={handlePopupContentChange} // Add this new prop
+      />
         <TileLayout sliderValue={sliderValue} action={selectedLayer} windDisplayed={WindDisplayed} path={path} />
         {position && (
           <Marker position={position} ref={markerRef}>

@@ -9,7 +9,7 @@ const LazyNotfoundComponent = React.lazy(() => import('./Notfound'));
 function App() {
   return (
     <BrowserRouter>
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div>&nbsp;</div>}>
       <Routes>
         <Route path="/" element={<LazyMapComponent />} />
         {/* Catch-all route for 404 */}

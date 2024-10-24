@@ -16,7 +16,14 @@ import CardContent from '@mui/material/CardContent';
 import Divider from '@mui/material/Divider';
 import WidgetGeodata from './WidgetGeodata';
 
-function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue, action }) {
+function GeoDistricts({ 
+  clearMarker, 
+  setClearMarker, 
+  onFeatureClick, 
+  sliderValue, 
+  action,
+  onPopupContentChange = () => {} 
+}) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [popupContent, setPopupContent] = useState('');
   const [selectedLat, setSelectedLat] = useState(null);
@@ -86,6 +93,7 @@ function GeoDistricts({ clearMarker, setClearMarker, onFeatureClick, sliderValue
             : feature.properties ? `ต.${feature.properties.tam_th} อ.${feature.properties.amp_th} จ.${feature.properties.pro_th}` : 'No data';
 
         setPopupContent(newPopupContent);
+        onPopupContentChange(newPopupContent); // Add this line to update parent component
         setSelectedLat(lat);
         setSelectedLng(lng);
 
