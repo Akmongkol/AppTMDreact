@@ -1,15 +1,21 @@
+// Import React and Suspense
+import React, { Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Map from './components/Map'
-import Notfound from './Notfound';
+
+
+const LazyMapComponent = React.lazy(() => import('./components/Map'));
+const LazyNotfoundComponent = React.lazy(() => import('./Notfound'));
 
 function App() {
   return (
     <BrowserRouter>
+    <Suspense fallback={<div>Loading...</div>}>
       <Routes>
-        <Route path="/" element={<Map />} />
+        <Route path="/" element={<LazyMapComponent />} />
         {/* Catch-all route for 404 */}
-        <Route path="*" element={<Notfound />} />
+        <Route path="*" element={<LazyNotfoundComponent/>} />
       </Routes>
+      </Suspense>
     </BrowserRouter>
   )
 }
