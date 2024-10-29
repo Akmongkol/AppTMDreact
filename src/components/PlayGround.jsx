@@ -121,7 +121,7 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
           }));
           setMarks(marksArray);
           setSatData(lastFourData); // Store the radar data
-        } 
+        }
       } catch (error) {
         console.error('Error fetching radar data:', error);
       }
@@ -272,11 +272,11 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
             nextIndex = (currentIndex + 1) % radarData.length; // Loop back to start
             currentIndex = nextIndex; // Update the current index for the next iteration
             return radarData[nextIndex].time * 1000; // Return the new time value in milliseconds
-          } else if(action === 'sat'){
-             // Move to the next index and loop back if at the end
-             nextIndex = (currentIndex + 1) % satData.length; // Loop back to start
-             currentIndex = nextIndex; // Update the current index for the next iteration
-             return satData[nextIndex].time * 1000; // Return the new time value in milliseconds
+          } else if (action === 'sat') {
+            // Move to the next index and loop back if at the end
+            nextIndex = (currentIndex + 1) % satData.length; // Loop back to start
+            currentIndex = nextIndex; // Update the current index for the next iteration
+            return satData[nextIndex].time * 1000; // Return the new time value in milliseconds
           } else {
             // For non-radar and non-sat actions, increment time by three hours
             let nextValue = prevValue + threeHours;
@@ -399,7 +399,7 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
           </FormControl>
         </Box>
       )}
-      <IconButton onClick={handlePlayPause} sx={{ mr: 1, mb: 1 }}>
+      <IconButton onClick={handlePlayPause} sx={{ mr: 1, mb: 1 }} aria-label={isPlaying ? "Pause" : "Play"}>
         {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
       </IconButton>
 
@@ -423,6 +423,7 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
             marginLeft: 2,
             marginRight: 5,
           }}
+          aria-label="Timeline slider"
         />
       </Box>
     </Card>
