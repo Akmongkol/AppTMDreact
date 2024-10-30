@@ -1,0 +1,1 @@
+import{j as o}from"./index-ClaSeBIV.js";function r(){return o.jsxs("div",{children:[o.jsx("h1",{children:"404 - Page Not Found"}),o.jsx("p",{children:"Sorry, the page you are looking for does not exist."})]})}export{r as default};
