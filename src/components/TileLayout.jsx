@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useMap } from 'react-leaflet';
 import 'leaflet-velocity/dist/leaflet-velocity.css';
 import 'leaflet-velocity';
@@ -10,8 +10,9 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
     const weatherChartRef = useRef(null);
     const velocityLayerRef = useRef(null);
     const boundsRef = useRef(null);
+    const clipPathRef = useRef(null);
+    const svgRef = useRef(null);
     const abortControllerRef = useRef(null);
-    const [clipPath, setClipPath] = useState('');
 
     // Cleanup function for previous requests
     const cleanupPreviousRequests = () => {
@@ -20,21 +21,6 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
         }
         if (weatherChartRef.current) {
             map.removeLayer(weatherChartRef.current);
-        }
-    };
-
-    // Function to update clip-path based on bounds
-    const updateClipPath = () => {
-        if (boundsRef.current) {
-            const bounds = boundsRef.current;
-            const nw = map.latLngToLayerPoint(bounds.getNorthWest());
-            const se = map.latLngToLayerPoint(bounds.getSouthEast());
-            const ne = map.latLngToLayerPoint(bounds.getNorthEast());
-            const sw = map.latLngToLayerPoint(bounds.getSouthWest());
-
-            // Create polygon points for clip-path
-            const clipPathValue = `polygon(${nw.x}px ${nw.y}px, ${ne.x}px ${ne.y}px, ${se.x}px ${se.y}px, ${sw.x}px ${sw.y}px)`;
-            setClipPath(clipPathValue);
         }
     };
 
@@ -64,7 +50,21 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
                 map.getPane('satellitePane').style.zIndex = 200;
             }
 
-            // Initial clip-path update
+            // Create or update the SVG clip path
+            if (!svgRef.current) {
+                const svgNS = "http://www.w3.org/2000/svg";
+                const svg = document.createElementNS(svgNS, "svg");
+                svg.setAttribute("style", "position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000;");
+                map.getContainer().appendChild(svg);
+                svgRef.current = svg;
+
+                const defs = document.createElementNS(svgNS, "defs");
+                svg.appendChild(defs);
+
+                clipPathRef.current = document.createElementNS(svgNS, "clipPath");
+                clipPathRef.current.setAttribute("id", "satellite-clip-path");
+                defs.appendChild(clipPathRef.current);
+            }
             updateClipPath();
 
             // Handle wind layer
@@ -130,6 +130,7 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
             };
 
             if (action === 'sat' && path) {
+                // Check if path matches expected format
                 if (!/^\/api\/tiles\/sat\/[^/]+\/[^/]+$/.test(path)) {
                     console.warn('Invalid satellite path format');
                     return;
@@ -141,6 +142,7 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
                     className: 'satellite-tile'
                 };
             } else if (action === 'radar' && path) {
+                // Check if path matches expected format
                 if (!/^\/api\/tiles\/radar\/[^/]+\/[^/]+$/.test(path)) {
                     console.warn('Invalid radar path format');
                     return;
@@ -180,12 +182,12 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
             newTileLayer.addTo(map);
             weatherChartRef.current = newTileLayer;
 
-            // Apply dynamic styles for satellite tiles
+            // Apply clip path to satellite tiles
             if (action === 'sat') {
                 const style = document.createElement('style');
                 style.innerHTML = `
                     .satellite-tile {
-                        clip-path: ${clipPath};
+                        clip-path: url(#satellite-clip-path);
                     }
                 `;
                 document.head.appendChild(style);
@@ -196,7 +198,7 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
             clearTimeout(delayDebounceFn);
             cleanupPreviousRequests();
         };
-    }, [map, sliderValue, action, windDisplayed, path, clipPath]);
+    }, [map, sliderValue, action, windDisplayed, path]);
 
     useEffect(() => {
         const updateClipPathOnMove = () => {
@@ -211,6 +213,23 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
             map.off('zoomend', updateClipPathOnMove);
         };
     }, [map]);
+
+    const updateClipPath = () => {
+        if (clipPathRef.current && boundsRef.current) {
+            const bounds = boundsRef.current;
+            const nw = map.latLngToLayerPoint(bounds.getNorthWest());
+            const se = map.latLngToLayerPoint(bounds.getSouthEast());
+            const sw = map.latLngToLayerPoint(bounds.getSouthWest());
+            const ne = map.latLngToLayerPoint(bounds.getNorthEast());
+
+            const points = `${nw.x},${nw.y} ${ne.x},${ne.y} ${se.x},${se.y} ${sw.x},${sw.y}`;
+
+            clipPathRef.current.innerHTML = ''; // Clear previous content
+            const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+            polygon.setAttribute("points", points);
+            clipPathRef.current.appendChild(polygon);
+        }
+    };
 
     return null;
 }
