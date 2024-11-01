@@ -10,11 +10,9 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
     const weatherChartRef = useRef(null);
     const velocityLayerRef = useRef(null);
     const boundsRef = useRef(null);
-    const clipPathRef = useRef(null);
-    const svgRef = useRef(null);
+    const canvasRef = useRef(null);
     const abortControllerRef = useRef(null);
 
-    // Cleanup function for previous requests
     const cleanupPreviousRequests = () => {
         if (abortControllerRef.current) {
             abortControllerRef.current.abort();
@@ -25,6 +23,8 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
     };
 
     useEffect(() => {
+        if (!map) return;
+
         const delayDebounceFn = setTimeout(() => {
             if (!sliderValue || isNaN(new Date(sliderValue).getTime())) return;
 
@@ -32,42 +32,33 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
             abortControllerRef.current = new AbortController();
 
             const date = new Date(sliderValue);
-            const formattedDate = date
-                .toISOString()
-                .slice(0, 13)
-                .replace(/[-T:]/g, "")
-                .concat("00");
+            const formattedDate = date.toISOString().slice(0, 13).replace(/[-T:]/g, "").concat("00");
 
-            // Set the bounds for the map
             const southWest = L.latLng(4.00760, 92.73595);
             const northEast = L.latLng(21.98961, 112.80782);
             const bounds = L.latLngBounds(southWest, northEast);
             boundsRef.current = bounds;
 
-            // Create a custom pane for the satellite layer if it doesn't exist
-            if (!map.getPane('satellitePane')) {
-                map.createPane('satellitePane');
-                map.getPane('satellitePane').style.zIndex = 200;
+            if (!canvasRef.current) {
+                const canvas = document.createElement("canvas");
+                canvas.style.position = "absolute";
+                canvas.style.top = 0;
+                canvas.style.left = 0;
+                canvas.style.width = "100%";
+                canvas.style.height = "100%";
+                canvas.style.zIndex = "1000";
+                canvas.style.pointerEvents = 'none';
+
+                const mapContainer = map.getContainer();
+                if (mapContainer) {
+                    mapContainer.appendChild(canvas);
+                    canvasRef.current = canvas;
+                } else {
+                    console.error("Map container is not available");
+                }
             }
+            updateCanvasMask();
 
-            // Create or update the SVG clip path
-            if (!svgRef.current) {
-                const svgNS = "http://www.w3.org/2000/svg";
-                const svg = document.createElementNS(svgNS, "svg");
-                svg.setAttribute("style", "position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000;");
-                map.getContainer().appendChild(svg);
-                svgRef.current = svg;
-
-                const defs = document.createElementNS(svgNS, "defs");
-                svg.appendChild(defs);
-
-                clipPathRef.current = document.createElementNS(svgNS, "clipPath");
-                clipPathRef.current.setAttribute("id", "satellite-clip-path");
-                defs.appendChild(clipPathRef.current);
-            }
-            updateClipPath();
-
-            // Handle wind layer
             if (windDisplayed) {
                 axios.get(`${import.meta.env.VITE_API_URL}/streamlines/${formattedDate}`, {
                     signal: abortControllerRef.current.signal
@@ -107,73 +98,105 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
                 }
             }
 
-            // Handle tile layer
             let tileLayerUrl = '';
             let tileLayerOptions = {
                 opacity: 0.9,
-                crossOrigin: true,
+                crossOrigin: "anonymous",
                 bounds: bounds,
                 errorTileUrl: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
                 noWrap: true,
                 updateWhenZooming: false,
                 updateWhenIdle: true,
                 keepBuffer: 2,
-                tileSize: 256
-            };
-
-            const createUrl = (baseUrl, coords) => {
-                if (!baseUrl) return null;
-                return baseUrl
-                    .replace('{z}', coords.z)
-                    .replace('{x}', coords.x)
-                    .replace('{y}', coords.y);
+                tileSize: 256,
+                minZoom: 0,
+                maxZoom: 18
             };
 
             if (action === 'sat' && path) {
-                // Check if path matches expected format
-                if (!/^\/api\/tiles\/sat\/[^/]+\/[^/]+$/.test(path)) {
-                    console.warn('Invalid satellite path format');
-                    return;
-                }
                 tileLayerUrl = `https://wxmap.tmd.go.th${path}/{z}/{x}/{y}.png`;
-                tileLayerOptions = {
-                    ...tileLayerOptions,
-                    pane: 'satellitePane',
-                    className: 'satellite-tile'
-                };
+                tileLayerOptions.bounds = bounds;
             } else if (action === 'radar' && path) {
-                // Check if path matches expected format
-                if (!/^\/api\/tiles\/radar\/[^/]+\/[^/]+$/.test(path)) {
-                    console.warn('Invalid radar path format');
-                    return;
-                }
                 tileLayerUrl = `https://wxmap.tmd.go.th${path}/{z}/{x}/{y}.png`;
             } else {
                 tileLayerUrl = `${import.meta.env.VITE_API_URL}/fcst/tiled/${formattedDate}/${action}/{z}/{x}/{y}/`;
             }
 
-            // Create custom TileLayer
             const CustomTileLayer = L.TileLayer.extend({
-                createTile: function(coords, done) {
-                    const tile = document.createElement('img');
-                    
-                    const setErrorTile = () => {
-                        tile.src = this.options.errorTileUrl;
+                createTile: function (coords, done) {
+                    const tile = document.createElement('canvas');
+                    const tileSize = this.getTileSize();
+                    tile.width = tileSize.x;
+                    tile.height = tileSize.y;
+                    const context = tile.getContext('2d');
+        
+                    const image = new Image();
+                    image.crossOrigin = 'anonymous';
+        
+                    image.onload = () => {
+                        context.clearRect(0, 0, tile.width, tile.height);
+        
+                        const tileBounds = this._tileCoordsToBounds(coords);
+                        const bounds = boundsRef.current;
+        
+                        if (bounds.overlaps(tileBounds)) {
+                            // แปลงพิกัดทั้งหมดเป็น pixel coordinates
+                            const tileNw = map.project(tileBounds.getNorthWest(), coords.z);
+                            const tileSe = map.project(tileBounds.getSouthEast(), coords.z);
+                            const boundNw = map.project(bounds.getNorthWest(), coords.z);
+                            const boundSe = map.project(bounds.getSouthEast(), coords.z);
+        
+                            // คำนวณจุดตัดระหว่าง tile และ bounds
+                            const intersectNw = {
+                                x: Math.max(tileNw.x, boundNw.x),
+                                y: Math.max(tileNw.y, boundNw.y)
+                            };
+                            const intersectSe = {
+                                x: Math.min(tileSe.x, boundSe.x),
+                                y: Math.min(tileSe.y, boundSe.y)
+                            };
+        
+                            // คำนวณ offset และขนาดสำหรับ source (ภาพต้นฉบับ)
+                            const sx = Math.max(0, intersectNw.x - tileNw.x);
+                            const sy = Math.max(0, intersectNw.y - tileNw.y);
+                            const sw = Math.min(tileSize.x, intersectSe.x - intersectNw.x);
+                            const sh = Math.min(tileSize.y, intersectSe.y - intersectNw.y);
+        
+                            // คำนวณตำแหน่งและขนาดสำหรับ destination (canvas)
+                            const dx = Math.max(0, intersectNw.x - tileNw.x);
+                            const dy = Math.max(0, intersectNw.y - tileNw.y);
+                            const dw = Math.min(tileSize.x - dx, sw);
+                            const dh = Math.min(tileSize.y - dy, sh);
+        
+                            // ตรวจสอบว่าพื้นที่ที่จะวาดมีขนาดมากกว่า 0
+                            if (sw > 0 && sh > 0 && dw > 0 && dh > 0) {
+                                try {
+                                    context.drawImage(
+                                        image,
+                                        sx, sy, sw, sh,  // Source coordinates
+                                        dx, dy, dw, dh   // Destination coordinates
+                                    );
+                                } catch (error) {
+                                    console.error('Error drawing image:', error);
+                                    console.log('Draw parameters:', {
+                                        sx, sy, sw, sh, dx, dy, dw, dh,
+                                        imageWidth: image.width,
+                                        imageHeight: image.height,
+                                        tileWidth: tile.width,
+                                        tileHeight: tile.height
+                                    });
+                                }
+                            }
+                        }
+        
                         done(null, tile);
                     };
-
-                    tile.onerror = setErrorTile;
-                    tile.onload = () => done(null, tile);
-                    
-                    const url = createUrl(this._url, coords);
-                    if (!url) {
-                        setErrorTile();
-                        return tile;
-                    }
-
-                    tile.alt = '';
-                    tile.src = url;
-
+        
+                    image.onerror = () => {
+                        done(null, tile);
+                    };
+        
+                    image.src = this.getTileUrl(coords);
                     return tile;
                 }
             });
@@ -182,16 +205,8 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
             newTileLayer.addTo(map);
             weatherChartRef.current = newTileLayer;
 
-            // Apply clip path to satellite tiles
-            if (action === 'sat') {
-                const style = document.createElement('style');
-                style.innerHTML = `
-                    .satellite-tile {
-                        clip-path: url(#satellite-clip-path);
-                    }
-                `;
-                document.head.appendChild(style);
-            }
+            updateCanvasMask();
+
         }, 100);
 
         return () => {
@@ -201,33 +216,44 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
     }, [map, sliderValue, action, windDisplayed, path]);
 
     useEffect(() => {
-        const updateClipPathOnMove = () => {
-            updateClipPath();
+        const updateMaskOnMove = () => {
+            updateCanvasMask();
         };
 
-        map.on('moveend', updateClipPathOnMove);
-        map.on('zoomend', updateClipPathOnMove);
+        if (map) {
+            map.on('moveend', updateMaskOnMove);
+            map.on('zoomend', updateMaskOnMove);
+        }
 
         return () => {
-            map.off('moveend', updateClipPathOnMove);
-            map.off('zoomend', updateClipPathOnMove);
+            if (map) {
+                map.off('moveend', updateMaskOnMove);
+                map.off('zoomend', updateMaskOnMove);
+            }
         };
     }, [map]);
 
-    const updateClipPath = () => {
-        if (clipPathRef.current && boundsRef.current) {
+    const updateCanvasMask = () => {
+        if (canvasRef.current && boundsRef.current) {
+            const canvas = canvasRef.current;
+            const context = canvas.getContext("2d");
+
+            canvas.width = map.getSize().x;
+            canvas.height = map.getSize().y;
+
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
             const bounds = boundsRef.current;
-            const nw = map.latLngToLayerPoint(bounds.getNorthWest());
-            const se = map.latLngToLayerPoint(bounds.getSouthEast());
-            const sw = map.latLngToLayerPoint(bounds.getSouthWest());
-            const ne = map.latLngToLayerPoint(bounds.getNorthEast());
+            const nw = map.latLngToContainerPoint(bounds.getNorthWest());
+            const se = map.latLngToContainerPoint(bounds.getSouthEast());
 
-            const points = `${nw.x},${nw.y} ${ne.x},${ne.y} ${se.x},${se.y} ${sw.x},${sw.y}`;
+            const maskWidth = se.x - nw.x;
+            const maskHeight = se.y - nw.y;
 
-            clipPathRef.current.innerHTML = ''; // Clear previous content
-            const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-            polygon.setAttribute("points", points);
-            clipPathRef.current.appendChild(polygon);
+            if (nw.x >= 0 && nw.y >= 0 && se.x <= canvas.width && se.y <= canvas.height) {
+                context.fillStyle = "rgba(0, 0, 0, 0)";
+                context.fillRect(nw.x, nw.y, maskWidth, maskHeight);
+            }
         }
     };
 
