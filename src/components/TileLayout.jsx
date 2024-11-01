@@ -12,7 +12,7 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
     const boundsRef = useRef(null);
     const canvasRef = useRef(null);
     const abortControllerRef = useRef(null);
-    const [clipPath, setClipPath] = useState('');
+    
 
     const cleanupPreviousRequests = () => {
         if (abortControllerRef.current) {
@@ -20,21 +20,6 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
         }
         if (weatherChartRef.current) {
             map.removeLayer(weatherChartRef.current);
-        }
-    };
-
-    // Function to update clip-path based on bounds
-    const updateClipPath = () => {
-        if (boundsRef.current) {
-            const bounds = boundsRef.current;
-            const nw = map.latLngToLayerPoint(bounds.getNorthWest());
-            const se = map.latLngToLayerPoint(bounds.getSouthEast());
-            const ne = map.latLngToLayerPoint(bounds.getNorthEast());
-            const sw = map.latLngToLayerPoint(bounds.getSouthWest());
-
-            // Create polygon points for clip-path
-            const clipPathValue = `polygon(${nw.x}px ${nw.y}px, ${ne.x}px ${ne.y}px, ${se.x}px ${se.y}px, ${sw.x}px ${sw.y}px)`;
-            setClipPath(clipPathValue);
         }
     };
 
@@ -229,7 +214,7 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
             clearTimeout(delayDebounceFn);
             cleanupPreviousRequests();
         };
-    }, [map, sliderValue, action, windDisplayed, path, clipPath]);
+    }, [map, sliderValue, action, windDisplayed, path]);
 
     useEffect(() => {
         const updateMaskOnMove = () => {
