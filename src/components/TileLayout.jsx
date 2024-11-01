@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useMap } from 'react-leaflet';
 import 'leaflet-velocity/dist/leaflet-velocity.css';
 import 'leaflet-velocity';
@@ -10,8 +10,12 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
     const weatherChartRef = useRef(null);
     const velocityLayerRef = useRef(null);
     const boundsRef = useRef(null);
+<<<<<<< HEAD
     const canvasRef = useRef(null);
+=======
+>>>>>>> 3e010440f4e216b7d9c3f6379ba0577281cee0ec
     const abortControllerRef = useRef(null);
+    const [clipPath, setClipPath] = useState('');
 
     const cleanupPreviousRequests = () => {
         if (abortControllerRef.current) {
@@ -19,6 +23,21 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
         }
         if (weatherChartRef.current) {
             map.removeLayer(weatherChartRef.current);
+        }
+    };
+
+    // Function to update clip-path based on bounds
+    const updateClipPath = () => {
+        if (boundsRef.current) {
+            const bounds = boundsRef.current;
+            const nw = map.latLngToLayerPoint(bounds.getNorthWest());
+            const se = map.latLngToLayerPoint(bounds.getSouthEast());
+            const ne = map.latLngToLayerPoint(bounds.getNorthEast());
+            const sw = map.latLngToLayerPoint(bounds.getSouthWest());
+
+            // Create polygon points for clip-path
+            const clipPathValue = `polygon(${nw.x}px ${nw.y}px, ${ne.x}px ${ne.y}px, ${se.x}px ${se.y}px, ${sw.x}px ${sw.y}px)`;
+            setClipPath(clipPathValue);
         }
     };
 
@@ -59,6 +78,13 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
             }
             updateCanvasMask();
 
+<<<<<<< HEAD
+=======
+            // Initial clip-path update
+            updateClipPath();
+
+            // Handle wind layer
+>>>>>>> 3e010440f4e216b7d9c3f6379ba0577281cee0ec
             if (windDisplayed) {
                 axios.get(`${import.meta.env.VITE_API_URL}/streamlines/${formattedDate}`, {
                     signal: abortControllerRef.current.signal
@@ -114,9 +140,23 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
             };
 
             if (action === 'sat' && path) {
+<<<<<<< HEAD
+=======
+                if (!/^\/api\/tiles\/sat\/[^/]+\/[^/]+$/.test(path)) {
+                    console.warn('Invalid satellite path format');
+                    return;
+                }
+>>>>>>> 3e010440f4e216b7d9c3f6379ba0577281cee0ec
                 tileLayerUrl = `https://wxmap.tmd.go.th${path}/{z}/{x}/{y}.png`;
                 tileLayerOptions.bounds = bounds;
             } else if (action === 'radar' && path) {
+<<<<<<< HEAD
+=======
+                if (!/^\/api\/tiles\/radar\/[^/]+\/[^/]+$/.test(path)) {
+                    console.warn('Invalid radar path format');
+                    return;
+                }
+>>>>>>> 3e010440f4e216b7d9c3f6379ba0577281cee0ec
                 tileLayerUrl = `https://wxmap.tmd.go.th${path}/{z}/{x}/{y}.png`;
             } else {
                 tileLayerUrl = `${import.meta.env.VITE_API_URL}/fcst/tiled/${formattedDate}/${action}/{z}/{x}/{y}/`;
@@ -205,15 +245,28 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
             newTileLayer.addTo(map);
             weatherChartRef.current = newTileLayer;
 
+<<<<<<< HEAD
             updateCanvasMask();
 
+=======
+            // Apply dynamic styles for satellite tiles
+            if (action === 'sat') {
+                const style = document.createElement('style');
+                style.innerHTML = `
+                    .satellite-tile {
+                        clip-path: ${clipPath};
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+>>>>>>> 3e010440f4e216b7d9c3f6379ba0577281cee0ec
         }, 100);
 
         return () => {
             clearTimeout(delayDebounceFn);
             cleanupPreviousRequests();
         };
-    }, [map, sliderValue, action, windDisplayed, path]);
+    }, [map, sliderValue, action, windDisplayed, path, clipPath]);
 
     useEffect(() => {
         const updateMaskOnMove = () => {
@@ -233,6 +286,7 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
         };
     }, [map]);
 
+<<<<<<< HEAD
     const updateCanvasMask = () => {
         if (canvasRef.current && boundsRef.current) {
             const canvas = canvasRef.current;
@@ -257,6 +311,8 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
         }
     };
 
+=======
+>>>>>>> 3e010440f4e216b7d9c3f6379ba0577281cee0ec
     return null;
 }
 
