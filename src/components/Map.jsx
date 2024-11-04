@@ -255,18 +255,25 @@ function Map() {
     <div className='map-container'>
 
       <Helmet>
-          <title>
-          {locationName 
-            ? `พยากรณ์อากาศ ${locationName}` 
-            : popupContent 
-              ? `พยากรณ์อากาศ ${popupContent}` 
-              : 'แผนที่พยากรณ์อากาศ กรมอุตุนิยมวิทยา'}
+        <title>
+          {locationName
+            ? `พยากรณ์อากาศ ${locationName}`
+            : popupContent
+              ? `พยากรณ์อากาศ ${popupContent}`
+              : 'Weather Forecast TMD แผนที่พยากรณ์อากาศ กรมอุตุนิยมวิทยา'}
         </title>
-        <meta name="description" content={weatherData ? `ตำแหน่งพยากรณ์อากาศ ${locationName}` : "ตรวจสอบพยากรณ์อากาศและข้อมูลสดบนแผนที่"} />
-        <meta name="keywords" content="พยากรณ์อากาศ, แผนที่, สภาพอากาศ, กรมอุตุนิยมวิทยา, weather, forecast, map, wxmap, wxmaptmd " />
+        <meta
+          name="description"
+          content={`ตรวจสอบพยากรณ์อากาศในพื้นที่ของคุณ พร้อมข้อมูลราย 3 ชั่วโมงเกี่ยวกับปริมาณฝน อุณหภูมิ ความกดอากาศ ความชื้นสัมพัทธ์ และความเร็วลม รวมถึงข้อมูลรายวัน นอกจากนี้ยังมีภาพเรดาห์และดาวเทียมที่ช่วยให้คุณได้รับข้อมูลที่แม่นยำสำหรับการวางแผนการเดินทางและกิจกรรมต่าง ๆ อย่างมีประสิทธิภาพ`}
+        />
+        <meta
+          name="keywords"
+          content="พยากรณ์อากาศ,สภาพอากาศ,ข้อมูลอากาศ,แผนที่พยากรณ์อากาศ,กรมอุตุ,กรมอุตุนิยมวิทยา,อุตุนิยมวิทยา,สภาพอากาศปัจจุบัน,การพยากรณ์อากาศ,สภาพภูมิอากาศ,ข่าวอากาศ,เตือนภัยอากาศ,รายงานอากาศ,อากาศวันนี้,แผนที่อากาศ,ตรวจสอบอากาศ,สภาพอากาศไทย,เรดาห์,ดาวเทียม,ข้อมูลราย 3 ชั่วโมง,ปริมาณฝน,อุณหภูมิ,ความกดอากาศ,ความชื้นสัมพัทธ์,ความเร็วลม,ข้อมูลรายวัน,weather,forecast,map,wxmap,wxmaptmd,current weather,weather alerts,meteorology,weather radar,satellite imagery,climate conditions,real-time weather,storm tracking,future weather data,rainfall,temperature,air pressure,humidity,wind speed,daily forecast"
+        />
         <link rel="canonical" href="https://wxmap.tmd.go.th" />
-
       </Helmet>
+
+
 
       <div className='input-container'>
         <Searchinput onLocationChange={handleLocationChange} />
@@ -287,13 +294,13 @@ function Map() {
         />
         <RectangleAndLines />
         <GeoDistricts
-        clearMarker={clearGeoDistrictMarker}
-        setClearMarker={setClearGeoDistrictMarker}
-        onFeatureClick={handleClearPosition}
-        sliderValue={sliderValue}
-        action={selectedLayer}
-        onPopupContentChange={handlePopupContentChange} // Add this new prop
-      />
+          clearMarker={clearGeoDistrictMarker}
+          setClearMarker={setClearGeoDistrictMarker}
+          onFeatureClick={handleClearPosition}
+          sliderValue={sliderValue}
+          action={selectedLayer}
+          onPopupContentChange={handlePopupContentChange} // Add this new prop
+        />
         <TileLayout sliderValue={sliderValue} action={selectedLayer} windDisplayed={WindDisplayed} path={path} />
         {position && (
           <Marker position={position} ref={markerRef}>

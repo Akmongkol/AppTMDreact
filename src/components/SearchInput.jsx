@@ -47,7 +47,7 @@ function Searchinput({ onLocationChange, initialLocation }) {
     // คำนวณระยะทางระหว่างสองจุด
     const calculateDistance = (lat1, lon1, lat2, lon2) => {
         const toRad = (value) => value * Math.PI / 180;
-        const R = 6371; // รัศมีของโลกในกิโลเมตร
+        const R = 6371;
         const dLat = toRad(lat2 - lat1);
         const dLon = toRad(lon2 - lon1);
         const a = 
@@ -58,7 +58,6 @@ function Searchinput({ onLocationChange, initialLocation }) {
         return R * c;
     };
 
-    // หาตำแหน่งที่ใกล้ที่สุด
     const findNearestLocation = (latitude, longitude) => {
         let nearest = null;
         let shortestDistance = Infinity;
@@ -83,25 +82,60 @@ function Searchinput({ onLocationChange, initialLocation }) {
         return nearest;
     };
 
+    // เพิ่มฟังก์ชันสำหรับตรวจสอบการทำงานใน iframe
+    const checkIframePermissions = () => {
+        return new Promise((resolve, reject) => {
+            // ตรวจสอบว่าอยู่ใน iframe หรือไม่
+            const isInIframe = window !== window.parent;
+            
+            if (!isInIframe) {
+                resolve();
+                return;
+            }
+
+            // ตรวจสอบ permissions policy
+            if (document.featurePolicy && 
+                !document.featurePolicy.allowsFeature('geolocation')) {
+                reject(new Error('Geolocation is not allowed in this iframe'));
+                return;
+            }
+
+            // ทดสอบขอสิทธิ์
+            navigator.permissions.query({ name: 'geolocation' })
+                .then(permissionStatus => {
+                    if (permissionStatus.state === 'granted' || 
+                        permissionStatus.state === 'prompt') {
+                        resolve();
+                    } else {
+                        reject(new Error('Geolocation permission denied'));
+                    }
+                })
+                .catch(reject);
+        });
+    };
+
     const handleLocationError = (error) => {
         console.error("Location error:", error);
         setIsLoading(false);
         setError(error);
 
         let errorMessage = "ไม่สามารถระบุตำแหน่งได้";
-        switch (error.code) {
-            case 1:
-                errorMessage = "กรุณาอนุญาตการเข้าถึงตำแหน่ง";
-                break;
-            case 2:
-                errorMessage = "ไม่สามารถหาตำแหน่งได้ กรุณาลองใหม่อีกครั้ง";
-                break;
-            case 3:
-                errorMessage = "หมดเวลาในการค้นหาตำแหน่ง กรุณาลองใหม่อีกครั้ง";
-                break;
+        if (error.message && error.message.includes('iframe')) {
+            errorMessage = "ไม่สามารถเข้าถึงตำแหน่งใน iframe ได้ กรุณาตั้งค่า allow-same-origin และ allow-scripts";
+        } else {
+            switch (error.code) {
+                case 1:
+                    errorMessage = "กรุณาอนุญาตการเข้าถึงตำแหน่ง";
+                    break;
+                case 2:
+                    errorMessage = "ไม่สามารถหาตำแหน่งได้ กรุณาลองใหม่อีกครั้ง";
+                    break;
+                case 3:
+                    errorMessage = "หมดเวลาในการค้นหาตำแหน่ง กรุณาลองใหม่อีกครั้ง";
+                    break;
+            }
         }
 
-        // ใช้ตำแหน่งเริ่มต้น
         const defaultLocation = options[0];
         setValue(defaultLocation.title);
         onLocationChange(defaultLocation);
@@ -109,7 +143,7 @@ function Searchinput({ onLocationChange, initialLocation }) {
         alert(errorMessage);
     };
 
-    const getLocation = () => {
+    const getLocation = async () => {
         if (!navigator.geolocation) {
             handleLocationError({ code: 0, message: "เบราว์เซอร์ของคุณไม่รองรับการรับตำแหน่ง" });
             return;
@@ -118,49 +152,44 @@ function Searchinput({ onLocationChange, initialLocation }) {
         setIsLoading(true);
         setError(null);
 
-        // เคลียร์ timeout เก่า
-        if (locationRequestTimeout.current) {
-            clearTimeout(locationRequestTimeout.current);
-        }
-
-        // สร้าง timeout ใหม่
-        locationRequestTimeout.current = setTimeout(() => {
-            if (isLoading) {
-                handleLocationError({ code: 3, message: "Timeout expired" });
-            }
-        }, 10000);
-
-        const options = {
-            enableHighAccuracy: false,
-            timeout: 10000,
-            maximumAge: 30000
-        };
-
         try {
+            // ตรวจสอบสิทธิ์ก่อน
+            await checkIframePermissions();
+
+            if (locationRequestTimeout.current) {
+                clearTimeout(locationRequestTimeout.current);
+            }
+
+            locationRequestTimeout.current = setTimeout(() => {
+                if (isLoading) {
+                    handleLocationError({ code: 3, message: "Timeout expired" });
+                }
+            }, 10000);
+
+            const options = {
+                enableHighAccuracy: false,
+                timeout: 10000,
+                maximumAge: 30000
+            };
+
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     clearTimeout(locationRequestTimeout.current);
                     const { latitude, longitude } = position.coords;
-                   /*  console.log("Current position:", latitude, longitude); */
 
-                    // หาตำแหน่งที่ใกล้ที่สุด
                     const nearest = findNearestLocation(latitude, longitude);
-                   /*  console.log("Nearest location:", nearest); */
 
                     if (nearest) {
-                        // สร้าง location object โดยใช้ title ของตำแหน่งที่ใกล้ที่สุด
-                        // แต่ใช้พิกัดปัจจุบัน
                         const currentLocation = {
                             ...nearest,
                             lat: latitude,
                             lng: longitude,
                             isCurrentPosition: true,
-                            actualLat: nearest.lat,  // เก็บพิกัดของตำแหน่งที่ใกล้ที่สุดไว้ด้วย
+                            actualLat: nearest.lat,
                             actualLng: nearest.lng,
-                            distance: nearest.distance  // ระยะห่างจากตำแหน่งที่ใกล้ที่สุด
+                            distance: nearest.distance
                         };
 
-                        /* console.log("Using location:", currentLocation); */
                         setValue(currentLocation.title);
                         onLocationChange(currentLocation);
                     }
@@ -212,7 +241,6 @@ function Searchinput({ onLocationChange, initialLocation }) {
                         setValue(newValue);
                         const selectedItem = titleToItemMap.get(newValue);
                         if (selectedItem) {
-                            console.log("Selected location:", selectedItem);
                             onLocationChange(selectedItem);
                         }
                     }}
