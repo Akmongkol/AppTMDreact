@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useMap } from 'react-leaflet';
 import 'leaflet-velocity/dist/leaflet-velocity.css';
 import 'leaflet-velocity';
@@ -12,7 +12,7 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
     const boundsRef = useRef(null);
     const canvasRef = useRef(null);
     const abortControllerRef = useRef(null);
-    
+
 
     const cleanupPreviousRequests = () => {
         if (abortControllerRef.current) {
@@ -35,9 +35,18 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
             const date = new Date(sliderValue);
             const formattedDate = date.toISOString().slice(0, 13).replace(/[-T:]/g, "").concat("00");
 
-            const southWest = L.latLng(4.00760, 92.73595);
-            const northEast = L.latLng(21.98961, 112.80782);
-            const bounds = L.latLngBounds(southWest, northEast);
+            let bounds;
+            if (action === 'radar') {
+                // ขอบเขตประเทศไทย
+                const southWest = L.latLng(5.61, 97.35);
+                const northEast = L.latLng(20.47, 105.65);
+                bounds = L.latLngBounds(southWest, northEast);
+            } else {
+                // ขอบเขตที่กำหนดไว้เดิม
+                const southWest = L.latLng(4.00760, 92.73595);
+                const northEast = L.latLng(21.98961, 112.80782);
+                bounds = L.latLngBounds(southWest, northEast);
+            }
             boundsRef.current = bounds;
 
             if (!canvasRef.current) {
@@ -116,7 +125,6 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
 
             if (action === 'sat' && path) {
                 tileLayerUrl = `https://wxmap.tmd.go.th${path}/{z}/{x}/{y}.png`;
-                tileLayerOptions.bounds = bounds;
             } else if (action === 'radar' && path) {
                 tileLayerUrl = `https://wxmap.tmd.go.th${path}/{z}/{x}/{y}.png`;
             } else {
@@ -130,23 +138,23 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
                     tile.width = tileSize.x;
                     tile.height = tileSize.y;
                     const context = tile.getContext('2d');
-        
+
                     const image = new Image();
                     image.crossOrigin = 'anonymous';
-        
+
                     image.onload = () => {
                         context.clearRect(0, 0, tile.width, tile.height);
-        
+
                         const tileBounds = this._tileCoordsToBounds(coords);
                         const bounds = boundsRef.current;
-        
+
                         if (bounds.overlaps(tileBounds)) {
                             // แปลงพิกัดทั้งหมดเป็น pixel coordinates
                             const tileNw = map.project(tileBounds.getNorthWest(), coords.z);
                             const tileSe = map.project(tileBounds.getSouthEast(), coords.z);
                             const boundNw = map.project(bounds.getNorthWest(), coords.z);
                             const boundSe = map.project(bounds.getSouthEast(), coords.z);
-        
+
                             // คำนวณจุดตัดระหว่าง tile และ bounds
                             const intersectNw = {
                                 x: Math.max(tileNw.x, boundNw.x),
@@ -156,19 +164,19 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
                                 x: Math.min(tileSe.x, boundSe.x),
                                 y: Math.min(tileSe.y, boundSe.y)
                             };
-        
+
                             // คำนวณ offset และขนาดสำหรับ source (ภาพต้นฉบับ)
                             const sx = Math.max(0, intersectNw.x - tileNw.x);
                             const sy = Math.max(0, intersectNw.y - tileNw.y);
                             const sw = Math.min(tileSize.x, intersectSe.x - intersectNw.x);
                             const sh = Math.min(tileSize.y, intersectSe.y - intersectNw.y);
-        
+
                             // คำนวณตำแหน่งและขนาดสำหรับ destination (canvas)
                             const dx = Math.max(0, intersectNw.x - tileNw.x);
                             const dy = Math.max(0, intersectNw.y - tileNw.y);
                             const dw = Math.min(tileSize.x - dx, sw);
                             const dh = Math.min(tileSize.y - dy, sh);
-        
+
                             // ตรวจสอบว่าพื้นที่ที่จะวาดมีขนาดมากกว่า 0
                             if (sw > 0 && sh > 0 && dw > 0 && dh > 0) {
                                 try {
@@ -189,14 +197,14 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
                                 }
                             }
                         }
-        
+
                         done(null, tile);
                     };
-        
+
                     image.onerror = () => {
                         done(null, tile);
                     };
-        
+
                     image.src = this.getTileUrl(coords);
                     return tile;
                 }
