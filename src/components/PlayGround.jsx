@@ -393,8 +393,8 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
               value={satType} // Set the current value to the selected satType
               onChange={handleSatTypeChange} // Update the satType when a radio button is selected
             >
-              <FormControlLabel value="B03" control={<Radio />} label="B03" />
-              <FormControlLabel value="B07" control={<Radio />} label="B07" />
+              <FormControlLabel value="B03" control={<Radio />} label="VISIBLE" />
+              <FormControlLabel value="B07" control={<Radio />} label="INFRA" />
             </RadioGroup>
           </FormControl>
         </Box>
