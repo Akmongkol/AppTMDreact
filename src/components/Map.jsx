@@ -60,6 +60,7 @@ function RectangleAndLines() {
 
     map.setZoom(zoomLevel);
 
+
     const rectangle = L.rectangle(bounds, { color: "#FFFFFF00", weight: 1 }).addTo(map);
 
     const corners = rectangle.getBounds();
@@ -99,6 +100,17 @@ function Map() {
 
   const [dailyWeatherData, setDailyWeatherData] = useState(null);
   const markerRef = useRef(null);
+
+  const mapRef = useRef(null);
+
+  // Effect to set zoom constraints based on selectedLayer
+  useEffect(() => {
+    const map = mapRef.current;
+    if (map) {
+      const maxZoom = selectedLayer === 'radar' ? 10 : selectedLayer === 'sat' ? 7 : 20;
+      map.setMaxZoom(maxZoom);
+    }
+  }, [selectedLayer]);
 
   useEffect(() => {
     if (position) {
@@ -284,6 +296,7 @@ function Map() {
         center={position || [13.7563, 100.5018]}
         zoomControl={false}
         style={{ height: 'calc(var(--vh, 1vh) * 100)', width: '100%' }}
+        ref={mapRef}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
