@@ -67,8 +67,7 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
                     console.error("Map container is not available");
                 }
             }
-            updateCanvasMask();
-
+            
             if (windDisplayed) {
                 axios.get(`${import.meta.env.VITE_API_URL}/streamlines/${formattedDate}`, {
                     signal: abortControllerRef.current.signal
@@ -214,8 +213,6 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
             newTileLayer.addTo(map);
             weatherChartRef.current = newTileLayer;
 
-            updateCanvasMask();
-
         }, 100);
 
         return () => {
@@ -223,48 +220,6 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
             cleanupPreviousRequests();
         };
     }, [map, sliderValue, action, windDisplayed, path]);
-
-    useEffect(() => {
-        const updateMaskOnMove = () => {
-            updateCanvasMask();
-        };
-
-        if (map) {
-            map.on('moveend', updateMaskOnMove);
-            map.on('zoomend', updateMaskOnMove);
-        }
-
-        return () => {
-            if (map) {
-                map.off('moveend', updateMaskOnMove);
-                map.off('zoomend', updateMaskOnMove);
-            }
-        };
-    }, [map]);
-
-    const updateCanvasMask = () => {
-        if (canvasRef.current && boundsRef.current) {
-            const canvas = canvasRef.current;
-            const context = canvas.getContext("2d");
-
-            canvas.width = map.getSize().x;
-            canvas.height = map.getSize().y;
-
-            context.clearRect(0, 0, canvas.width, canvas.height);
-
-            const bounds = boundsRef.current;
-            const nw = map.latLngToContainerPoint(bounds.getNorthWest());
-            const se = map.latLngToContainerPoint(bounds.getSouthEast());
-
-            const maskWidth = se.x - nw.x;
-            const maskHeight = se.y - nw.y;
-
-            if (nw.x >= 0 && nw.y >= 0 && se.x <= canvas.width && se.y <= canvas.height) {
-                context.fillStyle = "rgba(0, 0, 0, 0)";
-                context.fillRect(nw.x, nw.y, maskWidth, maskHeight);
-            }
-        }
-    };
 
     return null;
 }
