@@ -6,6 +6,7 @@ import WaterDropIcon from '@mui/icons-material/WaterDrop';
 import AirIcon from '@mui/icons-material/Air';
 import ThermostatIcon from '@mui/icons-material/Thermostat';
 import AcUnitIcon from '@mui/icons-material/AcUnit';
+import HumidityIcon from './DropletIcon'
 import RadarIcon from '@mui/icons-material/Radar';
 import SatelliteAltIcon from '@mui/icons-material/SatelliteAlt';
 import { useTheme, createTheme, ThemeProvider } from '@mui/material/styles';
@@ -86,7 +87,7 @@ function SelectTile({ onSelect }) {
             onClick={() => handleActionClick('t2m')}
           />
           <SpeedDialAction
-            icon={<AcUnitIcon style={getIconStyle('rhum')} />}
+            icon={ <HumidityIcon active={activeAction === 'rhum'} theme={theme} />}
             tooltipTitle="ความชื้น"
             title="ความชื้น"
             onClick={() => handleActionClick('rhum')}

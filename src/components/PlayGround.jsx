@@ -48,45 +48,46 @@ function PlayGround({ onSliderChange, onSwitchChange, action, setPath }) {
 
   // Function to fetch radar data
   const fetchRadarandSatData = async (type) => {
-    if (action === 'radar') {
-      try {
-        const response = await axios.get('https://wxmap.tmd.go.th/api/tiles/radar');
-        const radarData = response.data.radar.var0_1_203_surface;
+   if (action === 'radar') {
+    try {
+      const response = await axios.get('https://wxmap.tmd.go.th/api/tiles/radar');
+      const radarDataRaw = response.data.radar.var0_1_203_surface;
 
-        if (radarData && radarData.length > 0) {
-          const lastFourData = radarData.slice(-4);
-          const minValue = lastFourData[0].time * 1000; // Convert to milliseconds
-          const maxValue = lastFourData[3].time * 1000; // Convert to milliseconds
+      if (radarDataRaw && radarDataRaw.length > 0) {
+        // ดึงทั้งหมด ไม่ slice
+        const radarData = radarDataRaw;
 
-          setSliderValue(minValue);
-          onSliderChange(minValue);
-          setMinValue(minValue);
-          setMaxValue(maxValue);
+        // คำนวณ min/max value จากทุกตัว
+        const minValue = radarData[0].time * 1000;
+        const maxValue = radarData[radarData.length - 1].time * 1000;
 
-          // Function to format time to Thai format
-          const formatradarThaiDate = (timestamp) => {
-            // Convert timestamp from seconds to milliseconds
-            const date = new Date(timestamp * 1000); // Assuming timestamp is in seconds
+        setSliderValue(minValue);
+        onSliderChange(minValue);
+        setMinValue(minValue);
+        setMaxValue(maxValue);
 
-            // Adjust for UTC+7
-            const thaiTime = new Date(date.getTime());
-            const hours = thaiTime.getHours().toString().padStart(2, '0');
-            const minutes = thaiTime.getMinutes().toString().padStart(2, '0');
+        // Function to format time to Thai format
+        const formatradarThaiDate = (timestamp) => {
+          const date = new Date(timestamp * 1000);
+          const thaiTime = new Date(date.getTime());
+          const hours = thaiTime.getHours().toString().padStart(2, '0');
+          const minutes = thaiTime.getMinutes().toString().padStart(2, '0');
+          return `${hours}:${minutes} น.`;
+        };
 
-            return `${hours}:${minutes} น.`;
-          };
+        // ทำ marks จากข้อมูลทั้งหมด
+        const marksArray = radarData.map((item) => ({
+          value: item.time * 1000,
+          label: formatradarThaiDate(item.time),
+        }));
 
-          const marksArray = lastFourData.map((item) => ({
-            value: item.time * 1000, // Convert to milliseconds
-            label: formatradarThaiDate(item.time),
-          }));
-          setMarks(marksArray);
-          setRadarData(lastFourData); // Store the radar data
-        }
-      } catch (error) {
-        console.error('Error fetching radar data:', error);
+        setMarks(marksArray);
+        setRadarData(radarData); // ส่งทั้งหมดเข้า state
       }
+    } catch (error) {
+      console.error('Error fetching radar data:', error);
     }
+  }
     if (action === 'sat') {
       try {
         const response = await axios.get('https://wxmap.tmd.go.th/api/tiles/sat');

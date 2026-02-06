@@ -34,7 +34,7 @@ function TileLayout({ sliderValue, action, windDisplayed, path }) {
 
             const date = new Date(sliderValue);
             const formattedDate = date.toISOString().slice(0, 13).replace(/[-T:]/g, "").concat("00");
-
+console.log(formattedDate)
             let bounds;
             if (action === 'radar') {
                 // ขอบเขตประเทศไทย

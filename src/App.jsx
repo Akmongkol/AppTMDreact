@@ -1,24 +1,17 @@
-// Import React and Suspense
-import React, { Suspense } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import React, { Suspense } from "react";
+import { BrowserRouter, useRoutes } from "react-router-dom";
+import routes from "./routes/routes";
 
-const LazyMapComponent = React.lazy(() => import('./components/Map'));
-const LazyNotfoundComponent = React.lazy(() => import('./Notfound'));
-
-function App() {
-  return (
-
-      <BrowserRouter>
-        <Suspense fallback={<div>&nbsp;</div>}>
-          <Routes>
-            <Route path="/" element={<LazyMapComponent />} />
-            {/* Catch-all route for 404 */}
-            <Route path="*" element={<LazyNotfoundComponent />} />
-          </Routes>
-        </Suspense>
-      </BrowserRouter>
-
-  )
+function AppRoutes() {
+  return useRoutes(routes);
 }
 
-export default App
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Suspense fallback={<div>&nbsp;</div>}>
+        <AppRoutes />
+      </Suspense>
+    </BrowserRouter>
+  );
+}
