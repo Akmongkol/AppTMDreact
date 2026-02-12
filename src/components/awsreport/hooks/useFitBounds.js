@@ -11,7 +11,7 @@ export function useFitBounds(areaGeo, region, province) {
       (!region || region === "all") &&
       (!province || province === "all")
     ) {
-      map.setView([13.3, 100.5], 5.5);
+      map.setView([13, 101.5], 6);
       return;
     }
 

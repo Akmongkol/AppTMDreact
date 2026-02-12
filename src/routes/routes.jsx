@@ -10,7 +10,7 @@ const LazyRainreportComponent = React.lazy(() => import("../components/rainrepor
 const LazyRainreportDemoComponent = React.lazy(() => import("../components/rainreport/Demo/DemoMain"));
 const LazyMapAwsComponent = React.lazy(() => import("../components/awsmap/Map"));
 const StationDetail = React.lazy(() => import("../components/awsmap/StationDetail"));
-const AwsReport = React.lazy(() => import("../components/awsreport/main"));
+const AwsReport = React.lazy(() => import("../components/awsreport/Main"));
 const LazyNotfoundComponent = React.lazy(() => import("../Notfound"));
 
 /* ---------- route config ---------- */

@@ -1,38 +1,37 @@
 import { useEffect, useMemo, useState } from "react";
 import api from "../utils/apiaws";
-import { getRainColor } from "../utils/useColor";
+import { getRainColor, getTempColor } from "../utils/useColor";
+import { formatThaiTime } from "../utils/formatTime";
 
-export function useAwsNow() {
+export function useAwsNow(region, province) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [region, setRegion] = useState("all");
-  const [province, setProvince] = useState("all");
+  const [metric, setMetric] = useState("rain");
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const res = await api.get("/awsnow");
+
+      if (!res.data?.success)
+        throw new Error("API returned success = false");
+
+      setData(res.data.data || []);
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const res = await api.get("/awsnow");
-        if (!res.data?.success) {
-          throw new Error("API returned success = false");
-        }
-
-        setData(res.data.data || []);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, []);
 
-  // ⭐ filter + rainMeta พร้อมกัน
   const filteredData = useMemo(() => {
     return data
       .filter((item) => {
@@ -47,6 +46,8 @@ export function useAwsNow() {
       .map((item) => ({
         ...item,
         rainMeta: getRainColor(item.precip_today),
+        tempMeta: getTempColor(item.temperature),
+        observed_time_th: formatThaiTime(item.datetime_utc7),
       }));
   }, [data, region, province]);
 
@@ -67,15 +68,13 @@ export function useAwsNow() {
   }, [data, region]);
 
   return {
-    data,
-    filteredData, // ⭐ มี rainMeta แล้ว
+    filteredData,
     regions,
     provinces,
-    region,
-    province,
-    setRegion,
-    setProvince,
+    metric,
+    setMetric,
     loading,
     error,
+    refresh: fetchData,
   };
 }

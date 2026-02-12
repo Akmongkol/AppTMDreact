@@ -22,3 +22,32 @@ export function getRainColor(precip) {
 
   return { color: "#9e9e9e", label: "ไม่มีฝน" };
 }
+
+export function getTempColor(temp) {
+  const t = temp ?? null;
+
+  if (t === null) {
+    return { color: "#9e9e9e", label: "ไม่มีข้อมูล" };
+  }
+
+  if (t >= 40.0) {
+    return { color: "#d32f2f", label: "อากาศร้อนจัด" };
+  }
+  if (t >= 35.0) {
+    return { color: "#ff9800", label: "อากาศร้อน" };
+  }
+  if (t >= 30.0) {
+    return { color: "#ffeb3b", label: "อากาศปกติ" };
+  }
+  if (t >= 16.0) {
+    return { color: "#81d4fa", label: "อากาศเย็น" };
+  }
+  if (t >= 8.0) {
+    return { color: "#1565c0", label: "อากาศหนาว" };
+  }
+  if (t <= 7.9) {
+    return { color: "#0041FF", label: "อากาศหนาวจัด" };
+  }
+
+  return { color: "#9e9e9e", label: "ไม่มีข้อมูล" };
+}
