@@ -77,7 +77,6 @@ export function useApiRainfall(region, province) {
 
   return {
     rainfallData: filteredData,
-    rawData: data,
     regions,
     provinces,
     loading,

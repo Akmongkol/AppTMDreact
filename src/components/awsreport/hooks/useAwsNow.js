@@ -8,8 +8,6 @@ export function useAwsNow(region, province) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [metric, setMetric] = useState("rain");
-
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -71,8 +69,6 @@ export function useAwsNow(region, province) {
     filteredData,
     regions,
     provinces,
-    metric,
-    setMetric,
     loading,
     error,
     refresh: fetchData,

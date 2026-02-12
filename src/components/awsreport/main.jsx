@@ -8,19 +8,33 @@ import { useAwsNow } from "./hooks/useAwsNow";
 import { useApiRainfall } from "./hooks/useRainfall";
 
 export default function Main() {
-  // ⭐ global tab state
   const [region, setRegion] = React.useState("all");
   const [province, setProvince] = React.useState("all");
-  const aws = useAwsNow(region, province);
+  const [metric, setMetric] = React.useState("rain");
+
+  const aws = useAwsNow(region, province, metric);
   const rain = useApiRainfall(region, province);
-  const [activeTab, setActiveTab] = React.useState(0);
+
+  /** ✅ tab state แยก metric */
+  const [tabs, setTabs] = React.useState({
+    rain: 0,
+    temp: 0
+  });
+
+  /** ✅ tab ปัจจุบัน */
+  const activeTab = tabs[metric];
+
+  /** ✅ เปลี่ยน tab */
+  const handleTabChange = (newTab) => {
+    setTabs(prev => ({
+      ...prev,
+      [metric]: newTab
+    }));
+  };
+
   const [selectedStation, setSelectedStation] = React.useState(null);
 
-  // ⭐ reset tab เมื่อ metric เปลี่ยน
-  React.useEffect(() => {
-    setActiveTab(0);
-  }, [aws.metric]);
-
+  /** refresh */
   const handleRefreshAll = () => {
     aws.refresh();
     rain.refresh();
@@ -49,8 +63,8 @@ export default function Main() {
             error={aws.error}
             region={region}
             province={province}
-            metric={aws.metric}
-            tabIndex={activeTab}
+            metric={metric}
+            tabIndex={activeTab} // ⭐ sync map กับ tab
             selectedStation={selectedStation}
             onPopupOpened={() => setSelectedStation(null)}
           />
@@ -65,10 +79,10 @@ export default function Main() {
             rainLoading={rain.loading}
             awsError={aws.error}
             rainError={rain.error}
-            metric={aws.metric}
-            onMetricChange={aws.setMetric}
-            value={activeTab}
-            onTabChange={setActiveTab}
+            metric={metric}
+            onMetricChange={setMetric}
+            value={activeTab}           // ⭐ ใช้ tab ของ metric นั้น
+            onTabChange={handleTabChange} // ⭐ เปลี่ยน tab แบบแยก metric
             onSelectStation={setSelectedStation}
           />
         </Grid>
