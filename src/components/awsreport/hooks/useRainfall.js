@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import api from "../utils/apiaws";
 import { getRainColor } from "../utils/useColor";
 
-export function useApiRainfall(region, province) {
+export function useApiRainfall(region, province, station) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -38,23 +38,29 @@ export function useApiRainfall(region, province) {
   // FILTER + META
   // ======================
   const filteredData = useMemo(() => {
-    return data
-      .filter(item => {
-        const matchRegion =
-          region === "all" || item.region_name_th === region;
+  return data
+    .filter(item => {
+      const matchRegion =
+        region === "all" || item.region_name_th === region;
 
-        const matchProvince =
-          province === "all" || item.province_name_th === province;
+      const matchProvince =
+        province === "all" || item.province_name_th === province;
 
-        return matchRegion && matchProvince;
-      })
-      .map(item => ({
-        ...item,
-        rainlastMeta: getRainColor(item.precip_yesterday),
-        rain3dMeta: getRainColor(item.precip_3days),
-        rain7dMeta: getRainColor(item.precip_7days),
-      }));
-  }, [data, region, province]);
+      const matchStation =
+        !station ||
+        item.station_name_th
+          ?.toLowerCase()
+          .includes(station.toLowerCase());
+
+      return matchRegion && matchProvince && matchStation;
+    })
+    .map(item => ({
+      ...item,
+      rainlastMeta: getRainColor(item.precip_yesterday),
+      rain3dMeta: getRainColor(item.precip_3days),
+      rain7dMeta: getRainColor(item.precip_7days),
+    }));
+}, [data, region, province, station]);
 
   // ======================
   // OPTIONS (ใช้ data จริง)
@@ -75,10 +81,25 @@ export function useApiRainfall(region, province) {
     ];
   }, [data, region]);
 
+  const stations = useMemo(() => {
+  return [
+    ...new Set(
+      data
+        .filter(
+          d =>
+            (region === "all" || d.region_name_th === region) &&
+            (province === "all" || d.province_name_th === province)
+        )
+        .map(d => d.station_name_th)
+    ),
+  ];
+}, [data, region, province]);
+
   return {
     rainfallData: filteredData,
     regions,
     provinces,
+    stations,
     loading,
     error,
     refresh: fetchRainfall

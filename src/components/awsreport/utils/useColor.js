@@ -36,7 +36,7 @@ export function getTempColor(temp) {
   if (t >= 35.0) {
     return { color: "#ff9800", label: "อากาศร้อน" };
   }
-  if (t >= 30.0) {
+  if (t >= 23.0) {
     return { color: "#ffeb3b", label: "อากาศปกติ" };
   }
   if (t >= 16.0) {

@@ -1,6 +1,27 @@
-import React from "react";
-import { FirstPage, LastPage, KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
-import { Box, IconButton, Tooltip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, Typography, TablePagination, TableSortLabel } from "@mui/material";
+import React, { useMemo } from "react";
+import TableSearchFilter from "../../TableSearchFilter";
+import {
+  FirstPage,
+  LastPage,
+  KeyboardArrowLeft,
+  KeyboardArrowRight,
+} from "@mui/icons-material";
+
+import {
+  Box,
+  IconButton,
+  Tooltip,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  CircularProgress,
+  Typography,
+  TablePagination,
+  TableSortLabel,
+} from "@mui/material";
 
 /* ================= Pagination Actions ================= */
 function TablePaginationActions({ count, page, rowsPerPage, onPageChange }) {
@@ -52,7 +73,7 @@ function TablePaginationActions({ count, page, rowsPerPage, onPageChange }) {
   );
 }
 
-
+/* ================= Sort ================= */
 function descendingComparator(a, b, orderBy) {
   const av = a[orderBy] ?? 0;
   const bv = b[orderBy] ?? 0;
@@ -65,29 +86,78 @@ function getComparator(order, orderBy) {
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-/* ================= TablePanel ================= */
-export default function RainTodayTable({ data, loading, error, onSelectStation }) {
+/* ================= Table ================= */
+export default function RainTodayTable({
+  data,
+  stations,
+  loading,
+  error,
+  onSelectStation,
+}) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [order, setOrder] = React.useState("desc");
   const [orderBy, setOrderBy] = React.useState("precip_today");
+  const [searchText, setSearchText] = React.useState("");
 
+
+  /* ---------- Filter ---------- */
+  const filteredData = useMemo(() => {
+    let result = data;
+
+    // filter station
+    if (stations?.length) {
+      const stationSet = new Set(stations.map(s => s.toLowerCase()));
+      result = result.filter(d =>
+        stationSet.has(d.station_name_th?.toLowerCase())
+      );
+    }
+    // filter search
+    if (searchText) {
+      const text = searchText.toLowerCase();
+
+      result = result.filter(d =>
+        d.station_name_th?.toLowerCase().includes(text) ||
+        d.province_name_th?.toLowerCase().includes(text) ||
+        d.region_name_th?.toLowerCase().includes(text)
+      );
+    }
+
+    return result;
+  }, [data, stations, searchText]);
+
+  /* ---------- Sort ---------- */
   const sortedData = React.useMemo(() => {
-    return [...data].sort(getComparator(order, orderBy));
-  }, [data, order, orderBy]);
+    return [...filteredData].sort(getComparator(order, orderBy));
+  }, [filteredData, order, orderBy]);
 
-  const maxPage = Math.max(
-    0,
-    Math.ceil(data.length / rowsPerPage) - 1
-  );
-
-  const safePage = Math.min(page, maxPage);
+  /* ---------- Reset page ---------- */
   React.useEffect(() => {
     setPage(0);
-  }, [data.length, rowsPerPage]);
+  }, [filteredData.length, rowsPerPage]);
 
+  const maxPage = Math.max(0, Math.ceil(filteredData.length / rowsPerPage) - 1);
+  const safePage = Math.min(page, maxPage);
+
+  /* ================= UI ================= */
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+      {/* ---------- Station Filter ---------- */}
+      <Box sx={{
+        p: 1,
+        display: "flex",
+        justifyContent: {
+          xs: "stretch",   // มือถือเต็ม
+          sm: "flex-end",  // tablet ขึ้นไปชิดขวา
+        },
+      }}>
+        <TableSearchFilter
+          value={searchText}
+          onChange={setSearchText}
+        />
+      </Box>
+
+      {/* ---------- Table ---------- */}
       <TableContainer sx={{ flex: 1 }}>
         <Table>
           <TableHead>
@@ -98,22 +168,14 @@ export default function RainTodayTable({ data, loading, error, onSelectStation }
               <TableCell>เวลา</TableCell>
               <TableCell align="right">
                 <TableSortLabel
-                  hideSortIcon          // ⭐ สำคัญมาก
+                  hideSortIcon
                   active={orderBy === "precip_today"}
-                  direction={orderBy === "precip_today" ? order : "asc"}
+                  direction={order}
                   onClick={() => {
                     const isAsc =
                       orderBy === "precip_today" && order === "asc";
                     setOrder(isAsc ? "desc" : "asc");
                     setOrderBy("precip_today");
-                  }}
-                  sx={{
-                    "& .MuiTableSortLabel-icon": {
-                      display: "none",           // ❌ ซ่อนลูกศรถาวร
-                    },
-                    "&:hover .MuiTableSortLabel-icon": {
-                      display: "inline-flex",    // 👀 โผล่เฉพาะ hover
-                    },
                   }}
                 >
                   ฝนสะสม (มม.)
@@ -143,26 +205,21 @@ export default function RainTodayTable({ data, loading, error, onSelectStation }
               </TableRow>
             )}
 
-            {!loading && !error && sortedData.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={5} align="center">
-                  <Typography color="text.secondary">
-                    ไม่มีข้อมูล
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            )}
-
             {!loading &&
               !error &&
               sortedData
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .slice(
+                  safePage * rowsPerPage,
+                  safePage * rowsPerPage + rowsPerPage
+                )
                 .map((row) => (
-                  <TableRow key={row.station_id}
+                  <TableRow
+                    key={`${row.station_id}-${row.observed_time}`}
                     hover
                     sx={{ cursor: "pointer" }}
-                    onClick={() => onSelectStation(row.station_id)}>
-                    <TableCell >{row.station_name_th}</TableCell>
+                    onClick={() => onSelectStation(row.station_id)}
+                  >
+                    <TableCell>{row.station_name_th}</TableCell>
                     <TableCell>{row.region_name_th}</TableCell>
                     <TableCell>{row.province_name_th}</TableCell>
                     <TableCell>{row.observed_time_th}</TableCell>
@@ -190,10 +247,11 @@ export default function RainTodayTable({ data, loading, error, onSelectStation }
         </Table>
       </TableContainer>
 
+      {/* ---------- Pagination ---------- */}
       <TablePagination
         component="div"
         rowsPerPageOptions={[5, 10, 20]}
-        count={data.length}
+        count={filteredData.length}
         rowsPerPage={rowsPerPage}
         page={safePage}
         onPageChange={(e, p) => setPage(p)}
@@ -207,6 +265,7 @@ export default function RainTodayTable({ data, loading, error, onSelectStation }
         }
         ActionsComponent={TablePaginationActions}
       />
+
       <Box sx={{ px: 2, pb: 1 }}>
         <Typography variant="caption" color="text.secondary" sx={{ fontSize: { xs: 12, md: 14 } }}>
           หมายเหตุ: ข้อมูลปริมาณฝนสะสมตั้งแต่เวลา 7.00 น. ของวันนี้ จนถึงเวลาปัจจุบันของวันนี้

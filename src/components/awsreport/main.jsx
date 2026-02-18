@@ -41,6 +41,8 @@ export default function Main() {
           <TabsPanel
             data={ctrl.data.aws.filteredData}
             rainfallData={ctrl.data.rain.rainfallData}
+            stations={ctrl.data.aws.stations}
+            rainStations={ctrl.data.rain.stations}
             awsLoading={ctrl.data.aws.loading}
             rainLoading={ctrl.data.rain.loading}
             awsError={ctrl.data.aws.error}

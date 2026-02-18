@@ -6,13 +6,14 @@ export function useDashboardController() {
   /* ---------------- filter state ---------------- */
   const [region, setRegion] = React.useState("all");
   const [province, setProvince] = React.useState("all");
+  const [station, setStation] = React.useState("");
 
   /* ---------------- metric state ---------------- */
   const [metric, setMetric] = React.useState("rain");
 
   /* ---------------- api hooks ---------------- */
-  const aws = useAwsNow(region, province);
-  const rain = useApiRainfall(region, province);
+  const aws = useAwsNow(region, province, station);
+  const rain = useApiRainfall(region, province, station);
 
   /* ---------------- tab state per metric ---------------- */
   const [tabs, setTabs] = React.useState({
@@ -43,21 +44,22 @@ export function useDashboardController() {
     metric === "temp"
       ? aws.loading
       : activeTab === 0
-      ? aws.loading
-      : rain.loading;
+        ? aws.loading
+        : rain.loading;
 
   const mapError =
     metric === "temp"
       ? aws.error
       : activeTab === 0
-      ? aws.error
-      : rain.error;
+        ? aws.error
+        : rain.error;
 
   /* ---------------- return controller ---------------- */
   return {
     state: {
       region,
       province,
+      station,
       metric,
       activeTab,
       selectedStation,
@@ -66,6 +68,7 @@ export function useDashboardController() {
     actions: {
       setRegion,
       setProvince,
+      setStation,
       setMetric,
       setActiveTab,
       setSelectedStation,

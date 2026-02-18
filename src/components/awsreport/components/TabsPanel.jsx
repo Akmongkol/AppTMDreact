@@ -45,6 +45,8 @@ const BigTooltip = styled(({ className, ...props }) => (
 export default function TabsMenu({
     data,
     rainfallData,
+    stations,
+    rainStations,
     awsLoading,
     rainLoading,
     awsError,
@@ -165,6 +167,7 @@ export default function TabsMenu({
                         <TabPanel value={value} index={0} dir={theme.direction}>
                             <RainTodayTable
                                 data={data}
+                                stations={stations}
                                 loading={awsLoading}
                                 error={awsError}
                                 onSelectStation={onSelectStation}
@@ -174,6 +177,7 @@ export default function TabsMenu({
                         <TabPanel value={value} index={1}>
                             <RainAccYesterday
                                 data={rainfallData}
+                                stations={rainStations}
                                 loading={rainLoading}
                                 error={rainError}
                                 onSelectStation={onSelectStation}
@@ -183,6 +187,7 @@ export default function TabsMenu({
                         <TabPanel value={value} index={2}>
                             <RainAccThreeday
                                 data={rainfallData}
+                                stations={rainStations}
                                 loading={rainLoading}
                                 error={rainError}
                                 onSelectStation={onSelectStation}
@@ -191,6 +196,7 @@ export default function TabsMenu({
                         <TabPanel value={value} index={3}>
                             <RainAccSevenday
                                 data={rainfallData}
+                                stations={rainStations}
                                 loading={rainLoading}
                                 error={rainError}
                                 onSelectStation={onSelectStation}
@@ -204,6 +210,7 @@ export default function TabsMenu({
                         <TabPanel value={value} index={0}>
                             <TempTodayTable
                                 data={data}
+                                stations={stations}
                                 loading={awsLoading}
                                 error={awsError}
                                 onSelectStation={onSelectStation}
@@ -213,6 +220,7 @@ export default function TabsMenu({
                         <TabPanel value={value} index={1}>
                             <TempMinMaxTable
                                 data={data}
+                                stations={stations}
                                 loading={awsLoading}
                                 error={awsError}
                                 onSelectStation={onSelectStation}

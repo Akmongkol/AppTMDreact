@@ -1,6 +1,27 @@
 import React from "react";
-import { FirstPage, LastPage, KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
-import { Box, IconButton, Tooltip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, Typography, TablePagination, TableSortLabel } from "@mui/material";
+import TableSearchFilter from "../../TableSearchFilter";
+import {
+    FirstPage,
+    LastPage,
+    KeyboardArrowLeft,
+    KeyboardArrowRight,
+} from "@mui/icons-material";
+
+import {
+    Box,
+    IconButton,
+    Tooltip,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    CircularProgress,
+    Typography,
+    TablePagination,
+    TableSortLabel,
+} from "@mui/material";
 
 /* ================= Pagination Actions ================= */
 function TablePaginationActions({ count, page, rowsPerPage, onPageChange }) {
@@ -10,10 +31,7 @@ function TablePaginationActions({ count, page, rowsPerPage, onPageChange }) {
         <Box sx={{ flexShrink: 0, ml: 2 }}>
             <Tooltip title="ไปหน้าแรก">
                 <span>
-                    <IconButton
-                        onClick={(e) => onPageChange(e, 0)}
-                        disabled={page === 0}
-                    >
+                    <IconButton onClick={(e) => onPageChange(e, 0)} disabled={page === 0}>
                         <FirstPage />
                     </IconButton>
                 </span>
@@ -55,6 +73,7 @@ function TablePaginationActions({ count, page, rowsPerPage, onPageChange }) {
     );
 }
 
+/* ================= comparator ================= */
 function comparator(a, b, field, order) {
     let av = a[field];
     let bv = b[field];
@@ -72,13 +91,64 @@ function comparator(a, b, field, order) {
     return order === "asc" ? av - bv : bv - av;
 }
 
-
-/* ================= TablePanel ================= */
-export default function TempMinMaxTable({ data, loading, error, onSelectStation }) {
+/* ================= Table ================= */
+export default function TempMinMaxTable({
+    data,
+    loading,
+    error,
+    onSelectStation,
+    stations,
+}) {
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [orderBy, setOrderBy] = React.useState("temperature_max_today");
     const [order, setOrder] = React.useState("desc");
+    const [searchText, setSearchText] = React.useState("");
+
+    /* ---------- filter ---------- */
+    const filteredData = React.useMemo(() => {
+        let result = data;
+
+        // station filter
+        if (stations?.length) {
+            const set = new Set(stations.map((s) => s.toLowerCase()));
+            result = result.filter((d) =>
+                set.has(d.station_name_th?.toLowerCase())
+            );
+        }
+
+        // search filter
+        if (searchText) {
+            const text = searchText.toLowerCase();
+
+            result = result.filter(
+                (d) =>
+                    d.station_name_th?.toLowerCase().includes(text) ||
+                    d.province_name_th?.toLowerCase().includes(text) ||
+                    d.region_name_th?.toLowerCase().includes(text)
+            );
+        }
+
+        return result;
+    }, [data, stations, searchText]);
+
+    /* ---------- sort ---------- */
+    const sortedData = React.useMemo(() => {
+        return [...filteredData].sort((a, b) =>
+            comparator(a, b, orderBy, order)
+        );
+    }, [filteredData, orderBy, order]);
+
+    /* ---------- reset page ---------- */
+    React.useEffect(() => {
+        setPage(0);
+    }, [filteredData.length, rowsPerPage]);
+
+    const maxPage = Math.max(
+        0,
+        Math.ceil(filteredData.length / rowsPerPage) - 1
+    );
+    const safePage = Math.min(page, maxPage);
 
     const handleSort = (field) => {
         if (orderBy === field) {
@@ -89,16 +159,22 @@ export default function TempMinMaxTable({ data, loading, error, onSelectStation 
         }
     };
 
-    const sortedData = React.useMemo(() => {
-        return [...data].sort((a, b) => comparator(a, b, orderBy, order));
-    }, [data, orderBy, order]);
-
-    React.useEffect(() => {
-        setPage(0);
-    }, [data.length, rowsPerPage]);
-
+    /* ================= UI ================= */
     return (
         <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+
+            {/* ---------- search ---------- */}
+            <Box sx={{
+                p: 1,
+                display: "flex",
+                justifyContent: {
+                    xs: "stretch",   // มือถือเต็ม
+                    sm: "flex-end",  // tablet ขึ้นไปชิดขวา
+                },
+            }}>
+                <TableSearchFilter value={searchText} onChange={setSearchText} />
+            </Box>
+
             <TableContainer sx={{ flex: 1 }}>
                 <Table>
                     <TableHead>
@@ -108,22 +184,20 @@ export default function TempMinMaxTable({ data, loading, error, onSelectStation 
                             <TableCell>จังหวัด</TableCell>
                             <TableCell>เวลา</TableCell>
 
-                            {/* MAX */}
                             <TableCell align="center">
                                 <TableSortLabel
                                     active={orderBy === "temperature_max_today"}
-                                    direction={orderBy === "temperature_max_today" ? order : "desc"}
+                                    direction={order}
                                     onClick={() => handleSort("temperature_max_today")}
                                 >
                                     สูงสุด (°C)
                                 </TableSortLabel>
                             </TableCell>
 
-                            {/* MIN */}
                             <TableCell align="center">
                                 <TableSortLabel
                                     active={orderBy === "temperature_min_today"}
-                                    direction={orderBy === "temperature_min_today" ? order : "asc"}
+                                    direction={order}
                                     onClick={() => handleSort("temperature_min_today")}
                                 >
                                     ต่ำสุด (°C)
@@ -154,7 +228,9 @@ export default function TempMinMaxTable({ data, loading, error, onSelectStation 
                         {!loading && !error && sortedData.length === 0 && (
                             <TableRow>
                                 <TableCell colSpan={6} align="center">
-                                    <Typography color="text.secondary">ไม่มีข้อมูล</Typography>
+                                    <Typography color="text.secondary">
+                                        ไม่มีข้อมูล
+                                    </Typography>
                                 </TableCell>
                             </TableRow>
                         )}
@@ -162,7 +238,10 @@ export default function TempMinMaxTable({ data, loading, error, onSelectStation 
                         {!loading &&
                             !error &&
                             sortedData
-                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                .slice(
+                                    safePage * rowsPerPage,
+                                    safePage * rowsPerPage + rowsPerPage
+                                )
                                 .map((row) => (
                                     <TableRow
                                         key={row.station_id}
@@ -170,15 +249,17 @@ export default function TempMinMaxTable({ data, loading, error, onSelectStation 
                                         sx={{ cursor: "pointer" }}
                                         onClick={() => onSelectStation(row.station_id)}
                                     >
-                                        <TableCell>{row.station_name_th}</TableCell>
-                                        <TableCell>{row.region_name_th}</TableCell>
-                                        <TableCell>{row.province_name_th}</TableCell>
-                                        <TableCell>{row.observed_time_th}</TableCell>
+                                        <TableCell>{row.station_name_th ?? "-"}</TableCell>
+                                        <TableCell>{row.region_name_th ?? "-"}</TableCell>
+                                        <TableCell>{row.province_name_th ?? "-"}</TableCell>
+                                        <TableCell>{row.observed_time_th ?? "-"}</TableCell>
+
                                         <TableCell align="center">
                                             <Box sx={{ fontWeight: 600, color: "#c62828" }}>
                                                 {row.temperature_max_today ?? "-"}
                                             </Box>
                                         </TableCell>
+
                                         <TableCell align="center">
                                             <Box sx={{ fontWeight: 600, color: "#1565c0" }}>
                                                 {row.temperature_min_today ?? "-"}
@@ -189,21 +270,25 @@ export default function TempMinMaxTable({ data, loading, error, onSelectStation 
                     </TableBody>
                 </Table>
             </TableContainer>
+
             <TablePagination
                 component="div"
                 rowsPerPageOptions={[5, 10, 20]}
-                count={sortedData.length}
+                count={filteredData.length}
                 rowsPerPage={rowsPerPage}
-                page={page}
+                page={safePage}
                 onPageChange={(e, p) => setPage(p)}
                 onRowsPerPageChange={(e) => {
                     setRowsPerPage(parseInt(e.target.value, 10));
                     setPage(0);
                 }}
                 labelRowsPerPage="แถว"
-                labelDisplayedRows={({ from, to, count }) => `${from}–${to} จาก ${count}`}
+                labelDisplayedRows={({ from, to, count }) =>
+                    `${from}–${to} จาก ${count}`
+                }
                 ActionsComponent={TablePaginationActions}
             />
+
             <Box sx={{ px: 2, pb: 1 }}>
                 <Typography variant="caption" color="text.secondary" sx={{ fontSize: { xs: 12, md: 14 } }}>
                     หมายเหตุ: ข้อมูลอุณหภูมิสูงสุด / อุณหภูมิต่ำสุด

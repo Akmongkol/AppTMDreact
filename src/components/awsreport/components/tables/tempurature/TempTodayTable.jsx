@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useMemo } from "react";
+import TableSearchFilter from "../../TableSearchFilter";
 import { FirstPage, LastPage, KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import { Box, IconButton, Tooltip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, Typography, TablePagination, TableSortLabel } from "@mui/material";
 
@@ -65,28 +66,69 @@ function getComparator(order, orderBy) {
 }
 
 /* ================= TablePanel ================= */
-export default function TempTodayTable({ data, loading, error, onSelectStation }) {
+export default function TempTodayTable({ data, loading, error, onSelectStation, stations }) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [order, setOrder] = React.useState("desc");
   const [orderBy, setOrderBy] = React.useState("temperature");
+  const [searchText, setSearchText] = React.useState("");
 
+
+  /* ---------- Filter ---------- */
+  const filteredData = useMemo(() => {
+    let result = data;
+
+    // filter station
+    if (stations?.length) {
+      const stationSet = new Set(stations.map(s => s.toLowerCase()));
+      result = result.filter(d =>
+        stationSet.has(d.station_name_th?.toLowerCase())
+      );
+    }
+    // filter search
+    if (searchText) {
+      const text = searchText.toLowerCase();
+
+      result = result.filter(d =>
+        d.station_name_th?.toLowerCase().includes(text) ||
+        d.province_name_th?.toLowerCase().includes(text) ||
+        d.region_name_th?.toLowerCase().includes(text)
+      );
+    }
+
+    return result;
+  }, [data, stations, searchText]);
+
+  /* ---------- Sort ---------- */
   const sortedData = React.useMemo(() => {
-    return [...data].sort(getComparator(order, orderBy));
-  }, [data, order, orderBy]);
+    return [...filteredData].sort(getComparator(order, orderBy));
+  }, [filteredData, order, orderBy]);
 
-  const maxPage = Math.max(
-    0,
-    Math.ceil(data.length / rowsPerPage) - 1
-  );
-
-  const safePage = Math.min(page, maxPage);
+  /* ---------- Reset page ---------- */
   React.useEffect(() => {
     setPage(0);
-  }, [data.length, rowsPerPage]);
+  }, [filteredData.length, rowsPerPage]);
+
+  const maxPage = Math.max(0, Math.ceil(filteredData.length / rowsPerPage) - 1);
+  const safePage = Math.min(page, maxPage);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+      <Box
+        sx={{
+          p: 1,
+          display: "flex",
+          justifyContent: {
+            xs: "stretch",   // มือถือเต็ม
+            sm: "flex-end",  // tablet ขึ้นไปชิดขวา
+          },
+        }}
+      >
+        <TableSearchFilter
+          value={searchText}
+          onChange={setSearchText}
+        />
+      </Box>
       <TableContainer sx={{ flex: 1 }}>
         <Table>
           <TableHead>
@@ -192,7 +234,7 @@ export default function TempTodayTable({ data, loading, error, onSelectStation }
       <TablePagination
         component="div"
         rowsPerPageOptions={[5, 10, 20]}
-        count={data.length}
+        count={filteredData.length}
         rowsPerPage={rowsPerPage}
         page={safePage}
         onPageChange={(e, p) => setPage(p)}

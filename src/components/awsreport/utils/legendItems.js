@@ -11,8 +11,8 @@ export const rainLegendItems = [
 export const tempLegendItems = [
   { label: "อากาศหนาวจัด (≤ 7.9 °C)", color: "#0041FF" },
   { label: "อากาศหนาว (8.0 – 15.9 °C)", color: "#1565c0" },
-  { label: "อากาศเย็น (16.0 – 29.9 °C)", color: "#81d4fa" },
-  { label: "อากาศปกติ (30.0 – 34.9 °C)", color: "#ffeb3b" },
+  { label: "อากาศเย็น (16.0 – 22.9 °C)", color: "#81d4fa" },
+  { label: "อากาศปกติ (23.0 – 34.9 °C)", color: "#ffeb3b" },
   { label: "อากาศร้อน (35.0 – 39.9 °C)", color: "#ff9800" },
   { label: "อากาศร้อนจัด (≥ 40.0 °C)", color: "#d32f2f" },
   { label: "ไม่มีข้อมูล", color: "#9e9e9e" },

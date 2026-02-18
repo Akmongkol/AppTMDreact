@@ -3,7 +3,7 @@ import api from "../utils/apiaws";
 import { getRainColor, getTempColor } from "../utils/useColor";
 import { formatThaiTime } from "../utils/formatTime";
 
-export function useAwsNow(region, province) {
+export function useAwsNow(region, province, station) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -31,23 +31,30 @@ export function useAwsNow(region, province) {
   }, []);
 
   const filteredData = useMemo(() => {
-    return data
-      .filter((item) => {
-        const matchRegion =
-          region === "all" || item.region_name_th === region;
+  return data
+    .filter((item) => {
+      const matchRegion =
+        region === "all" || item.region_name_th === region;
 
-        const matchProvince =
-          province === "all" || item.province_name_th === province;
+      const matchProvince =
+        province === "all" || item.province_name_th === province;
 
-        return matchRegion && matchProvince;
-      })
-      .map((item) => ({
-        ...item,
-        rainMeta: getRainColor(item.precip_today),
-        tempMeta: getTempColor(item.temperature),
-        observed_time_th: formatThaiTime(item.datetime_utc7),
-      }));
-  }, [data, region, province]);
+      const matchStation =
+        !station ||
+        item.station_name_th
+          ?.toLowerCase()
+          .includes(station.toLowerCase());
+
+      return matchRegion && matchProvince && matchStation;
+    })
+    .map((item) => ({
+      ...item,
+      rainMeta: getRainColor(item.precip_today),
+      tempMeta: getTempColor(item.temperature),
+      observed_time_th: formatThaiTime(item.datetime_utc7),
+    }));
+}, [data, region, province, station]);
+
 
   const regions = useMemo(() => {
     return [...new Set(data.map((d) => d.region_name_th))];
@@ -65,10 +72,26 @@ export function useAwsNow(region, province) {
     ];
   }, [data, region]);
 
+  const stations = useMemo(() => {
+  return [
+    ...new Set(
+      data
+        .filter(
+          (d) =>
+            (region === "all" || d.region_name_th === region) &&
+            (province === "all" || d.province_name_th === province)
+        )
+        .map((d) => d.station_name_th)
+    ),
+  ];
+}, [data, region, province]);
+
+
   return {
     filteredData,
     regions,
     provinces,
+    stations,
     loading,
     error,
     refresh: fetchData,
