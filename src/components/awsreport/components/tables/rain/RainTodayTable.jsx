@@ -93,12 +93,13 @@ export default function RainTodayTable({
   loading,
   error,
   onSelectStation,
+  searchText,
+  onSearchChange
 }) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [order, setOrder] = React.useState("desc");
   const [orderBy, setOrderBy] = React.useState("precip_today");
-  const [searchText, setSearchText] = React.useState("");
 
 
   /* ---------- Filter ---------- */
@@ -112,17 +113,6 @@ export default function RainTodayTable({
         stationSet.has(d.station_name_th?.toLowerCase())
       );
     }
-    // filter search
-    if (searchText) {
-      const text = searchText.toLowerCase();
-
-      result = result.filter(d =>
-        d.station_name_th?.toLowerCase().includes(text) ||
-        d.province_name_th?.toLowerCase().includes(text) ||
-        d.region_name_th?.toLowerCase().includes(text)
-      );
-    }
-
     return result;
   }, [data, stations, searchText]);
 
@@ -153,7 +143,7 @@ export default function RainTodayTable({
       }}>
         <TableSearchFilter
           value={searchText}
-          onChange={setSearchText}
+          onChange={onSearchChange}
         />
       </Box>
 
@@ -176,6 +166,14 @@ export default function RainTodayTable({
                       orderBy === "precip_today" && order === "asc";
                     setOrder(isAsc ? "desc" : "asc");
                     setOrderBy("precip_today");
+                  }}
+                  sx={{
+                    "& .MuiTableSortLabel-icon": {
+                      display: "none",           // ❌ ซ่อนลูกศรถาวร
+                    },
+                    "&:hover .MuiTableSortLabel-icon": {
+                      display: "inline-flex",    // 👀 โผล่เฉพาะ hover
+                    },
                   }}
                 >
                   ฝนสะสม (มม.)
@@ -268,7 +266,7 @@ export default function RainTodayTable({
 
       <Box sx={{ px: 2, pb: 1 }}>
         <Typography variant="caption" color="text.secondary" sx={{ fontSize: { xs: 12, md: 14 } }}>
-          หมายเหตุ: ข้อมูลปริมาณฝนสะสมตั้งแต่เวลา 7.00 น. ของวันนี้ จนถึงเวลาปัจจุบันของวันนี้
+          หมายเหตุ: ฝนสะสมวันนี้ หมายถึง ข้อมูลปริมาณฝนสะสมตั้งแต่เวลา 7.00 น. ของวันนี้ จนถึงเวลาปัจจุบันของวันนี้
         </Typography>
       </Box>
     </Box>

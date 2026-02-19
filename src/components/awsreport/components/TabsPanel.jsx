@@ -47,6 +47,8 @@ export default function TabsMenu({
     rainfallData,
     stations,
     rainStations,
+    searchText,
+    setSearchText,
     awsLoading,
     rainLoading,
     awsError,
@@ -168,6 +170,8 @@ export default function TabsMenu({
                             <RainTodayTable
                                 data={data}
                                 stations={stations}
+                                searchText={searchText}
+                                onSearchChange={setSearchText}
                                 loading={awsLoading}
                                 error={awsError}
                                 onSelectStation={onSelectStation}
@@ -178,6 +182,8 @@ export default function TabsMenu({
                             <RainAccYesterday
                                 data={rainfallData}
                                 stations={rainStations}
+                                searchText={searchText}
+                                onSearchChange={setSearchText}
                                 loading={rainLoading}
                                 error={rainError}
                                 onSelectStation={onSelectStation}
@@ -188,6 +194,8 @@ export default function TabsMenu({
                             <RainAccThreeday
                                 data={rainfallData}
                                 stations={rainStations}
+                                searchText={searchText}
+                                onSearchChange={setSearchText}
                                 loading={rainLoading}
                                 error={rainError}
                                 onSelectStation={onSelectStation}
@@ -197,6 +205,8 @@ export default function TabsMenu({
                             <RainAccSevenday
                                 data={rainfallData}
                                 stations={rainStations}
+                                searchText={searchText}
+                                onSearchChange={setSearchText}
                                 loading={rainLoading}
                                 error={rainError}
                                 onSelectStation={onSelectStation}
@@ -211,6 +221,8 @@ export default function TabsMenu({
                             <TempTodayTable
                                 data={data}
                                 stations={stations}
+                                searchText={searchText}
+                                onSearchChange={setSearchText}
                                 loading={awsLoading}
                                 error={awsError}
                                 onSelectStation={onSelectStation}
@@ -221,6 +233,8 @@ export default function TabsMenu({
                             <TempMinMaxTable
                                 data={data}
                                 stations={stations}
+                                searchText={searchText}
+                                onSearchChange={setSearchText}
                                 loading={awsLoading}
                                 error={awsError}
                                 onSelectStation={onSelectStation}

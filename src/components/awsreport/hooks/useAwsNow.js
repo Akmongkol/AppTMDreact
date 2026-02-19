@@ -3,7 +3,7 @@ import api from "../utils/apiaws";
 import { getRainColor, getTempColor } from "../utils/useColor";
 import { formatThaiTime } from "../utils/formatTime";
 
-export function useAwsNow(region, province, station) {
+export function useAwsNow(region, province, station, searchText) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -31,29 +31,37 @@ export function useAwsNow(region, province, station) {
   }, []);
 
   const filteredData = useMemo(() => {
-  return data
-    .filter((item) => {
-      const matchRegion =
-        region === "all" || item.region_name_th === region;
+    const text = searchText?.toLowerCase();
 
-      const matchProvince =
-        province === "all" || item.province_name_th === province;
+    return data
+      .filter((item) => {
+        const matchRegion =
+          region === "all" || item.region_name_th === region;
 
-      const matchStation =
-        !station ||
-        item.station_name_th
-          ?.toLowerCase()
-          .includes(station.toLowerCase());
+        const matchProvince =
+          province === "all" || item.province_name_th === province;
 
-      return matchRegion && matchProvince && matchStation;
-    })
-    .map((item) => ({
-      ...item,
-      rainMeta: getRainColor(item.precip_today),
-      tempMeta: getTempColor(item.temperature),
-      observed_time_th: formatThaiTime(item.datetime_utc7),
-    }));
-}, [data, region, province, station]);
+        const matchStation =
+          !station ||
+          item.station_name_th
+            ?.toLowerCase()
+            .includes(station.toLowerCase());
+
+        const matchSearch =
+          !text ||
+          item.station_name_th?.toLowerCase().includes(text) ||
+          item.province_name_th?.toLowerCase().includes(text) ||
+          item.region_name_th?.toLowerCase().includes(text);
+
+        return matchRegion && matchProvince && matchStation && matchSearch;
+      })
+      .map((item) => ({
+        ...item,
+        rainMeta: getRainColor(item.precip_today),
+        tempMeta: getTempColor(item.temperature),
+        observed_time_th: formatThaiTime(item.datetime_utc7),
+      }));
+  }, [data, region, province, station, searchText]);
 
 
   const regions = useMemo(() => {
@@ -73,18 +81,9 @@ export function useAwsNow(region, province, station) {
   }, [data, region]);
 
   const stations = useMemo(() => {
-  return [
-    ...new Set(
-      data
-        .filter(
-          (d) =>
-            (region === "all" || d.region_name_th === region) &&
-            (province === "all" || d.province_name_th === province)
-        )
-        .map((d) => d.station_name_th)
-    ),
-  ];
-}, [data, region, province]);
+    return [...new Set(filteredData.map(d => d.station_name_th))];
+  }, [filteredData]);
+
 
 
   return {

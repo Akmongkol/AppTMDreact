@@ -66,12 +66,11 @@ function getComparator(order, orderBy) {
 }
 
 /* ================= TablePanel ================= */
-export default function TempTodayTable({ data, loading, error, onSelectStation, stations }) {
+export default function TempTodayTable({ data, loading, error, onSelectStation, stations, searchText, onSearchChange }) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [order, setOrder] = React.useState("desc");
   const [orderBy, setOrderBy] = React.useState("temperature");
-  const [searchText, setSearchText] = React.useState("");
 
 
   /* ---------- Filter ---------- */
@@ -83,16 +82,6 @@ export default function TempTodayTable({ data, loading, error, onSelectStation, 
       const stationSet = new Set(stations.map(s => s.toLowerCase()));
       result = result.filter(d =>
         stationSet.has(d.station_name_th?.toLowerCase())
-      );
-    }
-    // filter search
-    if (searchText) {
-      const text = searchText.toLowerCase();
-
-      result = result.filter(d =>
-        d.station_name_th?.toLowerCase().includes(text) ||
-        d.province_name_th?.toLowerCase().includes(text) ||
-        d.region_name_th?.toLowerCase().includes(text)
       );
     }
 
@@ -126,7 +115,7 @@ export default function TempTodayTable({ data, loading, error, onSelectStation, 
       >
         <TableSearchFilter
           value={searchText}
-          onChange={setSearchText}
+          onChange={onSearchChange}
         />
       </Box>
       <TableContainer sx={{ flex: 1 }}>
@@ -250,7 +239,7 @@ export default function TempTodayTable({ data, loading, error, onSelectStation, 
       />
       <Box sx={{ px: 2, pb: 1 }}>
         <Typography variant="caption" color="text.secondary" sx={{ fontSize: { xs: 12, md: 14 } }}>
-          หมายเหตุ: ข้อมูลอุณหภูมิ ณ เวลาปัจจุบัน
+          หมายเหตุ: อุณหภูมิปัจจุบัน หมายถึง ข้อมูลอุณหภูมิ ณ เวลาปัจจุบัน
         </Typography>
       </Box>
     </Box>

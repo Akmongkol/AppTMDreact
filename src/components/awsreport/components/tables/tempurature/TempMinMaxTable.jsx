@@ -98,12 +98,13 @@ export default function TempMinMaxTable({
     error,
     onSelectStation,
     stations,
+    searchText,
+    onSearchChange
 }) {
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [orderBy, setOrderBy] = React.useState("temperature_max_today");
     const [order, setOrder] = React.useState("desc");
-    const [searchText, setSearchText] = React.useState("");
 
     /* ---------- filter ---------- */
     const filteredData = React.useMemo(() => {
@@ -114,18 +115,6 @@ export default function TempMinMaxTable({
             const set = new Set(stations.map((s) => s.toLowerCase()));
             result = result.filter((d) =>
                 set.has(d.station_name_th?.toLowerCase())
-            );
-        }
-
-        // search filter
-        if (searchText) {
-            const text = searchText.toLowerCase();
-
-            result = result.filter(
-                (d) =>
-                    d.station_name_th?.toLowerCase().includes(text) ||
-                    d.province_name_th?.toLowerCase().includes(text) ||
-                    d.region_name_th?.toLowerCase().includes(text)
             );
         }
 
@@ -172,7 +161,10 @@ export default function TempMinMaxTable({
                     sm: "flex-end",  // tablet ขึ้นไปชิดขวา
                 },
             }}>
-                <TableSearchFilter value={searchText} onChange={setSearchText} />
+                <TableSearchFilter
+                    value={searchText}
+                    onChange={onSearchChange}
+                />
             </Box>
 
             <TableContainer sx={{ flex: 1 }}>
@@ -291,7 +283,7 @@ export default function TempMinMaxTable({
 
             <Box sx={{ px: 2, pb: 1 }}>
                 <Typography variant="caption" color="text.secondary" sx={{ fontSize: { xs: 12, md: 14 } }}>
-                    หมายเหตุ: ข้อมูลอุณหภูมิสูงสุด / อุณหภูมิต่ำสุด
+                    หมายเหตุ: อุณหภูมิสูงสุด / อุณหภูมิต่ำสุด หมายถึง ข้อมูลอุณหภูมิสูงสุด / อุณหภูมิต่ำสุด
                 </Typography>
             </Box>
         </Box>

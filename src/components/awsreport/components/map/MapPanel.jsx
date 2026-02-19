@@ -9,7 +9,6 @@ import MapOverlay from "./MapOverlay";
 
 export default function MapPanel({
   data,
-  rainfallData,
   loading,
   error,
   region,
@@ -23,14 +22,6 @@ export default function MapPanel({
     () => getAreaGeo(region, province),
     [region, province]
   );
-
-  /* ---------- dataset ที่ map ใช้จริง ---------- */
-  const mapData =
-    metric === "temp"
-      ? data || []
-      : tabIndex === 1 || tabIndex === 2 || tabIndex === 3
-        ? rainfallData || []
-        : data || [];
 
   return (
     <>
@@ -46,7 +37,7 @@ export default function MapPanel({
           />
           {!loading && !error && (
             <MapLayers
-              data={mapData}
+              data={data}
               areaGeo={areaGeo}
               region={region}
               province={province}

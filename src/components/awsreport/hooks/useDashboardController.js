@@ -7,15 +7,16 @@ export function useDashboardController() {
   const [region, setRegion] = React.useState("all");
   const [province, setProvince] = React.useState("all");
   const [station, setStation] = React.useState("");
+  const [searchText, setSearchText] = React.useState("");
 
   /* ---------------- metric state ---------------- */
   const [metric, setMetric] = React.useState("rain");
 
   /* ---------------- api hooks ---------------- */
-  const aws = useAwsNow(region, province, station);
-  const rain = useApiRainfall(region, province, station);
+  const aws = useAwsNow(region, province, station, searchText);
+  const rain = useApiRainfall(region, province, station, searchText);
 
-  /* ---------------- tab state per metric ---------------- */
+  /* ---------------- tab state ---------------- */
   const [tabs, setTabs] = React.useState({
     rain: 0,
     temp: 0,
@@ -24,37 +25,45 @@ export function useDashboardController() {
   const activeTab = tabs[metric];
 
   const setActiveTab = (newTab) => {
-    setTabs((prev) => ({
+    setTabs(prev => ({
       ...prev,
       [metric]: newTab,
     }));
   };
 
-  /* ---------------- station selection ---------------- */
+  /* ---------------- selected station ---------------- */
   const [selectedStation, setSelectedStation] = React.useState(null);
 
-  /* ---------------- refresh all ---------------- */
+  /* ---------------- refresh ---------------- */
   const refreshAll = () => {
     aws.refresh();
     rain.refresh();
   };
 
-  /* ---------------- map loading + error ---------------- */
+  /* ---------------- loading + error ---------------- */
   const mapLoading =
     metric === "temp"
       ? aws.loading
       : activeTab === 0
-        ? aws.loading
-        : rain.loading;
+      ? aws.loading
+      : rain.loading;
 
   const mapError =
     metric === "temp"
       ? aws.error
       : activeTab === 0
-        ? aws.error
-        : rain.error;
+      ? aws.error
+      : rain.error;
 
-  /* ---------------- return controller ---------------- */
+  /* ---------------- map data ---------------- */
+  const mapData =
+    metric === "temp"
+      ? aws.filteredData
+      : activeTab === 0
+      ? aws.filteredData
+      : rain.rainfallData;
+
+  /* ---------------- return ---------------- */
   return {
     state: {
       region,
@@ -63,6 +72,7 @@ export function useDashboardController() {
       metric,
       activeTab,
       selectedStation,
+      searchText,
     },
 
     actions: {
@@ -72,6 +82,7 @@ export function useDashboardController() {
       setMetric,
       setActiveTab,
       setSelectedStation,
+      setSearchText,
       refreshAll,
     },
 
@@ -83,6 +94,7 @@ export function useDashboardController() {
     derived: {
       mapLoading,
       mapError,
+      mapData,
     },
   };
 }

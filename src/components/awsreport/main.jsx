@@ -22,10 +22,10 @@ export default function Main() {
       />
 
       <Grid container spacing={2}>
+        {/* MAP */}
         <Grid size={{ xs: 12, md: 4 }}>
           <MapPanel
-            data={ctrl.data.aws.filteredData}
-            rainfallData={ctrl.data.rain.rainfallData}
+            data={ctrl.derived.mapData}
             loading={ctrl.derived.mapLoading}
             error={ctrl.derived.mapError}
             region={ctrl.state.region}
@@ -37,12 +37,15 @@ export default function Main() {
           />
         </Grid>
 
+        {/* TABLE */}
         <Grid size={{ xs: 12, md: 8 }}>
           <TabsPanel
             data={ctrl.data.aws.filteredData}
             rainfallData={ctrl.data.rain.rainfallData}
             stations={ctrl.data.aws.stations}
             rainStations={ctrl.data.rain.stations}
+            searchText={ctrl.state.searchText}
+            setSearchText={ctrl.actions.setSearchText}
             awsLoading={ctrl.data.aws.loading}
             rainLoading={ctrl.data.rain.loading}
             awsError={ctrl.data.aws.error}
